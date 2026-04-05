@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V.I.A – Principal</title>
+  <!-- CSS compartido (nav + footer) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/usuarios/base_usuarios.css') }}" />
+  <!-- CSS propio de esta página -->
+  <link rel="stylesheet" href="/static/css/index.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ══ NAV LATERAL (molde) ══ -->
+  {% set active_page = 'principal' %}
+  {% include 'usuarios/_nav.html' %}  <!--flask-->
+
+  <!-- ══ CONTENEDOR PRINCIPAL ══ -->
+  <div class="layout-wrapper">
+
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+
+      <!-- boton escudo -->
+      <a href="/usuarios/institucion" class="topbar-shield-link" aria-label="Información de la institución">
+        <div class="topbar-shield">
+          <span class="ts-top">EXCELSIOR</span>
+          <div class="ts-stars">★ ★</div>
+          <div class="ts-sun">☀</div>
+          <span class="ts-bottom">LICEO T.</span>
+        </div>
+      </a>
+
+      <span class="topbar-spacer"></span>
+
+      <!-- Perfil (derecha) -->
+      <div class="profile-menu-wrapper">
+        <button class="profile-btn" id="profileBtn" aria-label="Menú de usuario" aria-expanded="false">
+          {% if current_user.foto %}
+            <img src="{{ current_user.foto }}" alt="Foto de perfil" class="profile-photo" />
+          {% else %}
+            <!-- Ícono genérico si no hay foto -->
+            <svg class="profile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="8" r="4"/>
+              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+          {% endif %}
+        </button>
+
+        <!-- click al perfil -->
+        <div class="profile-dropdown" id="profileDropdown" aria-hidden="true">
+          <a href="/usuarios/perfil" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Perfil
+          </a>
+          <a href="/usuarios/configuracion" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Configuración
+          </a>
+          <a href="/usuarios/cambiar-contrasena" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Cambiar contraseña
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="/logout" class="dropdown-item dropdown-item--danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Cerrar sesión
+          </a>
+        </div>
+      </div>
+
+    </header>
+
+    <!-- ── MAIN ── -->
+    <main class="main-content">
+
+      <!-- Filtro por año -->
+      <section class="filter-section">
+        <h2 class="filter-label">AÑO</h2>
+        <div class="search-bar-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="number"
+            id="filtroAno"
+            class="search-bar"
+            placeholder="Ej: 2023"
+            min="1967"
+            max="2027"
+          />
+          <button class="search-btn" id="btnBuscarAno" type="button">BUSCAR</button>
+        </div>
+      </section>
+<!--definir carrusel
+      <!-- Carrusel de promociones 
+      <section class="carousel-section" aria-label="Promociones">
+        <button class="carousel-arrow carousel-arrow--prev" id="prevBtn" aria-label="Anterior">&#8249;</button>
+
+        <div class="carousel-track-wrapper">
+          <div class="carousel-track" id="carouselTrack">
+
+            <!-- Cada tarjeta es una promoción -->
+            <!-- En Flask esto sería un {% for promo in promociones %} 
+
+            <a href="/usuarios/promocion/2024" class="promo-card">
+              <div class="promo-img-wrapper">
+                <img src="{{ url_for('static', filename='img/promociones/2024.jpg') }}"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                     alt="Promoción 2024" class="promo-img" />
+                <div class="promo-img-placeholder">
+                  <span>PROMOCIÓN</span>
+                </div>
+              </div>
+              <div class="promo-label">Promoción 2024</div>
+            </a>
+
+            <a href="/usuarios/promocion/2023" class="promo-card">
+              <div class="promo-img-wrapper">
+                <img src="{{ url_for('static', filename='img/promociones/2023.jpg') }}"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                     alt="Promoción 2023" class="promo-img" />
+                <div class="promo-img-placeholder">
+                  <span>PROMOCIÓN</span>
+                </div>
+              </div>
+              <div class="promo-label">Promoción 2023</div>
+            </a>
+
+            <a href="/usuarios/promocion/2022" class="promo-card">
+              <div class="promo-img-wrapper">
+                <img src="{{ url_for('static', filename='img/promociones/2022.jpg') }}"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                     alt="Promoción 2022" class="promo-img" />
+                <div class="promo-img-placeholder">
+                  <span>PROMOCIÓN</span>
+                </div>
+              </div>
+              <div class="promo-label">Promoción 2022</div>
+            </a>
+
+            <a href="/usuarios/promocion/2021" class="promo-card">
+              <div class="promo-img-wrapper">
+                <img src="{{ url_for('static', filename='img/promociones/2021.jpg') }}"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                     alt="Promoción 2021" class="promo-img" />
+                <div class="promo-img-placeholder">
+                  <span>PROMOCIÓN</span>
+                </div>
+              </div>
+              <div class="promo-label">Promoción 2021</div>
+            </a>
+
+            <a href="/usuarios/promocion/2020" class="promo-card">
+              <div class="promo-img-wrapper">
+                <img src="{{ url_for('static', filename='img/promociones/2020.jpg') }}"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                     alt="Promoción 2020" class="promo-img" />
+                <div class="promo-img-placeholder">
+                  <span>PROMOCIÓN</span>
+                </div>
+              </div>
+              <div class="promo-label">Promoción 2020</div>
+            </a>
+
+            <a href="/usuarios/promocion/2019" class="promo-card">
+              <div class="promo-img-wrapper">
+                <img src="{{ url_for('static', filename='img/promociones/2019.jpg') }}"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                     alt="Promoción 2019" class="promo-img" />
+                <div class="promo-img-placeholder">
+                  <span>PROMOCIÓN</span>
+                </div>
+              </div>
+              <div class="promo-label">Promoción 2019</div>
+            </a>
+
+          </div>
+        </div>
+
+        <button class="carousel-arrow carousel-arrow--next" id="nextBtn" aria-label="Siguiente">&#8250;</button>
+      </section>
+
+      <!-- Indicadores del carrusel 
+      <div class="carousel-dots" id="carouselDots"></div>
+-->
+    </main>
+
+    <!-- ══ FOOTER (molde) ══ -->
+    {% include 'usuarios/_footer.html' %}
+
+  </div><!-- /layout-wrapper -->
+
+  <script>
+    /* ──  perfil ── */
+    const profileBtn      = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    profileBtn.addEventListener('click', () => {
+      const open = profileDropdown.classList.toggle('open');
+      profileBtn.setAttribute('aria-expanded', open);
+      profileDropdown.setAttribute('aria-hidden', !open);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.remove('open');
+        profileBtn.setAttribute('aria-expanded', false);
+        profileDropdown.setAttribute('aria-hidden', true);
+      }
+    });
+
+    /* ──  (sidebar) ── */
+    const navToggle  = document.getElementById('navToggle');
+    const sidebarNav = document.getElementById('sidebarNav');
+
+    navToggle.addEventListener('click', () => {
+      sidebarNav.classList.toggle('open');
+    });
+
+    /* ── Carrusel ── */
+    const track    = document.getElementById('carouselTrack');
+    const prevBtn  = document.getElementById('prevBtn');
+    const nextBtn  = document.getElementById('nextBtn');
+    const dotsWrap = document.getElementById('carouselDots');
+    const cards    = track.querySelectorAll('.promo-card');
+    const visible  = 3; // tarjetas visibles a la vez
+    let current    = 0;
+    const total    = Math.ceil(cards.length / visible);
+
+    // Crear dots
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement('button');
+      d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', `Página ${i + 1}`);
+      d.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(d);
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(index, total - 1));
+      const offset = current * (100 / visible) * visible;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+
+    /* ── Buscar por año ── */
+    document.getElementById('btnBuscarAno').addEventListener('click', () => {
+      const ano = document.getElementById('filtroAno').value.trim();
+      if (ano) window.location.href = `/usuarios/promocion/${ano}`;
+    });
+
+    document.getElementById('filtroAno').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('btnBuscarAno').click();
+    });
+  </script>
+
+</body>
+</html>

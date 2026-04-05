@@ -1,0 +1,383 @@
+/* ============================================================
+   V.I.A — index.css
+   /static/css/usuarios/index.css
+   Estilos propios de la página principal de usuarios.
+   ============================================================ */
+
+/* ── Variables heredadas ── */
+:root {
+  --verde-oscuro:   #0d2318;
+  --verde-base:     #1a3d2b;
+  --verde-medio:    #22502f;
+  --verde-claro:    #2e6b3e;
+  --oro:            #c9a227;
+  --oro-claro:      #f0c84a;
+  --blanco:         #ffffff;
+  --nav-width:      120px;
+  --topbar-height:  60px;
+  --fuente-display: 'Cinzel', serif;
+  --fuente-serif:   'Playfair Display', Georgia, serif;
+  --fuente-cuerpo:  'Lato', sans-serif;
+}
+
+/* ── Layout general ── */
+.layout-wrapper {
+  margin-left: var(--nav-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ════════════════════════════
+   TOPBAR
+   ════════════════════════════ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--topbar-height);
+  background: linear-gradient(90deg, var(--verde-base) 0%, var(--verde-medio) 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 1.2rem 0 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+}
+
+.topbar-spacer { flex: 1; }
+
+/* Escudo en topbar */
+.topbar-shield-link { text-decoration: none; flex-shrink: 0; }
+
+.topbar-shield {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(145deg, var(--verde-claro), var(--verde-oscuro));
+  border: 2px solid var(--oro);
+  border-radius: 3px 3px 40% 40% / 3px 3px 24% 24%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  box-shadow: 0 0 10px rgba(201,162,39,0.35);
+  transition: transform 0.18s;
+}
+
+.topbar-shield:hover { transform: scale(1.08); }
+
+.ts-top, .ts-bottom {
+  font-family: var(--fuente-display);
+  font-size: 0.22rem;
+  letter-spacing: 0.05em;
+  color: var(--oro-claro);
+}
+.ts-stars { color: var(--oro); font-size: 0.44rem; letter-spacing: 0.15em; }
+.ts-sun   { font-size: 0.72rem; color: var(--oro-claro); line-height: 1; }
+
+/* ── Perfil ── */
+.profile-menu-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.10);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s, background 0.18s;
+  overflow: hidden;
+  padding: 0;
+}
+
+.profile-btn:hover {
+  border-color: var(--oro-claro);
+  background: rgba(255,255,255,0.18);
+}
+
+.profile-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-icon {
+  width: 22px;
+  height: 22px;
+  color: rgba(255,255,255,0.85);
+}
+
+/* Dropdown */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 200px;
+  background: var(--blanco);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.20s, transform 0.20s;
+  z-index: 300;
+}
+
+.profile-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.82rem;
+  color: #2a2a2a;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.dropdown-item:hover { background: #f0f4ee; }
+
+.dropdown-item svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--verde-base);
+  flex-shrink: 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e8e8e8;
+  margin: 0.2rem 0;
+}
+
+.dropdown-item--danger       { color: #c0392b; }
+.dropdown-item--danger svg   { stroke: #c0392b; }
+.dropdown-item--danger:hover { background: #fdf0ee; }
+
+/* ════════════════════════════
+   MAIN CONTENT
+   ════════════════════════════ */
+.main-content {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  background: #f4f6f2;
+}
+
+/* ── Filtro por año ── */
+.filter-section {
+  margin-bottom: 2rem;
+}
+
+.filter-label {
+  font-family: var(--fuente-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: var(--verde-base);
+  margin-bottom: 0.6rem;
+}
+
+.search-bar-wrapper {
+  display: flex;
+  align-items: center;
+  background: #d8e6c8;
+  border-radius: 50px;
+  padding: 0.45rem 1rem;
+  gap: 0.6rem;
+  max-width: 480px;
+}
+
+.search-icon {
+  width: 17px;
+  height: 17px;
+  stroke: var(--verde-base);
+  flex-shrink: 0;
+}
+
+.search-bar {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.9rem;
+  color: var(--verde-oscuro);
+  outline: none;
+}
+
+.search-bar::placeholder { color: rgba(26,61,43,0.45); }
+
+/* Ocultar flechas del input number */
+.search-bar::-webkit-outer-spin-button,
+.search-bar::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+.search-bar[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+.search-btn {
+  background: var(--verde-base);
+  color: var(--blanco);
+  border: none;
+  border-radius: 50px;
+  padding: 0.38rem 1rem;
+  font-family: var(--fuente-display);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.search-btn:hover { background: var(--verde-oscuro); }
+
+/* ── Carrusel ── */
+.carousel-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.carousel-track-wrapper {
+  flex: 1;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1.2rem;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tarjeta de promoción */
+.promo-card {
+  flex: 0 0 calc((100% - 2.4rem) / 3);
+  text-decoration: none;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--blanco);
+  box-shadow: 0 3px 14px rgba(0,0,0,0.10);
+  transition: transform 0.22s, box-shadow 0.22s;
+  display: flex;
+  flex-direction: column;
+}
+
+.promo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+}
+
+.promo-img-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #c8d8b8;
+  overflow: hidden;
+}
+
+.promo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder cuando no hay imagen */
+.promo-img-placeholder {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #c8d8b8, #a8c898);
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.promo-img-placeholder span {
+  font-family: var(--fuente-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: var(--verde-base);
+  opacity: 0.7;
+}
+
+.promo-label {
+  padding: 0.7rem 0.9rem;
+  font-family: var(--fuente-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--verde-base);
+  text-align: center;
+  border-top: 1px solid #eee;
+}
+
+/* Flechas del carrusel */
+.carousel-arrow {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--verde-base);
+  background: var(--blanco);
+  color: var(--verde-base);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.18s, color 0.18s;
+}
+
+.carousel-arrow:hover {
+  background: var(--verde-base);
+  color: var(--blanco);
+}
+
+/* Dots */
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: #c0cebc;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s;
+  padding: 0;
+}
+
+.carousel-dot.active {
+  background: var(--verde-base);
+  transform: scale(1.3);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .promo-card { flex: 0 0 calc((100% - 1.2rem) / 2); }
+}
+
+@media (max-width: 768px) {
+  .layout-wrapper { margin-left: 0; }
+
+  .main-content { padding: 1.5rem 1rem; }
+
+  .promo-card { flex: 0 0 100%; }
+
+  .search-bar-wrapper { max-width: 100%; }
+}
