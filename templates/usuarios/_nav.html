@@ -1,0 +1,43 @@
+<!-- ============================================================
+     MOLDE NAV — Usuarios
+     Uso: {% include 'usuarios/_nav.html' %}
+     ============================================================ -->
+
+<aside class="sidebar-nav" id="sidebarNav">
+
+  <!-- Botón toggle (hamburger) -->
+  <button class="nav-toggle" id="navToggle" aria-label="Abrir o cerrar menú">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <!-- Escudo / logo -->
+  <a href="/static/img/" class="nav-shield-link" aria-label="Información de la institución">
+    <div class="nav-shield">
+      <span class="ns-top">EXCELSIOR</span>
+      <div class="ns-stars">★ ★</div>
+      <div class="ns-sun">☀</div>
+      <span class="ns-bottom">LICEO T.</span>
+    </div>
+  </a>
+
+  <!-- Enlaces -->
+  <nav aria-label="Menú de usuarios">
+    <ul class="nav-list">
+      <li class="nav-item {% if active_page == 'principal' %}active{% endif %}">
+        <a href="/templates/index.html" class="nav-link">PRINCIPAL</a>
+      </li>
+      <li class="nav-item {% if active_page == 'actualizar' %}active{% endif %}">
+        <a href="/templates/perfil.html class="nav-link">ACTUALIZAR INFORMACIÓN</a>
+      </li>
+      <li class="nav-item {% if active_page == 'ayuda' %}active{% endif %}">
+        <a href="/templates/ayuda.html" class="nav-link">AYUDA</a>
+      </li>
+      <li class="nav-item {% if active_page == 'comentarios' %}active{% endif %}">
+        <a href="/templates/comentarios.html" class="nav-link">COMENTARIOS</a>
+      </li>
+    </ul>
+  </nav>
+
+</aside>
