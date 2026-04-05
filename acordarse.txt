@@ -1,0 +1,1 @@
+para enviar un focking git se usa git commit -m "mensaje" 
