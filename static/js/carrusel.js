@@ -1,8 +1,4 @@
-/* ============================================================
-   carrusel.js — /static/js/carrusel.js
-   Lógica del carrusel de promociones y del filtro por año.
-   Solo se usa en: /templates/usuarios/index.html
-   ============================================================ */
+
 
 /* ── Carrusel ── */
 const track    = document.getElementById('carouselTrack');

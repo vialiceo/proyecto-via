@@ -1,8 +1,4 @@
-/* ============================================================
-   perfil.js — /static/js/perfil.js
-   Dropdown del menú de perfil (compartido en todas las
-   páginas del área de usuarios).
-   ============================================================ */
+
 
 const profileBtn      = document.getElementById('profileBtn');
 const profileDropdown = document.getElementById('profileDropdown');

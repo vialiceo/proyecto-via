@@ -1,1 +1,22 @@
-para enviar un focking git se usa git commit -m "mensaje" 
+para enviar un focking git se usa git commit -m "mensaje" y luego git push
+ si no se puede hacer push es por que hay cambios en el servidor y se debe usar 
+ git pull y luego git push
+ 
+
+
+ en index, contacto y login hay partes de integracion de flask que se tienen acomodar apenas cree la db 
+
+ actualizar flask
+
+ no putear mysql pq no registra la contraseña :,v
+
+ rezar que mis compañeros hagan algo
+
+ claude es mi salvacion y tokens no me faltaran
+
+ creo que esta quedando un poquito pesado el sitio :v
+ ya que al menos me gusta como quedando
+
+ profes si ven esto diganle a karla que colabore POR FAVOR 
+
+ 
