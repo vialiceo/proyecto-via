@@ -12,7 +12,7 @@
 
   <div class="layout-wrapper">
 
-    <!-- ══ TOPBAR ══ -->
+
     <header class="topbar">
       <a href="{{ url_for('public.index') }}" class="topbar-shield-link" aria-label="Información de la institución">
         <div class="topbar-shield">
@@ -23,7 +23,7 @@
         </div>
       </a>
 
-      <!-- Tabs de navegación interna -->
+
       <nav class="page-tabs" aria-label="Secciones de la página">
         <a href="#contacto" class="page-tab active" data-section="contacto">Contacto</a>
         <a href="#equipo"   class="page-tab"        data-section="equipo">Equipo de trabajo</a>
@@ -63,12 +63,10 @@
       </div>
     </header>
 
-    <!-- ══ MAIN ══ -->
+
     <main class="main-content">
 
-      <!-- ─────────────────────────────
-           SECCIÓN 1 — CONTACTO
-           ───────────────────────────── -->
+
       <section class="seccion" id="contacto">
 
         <div class="seccion-header">
@@ -81,7 +79,7 @@
 
         <div class="contacto-grid">
 
-          <!-- Tarjeta: Institución -->
+
           <div class="contacto-bloque">
             <div class="bloque-header">
               <div class="bloque-icono bloque-icono--verde">
@@ -129,7 +127,7 @@
               </li>
             </ul>
 
-            <!-- Redes sociales institución -->
+
             <div class="redes-titulo">Redes sociales</div>
             <div class="redes-grupo">
               <a href="#" class="red-btn red-btn--ig" aria-label="Instagram">
@@ -147,7 +145,7 @@
             </div>
           </div>
 
-          <!-- Tarjeta: V.I.A -->
+
           <div class="contacto-bloque contacto-bloque--via">
             <div class="bloque-header">
               <div class="bloque-icono bloque-icono--oro">
@@ -192,7 +190,7 @@
 
         </div>
 
-        <!-- ── Formulario: canal de soporte ── -->
+
         <div class="contacto-bloque contacto-bloque--form" id="soporte">
           <div class="bloque-header">
             <div class="bloque-icono bloque-icono--oro">
@@ -236,12 +234,10 @@
         </div>
       </section>
 
-      <!-- Divisor entre secciones -->
+
       <div class="seccion-divisor"></div>
 
-      <!-- ─────────────────────────────
-           SECCIÓN 2 — EQUIPO
-           ───────────────────────────── -->
+
       <section class="seccion" id="equipo">
 
         <div class="seccion-header">
@@ -253,9 +249,9 @@
           </p>
         </div>
 
-        <!-- Tarjetas del equipo -->
-        <!-- JS cargará estas tarjetas desde la API cuando esté disponible -->
-        <!-- Por ahora se usan tarjetas estáticas de placeholder -->
+
+
+
         <div class="equipo-grid" id="equipoGrid">
 
           <div class="miembro-card">
@@ -322,7 +318,7 @@
 
     {% include 'usuarios/_footer.html' %}
 
-  </div><!-- /layout-wrapper -->
+  </div>
 
   <script src="/static/js/perfil.js"></script>
   <script src="/static/js/contacto.js"></script>

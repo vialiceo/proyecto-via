@@ -1,13 +1,3 @@
-"""
-API REST /api/v1 — JSON puro, pensada para que admin.js/perfil.js/
-comentarios.js la consuman por fetch() sin recargar la página.
-
-Todo lo que escribe (POST/PUT/PATCH/DELETE) pasa por Flask-WTF CSRF:
-el front debe mandar el header X-CSRFToken con el valor que expone
-templates/usuarios/_layout.html en <meta name="csrf-token">.
-
-Convención de respuestas: éxito -> {"data": ...}; error -> {"error": "..."}.
-"""
 import mysql.connector
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
@@ -26,9 +16,6 @@ def _ok(data, codigo=200):
     return jsonify(data=data), codigo
 
 
-# ================================================================
-# Perfil propio
-# ================================================================
 @api_bp.route("/perfil", methods=["GET"])
 @login_required
 def perfil_get():
@@ -55,9 +42,6 @@ def perfil_put():
     return _ok(experiencia.construir_vista_perfil(current_user.id))
 
 
-# ================================================================
-# Comentarios
-# ================================================================
 @cache.memoize(timeout=30)
 def _comentarios_api_cacheados(pagina):
     return models.listar_comentarios_visibles(pagina=pagina, por_pagina=20)
@@ -84,9 +68,6 @@ def comentarios_post():
     return _ok({"id": comentario_id}, 201)
 
 
-# ================================================================
-# Soporte (público: no requiere login)
-# ================================================================
 @api_bp.route("/soporte", methods=["POST"])
 @limiter.limit("6 per hour")
 def soporte_post():
@@ -110,9 +91,6 @@ def soporte_post():
     return _ok({"id": ticket_id}, 201)
 
 
-# ================================================================
-# Admin — usuarios
-# ================================================================
 @api_bp.route("/admin/usuarios", methods=["GET"])
 @utils.admin_required
 def admin_usuarios_get():
@@ -222,9 +200,6 @@ def admin_usuario_bitacora(usuario_id):
     return _ok(models.listar_bitacora_usuario(usuario_id, pagina=pagina, por_pagina=por_pagina))
 
 
-# ================================================================
-# Admin — comentarios (moderación)
-# ================================================================
 @api_bp.route("/admin/comentarios", methods=["GET"])
 @utils.admin_required
 def admin_comentarios_get():
@@ -249,9 +224,6 @@ def admin_comentario_patch(comentario_id):
     return _ok({"id": comentario_id, "estado": estado})
 
 
-# ================================================================
-# Admin — soporte (tickets)
-# ================================================================
 @api_bp.route("/admin/soporte", methods=["GET"])
 @utils.admin_required
 def admin_soporte_get():

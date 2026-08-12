@@ -1,16 +1,12 @@
-
-
-/* ── Carrusel ── */
 const track    = document.getElementById('carouselTrack');
 const prevBtn  = document.getElementById('prevBtn');
 const nextBtn  = document.getElementById('nextBtn');
 const dotsWrap = document.getElementById('carouselDots');
 const cards    = track.querySelectorAll('.promo-card');
-const visible  = 3; // tarjetas visibles a la vez
+const visible  = 3;
 let current    = 0;
 const total    = Math.ceil(cards.length / visible);
 
-/* Crear dots */
 for (let i = 0; i < total; i++) {
   const dot = document.createElement('button');
   dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
@@ -30,7 +26,6 @@ function goTo(index) {
 prevBtn.addEventListener('click', () => goTo(current - 1));
 nextBtn.addEventListener('click', () => goTo(current + 1));
 
-/* ── Filtro por año ── */
 document.getElementById('btnBuscarAno').addEventListener('click', () => {
   const ano = document.getElementById('filtroAno').value.trim();
   if (ano) window.location.href = `/usuarios/promocion/${ano}`;

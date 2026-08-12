@@ -1,9 +1,3 @@
-"""
-Sitio público: portada (ayuda.html para visitantes / index.html para
-quien ya inició sesión), la página de contacto (con el formulario que
-alimenta soporte_tickets) y el registro de canal telefónico si alguna
-vez se agrega.
-"""
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 
@@ -22,8 +16,6 @@ def index():
 
 @cache.memoize(timeout=180)
 def _promociones_recientes_cacheadas():
-    """Las 4 promociones del carrusel de la portada. Se calculan una vez
-    cada 3 minutos, no en cada carga de index.html."""
     return models.listar_promociones_recientes(limite=4)
 
 

@@ -39,6 +39,18 @@ Cuentas de prueba (ver `database/datos.sql`, contraseñas solo para desarrollo):
 
 Ambas piden cambiar la contraseña en el primer ingreso.
 
+## Variables de entorno (`.env`, ver `.env.example`)
+
+| Variable | Para qué |
+|---|---|
+| `SECRET_KEY` | Firma de sesiones/CSRF. Generar una real con `secrets.token_hex()`. |
+| `MYSQL_HOST` / `MYSQL_PORT` / `MYSQL_USER` / `MYSQL_PASSWORD` / `MYSQL_DB` | Conexión a MySQL. |
+| `MYSQL_POOL_SIZE` | Tamaño del pool de conexiones (ver `backend/db.py`). |
+| `RATELIMIT_STORAGE_URI` | `memory://` alcanza para ~5000 usuarios en una sola instancia. Con varias instancias detrás de un balanceador, usar Redis: `redis://host:6379/0`. |
+| `CACHE_TYPE` / `CACHE_REDIS_URL` | `SimpleCache` vive en el proceso Python — si se despliega con más de un worker, cambiar a `RedisCache` + `CACHE_REDIS_URL` para que todos vean la misma caché. |
+| `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_DEFAULT_SENDER` | SMTP real. Si se dejan vacías, el correo no se envía: queda registrado en el log (modo desarrollo). |
+| `MAX_CONTENT_LENGTH_MB` | Límite de tamaño para la foto de perfil. |
+
 ## Arquitectura del backend
 
 App factory en `backend/app.py` / `backend/__init__.py`. Las extensiones

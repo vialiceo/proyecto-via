@@ -1,10 +1,3 @@
-/* ============================================================
-   admin.js — /static/js/admin.js
-   Modal de gestión de cuentas en /admin/usuarios, hablando con la
-   API REST (/api/v1/admin/usuarios/...). Todo mutation lleva el
-   header X-CSRFToken que exige Flask-WTF.
-   ============================================================ */
-
 const csrfMeta = document.querySelector('meta[name="csrf-token"]');
 const csrfToken = csrfMeta ? csrfMeta.content : null;
 

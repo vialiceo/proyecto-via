@@ -1,16 +1,9 @@
-/* ============================================================
-   V.I.A — login.css
-   /static/css/login.css
-   ============================================================ */
-
-/* ── Reset ── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* ── Variables ── */
 :root {
   --verde-oscuro:   #0d2318;
   --verde-base:     #1a3d2b;
@@ -28,7 +21,6 @@
   --fuente-cuerpo:  'Lato', sans-serif;
 }
 
-/* ── Base ── */
 html, body {
   height: 100%;
   font-family: var(--fuente-cuerpo);
@@ -36,15 +28,11 @@ html, body {
   color: var(--blanco);
 }
 
-/* ── Estructura de página ── */
 .page-wrapper {
   display: flex;
   min-height: calc(100vh - 44px);
 }
 
-/* ════════════════════════════
-   PANEL IZQUIERDO
-   ════════════════════════════ */
 .panel-left {
   position: relative;
   flex: 0 0 46%;
@@ -56,7 +44,6 @@ html, body {
   overflow: hidden;
 }
 
-/* Orbe de luz dorada detrás del contenido */
 .glow-orb {
   position: absolute;
   top: 50%;
@@ -68,7 +55,6 @@ html, body {
   pointer-events: none;
 }
 
-/* Degradado suave hacia el panel derecho */
 .panel-left::after {
   content: '';
   position: absolute;
@@ -87,7 +73,6 @@ html, body {
   text-align: center;
 }
 
-/* Escudo */
 .shield {
   width: 100px;
   height: 100px;
@@ -122,7 +107,6 @@ html, body {
   line-height: 1;
 }
 
-/* Bloque aniversario */
 .anniversary {
   display: flex;
   flex-direction: column;
@@ -186,9 +170,6 @@ html, body {
   color: var(--oro-claro);
 }
 
-/* ════════════════════════════
-   PANEL DERECHO
-   ════════════════════════════ */
 .panel-right {
   flex: 1;
   background: linear-gradient(140deg, #1e4a30 0%, var(--verde-medio) 55%, var(--verde-base) 100%);
@@ -200,7 +181,6 @@ html, body {
   position: relative;
 }
 
-/* Tarjeta de login */
 .login-card {
   width: 100%;
   max-width: 340px;
@@ -210,7 +190,6 @@ html, body {
   gap: 1.3rem;
 }
 
-/* Marca V.I.A */
 .via-brand {
   text-align: center;
   margin-bottom: 0.4rem;
@@ -236,7 +215,6 @@ html, body {
   text-transform: uppercase;
 }
 
-/* Mensajes flash de Flask */
 .flash-messages {
   width: 100%;
   list-style: none;
@@ -264,7 +242,6 @@ html, body {
   color: #aaffcc;
 }
 
-/* Campos */
 .field-group {
   width: 100%;
   display: flex;
@@ -304,7 +281,6 @@ html, body {
   background: var(--blanco);
 }
 
-/* Botón */
 .login-form {
   width: 100%;
   display: flex;
@@ -340,7 +316,6 @@ html, body {
   box-shadow: 0 3px 10px rgba(201,162,39,0.3);
 }
 
-/* Enlace recuperar */
 .link-recuperar {
   font-family: var(--fuente-cuerpo);
   font-size: 0.68rem;
@@ -356,7 +331,6 @@ html, body {
   text-decoration: underline;
 }
 
-/* Íconos sociales */
 .social-rail {
   position: absolute;
   right: 1rem;
@@ -403,9 +377,6 @@ html, body {
   color: var(--blanco);
 }
 
-/* ════════════════════════════
-   FOOTER
-   ════════════════════════════ */
 .site-footer {
   height: 44px;
   background: #091a10;
@@ -439,7 +410,6 @@ html, body {
   margin-left: auto;
 }
 
-/* ── Responsive ── */
 @media (max-width: 768px) {
   .page-wrapper {
     flex-direction: column;
@@ -474,14 +444,14 @@ html, body {
     margin-left: 0;
   }
 }
-/* ── Botón ver contraseña ── */
+
 .input-wrapper {
   position: relative;
   width: 100%;
 }
 
 .input-wrapper input {
-  padding-right: 2.8rem; 
+  padding-right: 2.8rem;
 }
 
 .btn-ver {
@@ -509,10 +479,8 @@ html, body {
   pointer-events: none;
 }
 
-
 .btn-ver .icon-eye     { display: none; }
 .btn-ver .icon-eye-off { display: block; }
-
 
 .btn-ver.mostrando .icon-eye     { display: block; }
 .btn-ver.mostrando .icon-eye-off { display: none; }

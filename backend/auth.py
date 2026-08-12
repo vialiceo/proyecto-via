@@ -1,9 +1,3 @@
-"""
-Autenticación: login, logout, recuperar contraseña y cambio obligatorio
-de contraseña en el primer ingreso. Las rutas de escritura llevan rate
-limit estricto porque son las más golpeadas en un intento de fuerza
-bruta o de enumeración de correos.
-"""
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import (
     UserMixin,
@@ -20,8 +14,6 @@ auth_bp = Blueprint("auth", __name__)
 
 
 class Usuario(UserMixin):
-    """Envoltorio de la fila de `usuarios` para Flask-Login."""
-
     def __init__(self, fila):
         self.id = fila["id"]
         self.nombre = fila["nombre"]
@@ -98,9 +90,6 @@ def recuperar():
         identificador = (request.form.get("identificador") or "").strip()
         fila = models.obtener_usuario_por_login(identificador) if identificador else None
 
-        # Mensaje idéntico exista o no la cuenta: no delatar qué correos
-        # están registrados (evita que alguien use este formulario para
-        # confirmar quién tiene cuenta en el sistema).
         if fila:
             token_plano, token_hash, expira_en = utils.generar_token(minutos_validez=30)
             models.crear_token_reset(fila["id"], token_hash, expira_en)
@@ -154,8 +143,6 @@ def restablecer(token):
 @auth_bp.route("/cambiar-password", methods=["GET", "POST"])
 @login_required
 def cambiar_password():
-    """Usada tanto para el cambio obligatorio del primer login como para
-    un cambio voluntario desde el perfil."""
     if request.method == "POST":
         actual = request.form.get("password_actual") or ""
         nueva = request.form.get("password") or ""

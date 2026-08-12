@@ -1,4 +1,3 @@
-"""Punto de entrada. Uso local: python run.py"""
 from backend import create_app
 
 app = create_app()

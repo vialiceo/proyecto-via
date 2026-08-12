@@ -1,9 +1,3 @@
-/* ============================================================
-   contacto.js — /static/js/contacto.js
-   Lógica de la página de contacto y equipo de trabajo.
-   ============================================================ */
-
-/* ── Tabs de navegación entre secciones ── */
 const tabs     = document.querySelectorAll('.page-tab')
 const secciones = {
   contacto: document.getElementById('contacto'),
@@ -12,13 +6,11 @@ const secciones = {
 
 tabs.forEach(tab => {
   tab.addEventListener('click', (e) => {
-    // Marcar tab activo
     tabs.forEach(t => t.classList.remove('active'))
     tab.classList.add('active')
   })
 })
 
-/* Resalta el tab al hacer scroll hasta la sección */
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -32,7 +24,6 @@ const observer = new IntersectionObserver((entries) => {
 
 Object.values(secciones).forEach(s => observer.observe(s))
 
-/* ── Animación de entrada de tarjetas del equipo ── */
 const miembros = document.querySelectorAll('.miembro-card')
 
 const cardObserver = new IntersectionObserver((entries) => {
@@ -59,8 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 })
 
-/* Clase visible activa la animación */
 const style = document.createElement('style')
 style.textContent = `.miembro-card.visible { opacity: 1 !important; transform: translateY(0) !important; }`
 document.head.appendChild(style)
-

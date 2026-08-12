@@ -1,10 +1,3 @@
-/* ============================================================
-   promocion.js — /static/js/promocion.js
-   Pop-up de egresado en /usuarios/promocion/<anio>. Todo el dato
-   ya viene en el HTML (data-attributes), así que no hace falta
-   pedir nada al servidor al abrir el pop-up.
-   ============================================================ */
-
 const modal = document.getElementById('modalEgresado');
 const modalCerrar = document.getElementById('modalEgresadoCerrar');
 const modalFoto = document.getElementById('modalEgresadoFoto');

@@ -1,12 +1,5 @@
-/* ============================================================
-   V.I.A — landing.css
-   /static/css/landing.css
-   ============================================================ */
-
-/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── Variables ── */
 :root {
   --verde-oscuro:   #0d2318;
   --verde-base:     #1a3d2b;
@@ -35,9 +28,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ════════════════════════════
-   TOPBAR
-   ════════════════════════════ */
 .topbar {
   background: var(--verde-oscuro);
   padding: 0.45rem 2rem;
@@ -68,9 +58,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ════════════════════════════
-   NAVBAR
-   ════════════════════════════ */
 .navbar {
   position: sticky;
   top: 0;
@@ -89,7 +76,6 @@ body {
   gap: 1.5rem;
 }
 
-/* Brand */
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -161,7 +147,6 @@ body {
   filter: brightness(1.06);
 }
 
-/* Hamburger */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -182,9 +167,6 @@ body {
   transition: all 0.22s;
 }
 
-/* ════════════════════════════
-   HERO
-   ════════════════════════════ */
 .hero {
   position: relative;
   background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-base) 50%, #1e4a30 100%);
@@ -195,7 +177,6 @@ body {
   align-items: center;
 }
 
-/* Patrón decorativo de fondo */
 .hero-bg {
   position: absolute;
   inset: 0;
@@ -205,7 +186,6 @@ body {
   pointer-events: none;
 }
 
-/* Líneas decorativas */
 .hero::before {
   content: '';
   position: absolute;
@@ -298,9 +278,6 @@ body {
   text-transform: uppercase;
 }
 
-/* ════════════════════════════
-   PERFILES
-   ════════════════════════════ */
 .perfiles {
   background: var(--gris-claro);
   padding: 4rem 2rem;
@@ -314,7 +291,6 @@ body {
   gap: 1.5rem;
 }
 
-/* Tarjeta */
 .perfil-card {
   background: var(--blanco);
   border-radius: 14px;
@@ -331,7 +307,6 @@ body {
   box-shadow: 0 12px 36px rgba(0,0,0,0.14);
 }
 
-/* Tarjeta destacada (admin) */
 .perfil-card--featured {
   border: 2px solid var(--oro);
   box-shadow: 0 4px 20px rgba(201,162,39,0.18);
@@ -341,7 +316,6 @@ body {
   box-shadow: 0 12px 36px rgba(201,162,39,0.28);
 }
 
-/* Imagen placeholder con gradiente */
 .perfil-img-wrapper {
   position: relative;
   width: 100%;
@@ -371,7 +345,6 @@ body {
   background: linear-gradient(135deg, #22502f 0%, #1a3d2b 50%, #2e6b3e 100%);
 }
 
-/* Decoración interna de los placeholders */
 .perfil-img--egresado::after,
 .perfil-img--admin::after,
 .perfil-img--institucion::after {
@@ -387,7 +360,6 @@ body {
   background: linear-gradient(to top, rgba(13,35,24,0.5) 0%, transparent 60%);
 }
 
-/* Cuerpo de la tarjeta */
 .perfil-body {
   padding: 1.5rem;
   display: flex;
@@ -455,9 +427,6 @@ body {
   filter: brightness(1.08);
 }
 
-/* ════════════════════════════
-   STATS
-   ════════════════════════════ */
 .stats {
   background: var(--verde-base);
   padding: 2.5rem 2rem;
@@ -504,9 +473,6 @@ body {
   flex-shrink: 0;
 }
 
-/* ════════════════════════════
-   FOOTER
-   ════════════════════════════ */
 .footer {
   background: linear-gradient(135deg, var(--verde-base) 0%, var(--verde-oscuro) 100%);
   color: rgba(255,255,255,0.80);
@@ -641,9 +607,6 @@ body {
   color: rgba(255,255,255,0.45);
 }
 
-/* ════════════════════════════
-   ANIMACIONES DE ENTRADA
-   ════════════════════════════ */
 .perfil-card {
   opacity: 0;
   transform: translateY(24px);
@@ -658,9 +621,6 @@ body {
 .perfil-card:nth-child(2) { transition-delay: 0.1s; }
 .perfil-card:nth-child(3) { transition-delay: 0.2s; }
 
-/* ════════════════════════════
-   RESPONSIVE
-   ════════════════════════════ */
 @media (max-width: 900px) {
   .perfiles-inner {
     grid-template-columns: 1fr 1fr;

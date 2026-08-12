@@ -1,26 +1,5 @@
--- ============================================================
--- V.I.A — datos.sql — datos semilla / de prueba
---
--- IMPORTANTE: las contraseñas de aquí abajo son SOLO para
--- desarrollo local. Los hashes están generados con
--- werkzeug.security.generate_password_hash (scrypt), el mismo
--- método que usa backend/utils.py, así que login funciona tal
--- cual contra esta data. Antes de producción: borra estas filas
--- o cambia las contraseñas desde el panel de admin.
---
---   admin      / usuario: admin       -> contraseña: CambiarAhora2026!
---   egresados  / usuario: jgomez, mlopez -> contraseña: Egresado123!
---
--- Ambas cuentas quedan con forzar_cambio_password = 1, así que
--- el primer login pide cambiarla de una vez.
--- ============================================================
-
 SET NAMES utf8mb4;
 
--- ------------------------------------------------------------
--- Catálogo de técnicos — ajusta esta lista a los programas
--- reales que ofrece el Liceo Tame.
--- ------------------------------------------------------------
 INSERT INTO tecnicos (nombre) VALUES
   ('Técnico en Sistemas'),
   ('Técnico en Contabilidad y Finanzas'),
@@ -29,9 +8,6 @@ INSERT INTO tecnicos (nombre) VALUES
   ('Técnico Agropecuario')
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
--- ------------------------------------------------------------
--- Cuenta administradora
--- ------------------------------------------------------------
 INSERT INTO usuarios
   (nombre, correo, usuario, password_hash, rol, estado, forzar_cambio_password)
 VALUES
@@ -40,9 +16,6 @@ VALUES
    'administrador', 'activo', 1)
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
--- ------------------------------------------------------------
--- Egresados de ejemplo (para probar listado, filtros y perfil)
--- ------------------------------------------------------------
 INSERT INTO usuarios
   (nombre, correo, usuario, password_hash, rol, estado, anio_promocion, tecnico_id, forzar_cambio_password)
 VALUES
@@ -60,10 +33,6 @@ VALUES
    'egresado', 'activo', 2023, (SELECT id FROM tecnicos WHERE nombre = 'Técnico Agropecuario'), 1)
 ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
--- ------------------------------------------------------------
--- Perfil extendido de ejemplo para Julián (para ver /usuarios/perfil
--- y la tarjeta de promoción con datos, incluida la frase opcional)
--- ------------------------------------------------------------
 INSERT INTO perfil_extendido (usuario_id, profesion, lugar_residencia, lugar_estudio, fecha_nacimiento, frase)
 SELECT id, 'Desarrollador de software', 'Tame, Arauca', 'Universidad Nacional de Colombia', '2001-04-12',
        'Gracias Liceo Tame por los años que me formaron.'

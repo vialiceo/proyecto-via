@@ -1,14 +1,5 @@
-/* ============================================================
-   V.I.A — base_usuarios.css
-   /static/css/usuarios/base_usuarios.css
-   Estilos compartidos: sidebar nav + footer
-   Incluir en TODAS las páginas del área de usuarios.
-   ============================================================ */
-
-/* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── Variables globales ── */
 :root {
   --verde-oscuro:    #0d2318;
   --verde-base:      #1a3d2b;
@@ -34,9 +25,6 @@ html, body {
   color: #1a1a1a;
 }
 
-/* ════════════════════════════════════
-   SIDEBAR NAV
-   ════════════════════════════════════ */
 .sidebar-nav {
   position: fixed;
   top: 0;
@@ -54,7 +42,6 @@ html, body {
   transition: transform 0.28s ease;
 }
 
-/* Botón hamburger */
 .nav-toggle {
   width: 36px;
   height: 28px;
@@ -81,7 +68,6 @@ html, body {
 .sidebar-nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
 .sidebar-nav.open .nav-toggle span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
 
-/* Escudo en nav */
 .nav-shield-link { text-decoration: none; margin-bottom: 1rem; }
 
 .nav-shield {
@@ -110,7 +96,6 @@ html, body {
 .ns-stars { color: var(--oro); font-size: 0.55rem; letter-spacing: 0.18em; }
 .ns-sun   { font-size: 0.88rem; color: var(--oro-claro); line-height: 1; }
 
-/* Lista nav */
 .nav-list {
   list-style: none;
   width: 100%;
@@ -146,9 +131,6 @@ html, body {
   border-left: 3px solid var(--oro);
 }
 
-/* ════════════════════════════════════
-   FOOTER
-   ════════════════════════════════════ */
 .site-footer {
   background: linear-gradient(135deg, var(--verde-base) 0%, var(--verde-oscuro) 100%);
   color: rgba(255,255,255,0.80);
@@ -165,7 +147,6 @@ html, body {
   border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 
-/* Columna marca */
 .footer-col--brand {
   display: flex;
   flex-direction: column;
@@ -204,7 +185,6 @@ html, body {
   letter-spacing: 0.06em;
 }
 
-/* Redes sociales en footer */
 .footer-social {
   display: flex;
   gap: 0.7rem;
@@ -227,7 +207,6 @@ html, body {
 .fsocial-link:hover { background: rgba(255,255,255,0.25); transform: scale(1.1); }
 .fsocial-link svg   { width: 14px; height: 14px; }
 
-/* Columnas de links */
 .footer-col-title {
   font-family: var(--fuente-display);
   font-size: 0.65rem;
@@ -254,7 +233,6 @@ html, body {
 
 .footer-links a:hover { color: var(--oro-claro); }
 
-/* Links de contacto con ícono */
 .footer-links--contact li {
   display: flex;
   align-items: flex-start;
@@ -272,7 +250,6 @@ html, body {
   stroke: var(--oro-claro);
 }
 
-/* Pie inferior */
 .footer-bottom {
   padding: 0.9rem 2rem;
   text-align: center;
@@ -284,9 +261,6 @@ html, body {
   letter-spacing: 0.06em;
 }
 
-/* ════════════════════════════════════
-   RESPONSIVE NAV
-   ════════════════════════════════════ */
 @media (max-width: 768px) {
   .sidebar-nav {
     transform: translateX(100%);

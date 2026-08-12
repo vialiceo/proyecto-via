@@ -1,10 +1,3 @@
-"""
-Panel de administración. Las páginas aquí son "cascarones" que renderizan
-la plantilla con los datos iniciales; la edición fina (cambiar rol,
-activar/desactivar, resetear contraseña, ver bitácora) vive en la API
-REST (backend/api.py) y se dispara desde admin.js — así el admin puede
-operar sobre un usuario sin recargar la página completa.
-"""
 import mysql.connector
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
@@ -33,9 +26,6 @@ def dashboard():
 
 @cache.memoize(timeout=120)
 def _stats_dashboard_cacheadas():
-    """Contadores del dashboard: se calculan una sola vez cada 2 minutos
-    en vez de en cada carga del panel. Se invalida antes si algo cambia
-    (ver _invalidar_stats)."""
     return models.contar_usuarios_por_estado()
 
 

@@ -1,4 +1,3 @@
-"""Configuración de la app, leída desde variables de entorno (.env)."""
 import os
 from dotenv import load_dotenv
 
@@ -14,7 +13,6 @@ def _bool(valor, default=False):
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-cambiar-en-produccion")
 
-    # ---- MySQL ----
     MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
     MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
     MYSQL_USER = os.getenv("MYSQL_USER", "root")
@@ -22,16 +20,13 @@ class Config:
     MYSQL_DB = os.getenv("MYSQL_DB", "via_db")
     MYSQL_POOL_SIZE = int(os.getenv("MYSQL_POOL_SIZE", "10"))
 
-    # ---- Rate limiting ----
     RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI", "memory://")
     RATELIMIT_DEFAULT = os.getenv("RATELIMIT_DEFAULT", "200 per minute")
 
-    # ---- Caché ----
     CACHE_TYPE = os.getenv("CACHE_TYPE", "SimpleCache")
     CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT", "60"))
     CACHE_REDIS_URL = os.getenv("CACHE_REDIS_URL")
 
-    # ---- Correo ----
     MAIL_SERVER = os.getenv("MAIL_SERVER") or None
     MAIL_PORT = int(os.getenv("MAIL_PORT", "587"))
     MAIL_USE_TLS = _bool(os.getenv("MAIL_USE_TLS"), True)
@@ -39,18 +34,15 @@ class Config:
     MAIL_PASSWORD = os.getenv("MAIL_PASSWORD") or None
     MAIL_DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", "no-responder@liceotame.edu.co")
 
-    # ---- Subida de archivos ----
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH_MB", "3")) * 1024 * 1024
     UPLOAD_FOLDER = os.path.join("static", "uploads", "perfiles")
     EXTENSIONES_FOTO_PERMITIDAS = {"png", "jpg", "jpeg", "webp"}
 
-    # ---- Sesión / cookies ----
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = _bool(os.getenv("SESSION_COOKIE_SECURE"), False)
-    PERMANENT_SESSION_LIFETIME = 60 * 60 * 8  # 8 horas
+    PERMANENT_SESSION_LIFETIME = 60 * 60 * 8
 
-    # ---- Paginación admin ----
     ADMIN_PAGE_SIZE = 25
 
 

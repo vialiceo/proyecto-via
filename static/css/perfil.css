@@ -1,9 +1,3 @@
-/* ============================================================
-   V.I.A — perfil.css
-   /static/css/perfil.css
-   Página "Actualizar información" (/usuarios/perfil).
-   ============================================================ */
-
 .perfil-grid {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -22,7 +16,6 @@
   padding: 1.75rem;
 }
 
-/* ── Identidad ── */
 .perfil-card--identidad { text-align: center; }
 
 .identidad-foto {
@@ -105,7 +98,6 @@
 
 .identidad-nota a { color: var(--verde-base); }
 
-/* ── Formulario editable ── */
 .card-titulo {
   font-family: var(--fuente-serif);
   font-size: 1.15rem;

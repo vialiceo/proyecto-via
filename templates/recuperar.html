@@ -11,13 +11,13 @@
 
   <div class="page-wrapper">
 
-    <!-- ── titulongo ── -->
+
     <header class="top-brand">
       <span class="via-letters">V.I.A</span>
       <p class="via-sub">VINCULACIÓN INTEGRAL DE ALUMNOS</p>
     </header>
 
-    <!-- ── contenedor central ── -->
+
     <main class="card-center">
 
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -27,7 +27,7 @@
               <li class="flash flash--{{ category }}">{{ message }}</li>
             {% endfor %}
           </ul>
-        {% endif %} <!-- mensajes de flash (si ya me adelante sabiendo que ni se que dice ahi jaja xd)-->
+        {% endif %}
       {% endwith %}
 
       <h1 class="card-title">Recuperación de<br>contraseña</h1>
@@ -56,13 +56,12 @@
 
   </div>
 
-  <!-- ── FOOTER ── -->
+
   <footer class="site-footer">
     <span class="footer-link">EQUIPO DE TRABAJO</span>
     <span class="footer-link">CONTACTO</span>
     <span class="footer-copy">©2026 V I A</span>
   </footer>
-
 
 </body>
 </html>

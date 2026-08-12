@@ -1,7 +1,3 @@
-"""
-Área autenticada de "usuarios": actualizar el propio perfil y el feed
-de comentarios. Todo bajo /usuarios y protegido con @login_required.
-"""
 import os
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
@@ -85,9 +81,6 @@ def comentarios():
 
 @cache.memoize(timeout=30)
 def _comentarios_visibles_cacheados(pagina):
-    """Se calcula una sola vez por página cada 30s: el feed de comentarios
-    no necesita ser exacto al segundo y así no se golpea MySQL en cada
-    request de cada uno de los 5000 usuarios viendo la misma página."""
     return models.listar_comentarios_visibles(pagina=pagina, por_pagina=20)
 
 
@@ -100,7 +93,4 @@ def promocion(anio):
 
 @cache.memoize(timeout=120)
 def _egresados_por_promocion_cacheados(anio):
-    """Una sola query trae nombre + foto + profesión + frase de todos los
-    egresados de la promoción: la tarjeta y el pop-up salen del mismo dato,
-    ya calculado, sin pedir nada extra por cada clic."""
     return models.listar_egresados_por_promocion(anio, pagina=1, por_pagina=200)

@@ -1,25 +1,12 @@
-"""
-Capa de datos. Cada función hace un query concreto y parametrizado.
-No hay ORM a propósito: para ~5000 usuarios el cuello de botella nunca
-va a ser "cuántas líneas de SQL escribimos", así que se prefiere tener
-el query real a la vista (y poder correr EXPLAIN sobre él) en vez de
-esconderlo detrás de una capa de abstracción.
-"""
 from backend import db
 
 
-# ================================================================
-# Técnicos (catálogo)
-# ================================================================
 def listar_tecnicos_activos():
     return db.fetch_all(
         "SELECT id, nombre FROM tecnicos WHERE activo = 1 ORDER BY nombre"
     )
 
 
-# ================================================================
-# Usuarios
-# ================================================================
 _CAMPOS_USUARIO_ADMIN = {"nombre", "correo", "usuario", "rol", "estado", "anio_promocion", "tecnico_id"}
 
 
@@ -33,7 +20,6 @@ def obtener_usuario_por_id(usuario_id):
 
 
 def obtener_usuario_por_login(identificador):
-    """Login acepta correo o usuario (recuperar.html también). Ambos son UNIQUE."""
     return db.fetch_one(
         "SELECT * FROM usuarios WHERE correo = %s OR usuario = %s LIMIT 1",
         (identificador, identificador),
@@ -51,7 +37,6 @@ def crear_usuario(nombre, correo, usuario, password_hash, rol, anio_promocion=No
 
 
 def actualizar_usuario_admin(usuario_id, campos: dict):
-    """campos: subconjunto de _CAMPOS_USUARIO_ADMIN. Ignora cualquier otra llave."""
     campos = {k: v for k, v in campos.items() if k in _CAMPOS_USUARIO_ADMIN}
     if not campos:
         return 0
@@ -86,8 +71,6 @@ def registrar_login(usuario_id):
 
 
 def listar_usuarios_admin(busqueda=None, rol=None, estado=None, tecnico_id=None, pagina=1, por_pagina=25):
-    """Listado paginado del panel de admin. Usa ix_usuarios_rol_estado_promocion /
-    ix_usuarios_tecnico_promocion según los filtros que vengan."""
     condiciones = []
     parametros = []
 
@@ -124,17 +107,11 @@ def listar_usuarios_admin(busqueda=None, rol=None, estado=None, tecnico_id=None,
 
 
 def contar_usuarios_por_estado():
-    """Para el dashboard de admin. Se cachea en admin.py: no hay razón
-    para recalcular esto en cada request si los datos casi no cambian."""
     filas = db.fetch_all("SELECT estado, COUNT(*) AS total FROM usuarios GROUP BY estado")
     return {fila["estado"]: fila["total"] for fila in filas}
 
 
 def listar_promociones_recientes(limite=4):
-    """Para el carrusel de index.html: agrupa a los egresados activos por
-    año y trae las que tuvieron actividad más reciente (cuenta creada o
-    perfil actualizado) — no simplemente los años más nuevos. Usa
-    ix_usuarios_rol_estado_promocion para el filtro + agrupación."""
     return db.fetch_all(
         """SELECT
              u.anio_promocion,
@@ -151,9 +128,6 @@ def listar_promociones_recientes(limite=4):
 
 
 def listar_egresados_por_promocion(anio, pagina=1, por_pagina=60):
-    """Tarjetas foto+nombre de /usuarios/promocion/<anio>. Trae también lo
-    que necesita el pop-up (profesión, frase) en el mismo query: una sola
-    consulta calcula toda la página, sin ir a buscar cada tarjeta aparte."""
     offset = max(pagina - 1, 0) * por_pagina
     return db.fetch_all(
         """SELECT u.id, u.nombre, u.foto, pe.profesion, pe.frase
@@ -166,9 +140,6 @@ def listar_egresados_por_promocion(anio, pagina=1, por_pagina=60):
     )
 
 
-# ================================================================
-# Perfil extendido (lo que edita el propio egresado)
-# ================================================================
 def obtener_perfil_extendido(usuario_id):
     return db.fetch_one(
         "SELECT * FROM perfil_extendido WHERE usuario_id = %s", (usuario_id,)
@@ -189,9 +160,6 @@ def upsert_perfil_extendido(usuario_id, profesion, lugar_residencia, lugar_estud
     )
 
 
-# ================================================================
-# Contactos (1 a N por usuario)
-# ================================================================
 def listar_contactos(usuario_id):
     return db.fetch_all(
         "SELECT id, tipo, valor, es_principal FROM contactos WHERE usuario_id = %s ORDER BY es_principal DESC, id",
@@ -200,9 +168,6 @@ def listar_contactos(usuario_id):
 
 
 def reemplazar_contactos(usuario_id, contactos):
-    """contactos: lista de dicts {tipo, valor, es_principal}. Se reemplaza
-    todo el set de una vez porque así lo edita el usuario (un formulario
-    con N filas), no fila por fila."""
     with db.transaction() as cur:
         cur.execute("DELETE FROM contactos WHERE usuario_id = %s", (usuario_id,))
         if contactos:
@@ -212,9 +177,6 @@ def reemplazar_contactos(usuario_id, contactos):
             )
 
 
-# ================================================================
-# Comentarios
-# ================================================================
 def crear_comentario(usuario_id, contenido):
     lastrowid, _ = db.execute(
         "INSERT INTO comentarios (usuario_id, contenido, estado) VALUES (%s, %s, 'visible')",
@@ -256,9 +218,6 @@ def moderar_comentario(comentario_id, estado):
     return rowcount
 
 
-# ================================================================
-# Soporte (tickets)
-# ================================================================
 def crear_ticket_soporte(nombre, correo, asunto, mensaje, usuario_id=None, canal="formulario"):
     lastrowid, _ = db.execute(
         """INSERT INTO soporte_tickets (usuario_id, nombre, correo, canal, asunto, mensaje)
@@ -290,9 +249,6 @@ def actualizar_estado_ticket(ticket_id, estado):
     return rowcount
 
 
-# ================================================================
-# Password reset tokens
-# ================================================================
 def crear_token_reset(usuario_id, token_hash, expira_en):
     lastrowid, _ = db.execute(
         "INSERT INTO password_reset_tokens (usuario_id, token_hash, expira_en) VALUES (%s, %s, %s)",
@@ -313,9 +269,6 @@ def marcar_token_usado(token_id):
     db.execute("UPDATE password_reset_tokens SET usado_en = NOW() WHERE id = %s", (token_id,))
 
 
-# ================================================================
-# Bitácora (auditoría)
-# ================================================================
 def registrar_bitacora(usuario_id, accion, detalle=None, ip=None):
     db.execute(
         "INSERT INTO bitacora (usuario_id, accion, detalle, ip) VALUES (%s, %s, %s, %s)",

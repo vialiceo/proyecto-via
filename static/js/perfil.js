@@ -10,7 +10,6 @@ if (profileBtn && profileDropdown) {
     profileDropdown.setAttribute('aria-hidden', !open);
   });
 
-  /* Cierra el dropdown al hacer click fuera */
   document.addEventListener('click', (e) => {
     if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
       profileDropdown.classList.remove('open');

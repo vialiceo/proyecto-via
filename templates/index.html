@@ -4,25 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>V.I.A – Principal</title>
-  <!-- CSS compartido (nav + footer) -->
+
   <link rel="stylesheet" href="/static/css/usuarios/Base usuarios.css" />
-  <!-- CSS propio de esta página -->
+
   <link rel="stylesheet" href="/static/css/index.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- ══ NAV LATERAL (molde) ══ -->
+
   {% set active_page = 'principal' %}
   {% include 'usuarios/_nav.html' %}
 
-  <!-- ══ CONTENEDOR PRINCIPAL ══ -->
+
   <div class="layout-wrapper">
 
-    <!-- ── TOPBAR ── -->
+
     <header class="topbar">
 
-      <!-- Escudo (izquierda, mismo eje X que el icono de perfil) -->
+
       <a href="{{ url_for('public.ayuda') }}" class="topbar-shield-link" aria-label="Información de la institución">
         <div class="topbar-shield">
           <span class="ts-top">EXCELSIOR</span>
@@ -54,13 +54,13 @@
 
       <span class="topbar-spacer"></span>
 
-      <!-- Perfil (derecha) -->
+
       <div class="profile-menu-wrapper">
         <button class="profile-btn" id="profileBtn" aria-label="Menú de usuario" aria-expanded="false">
           {% if current_user.foto %}
             <img src="{{ current_user.foto }}" alt="Foto de perfil" class="profile-photo" />
           {% else %}
-            <!-- Ícono genérico si no hay foto -->
+
             <svg class="profile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <circle cx="12" cy="8" r="4"/>
               <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
@@ -68,7 +68,7 @@
           {% endif %}
         </button>
 
-        <!-- Dropdown -->
+
         <div class="profile-dropdown" id="profileDropdown" aria-hidden="true">
           <a href="{{ url_for('usuarios.perfil') }}" class="dropdown-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -94,10 +94,10 @@
 
     </header>
 
-    <!-- ── MAIN ── -->
+
     <main class="main-content">
 
-      <!-- Filtro por año -->
+
       <section class="filter-section">
         <h2 class="filter-label">AÑO</h2>
         <div class="search-bar-wrapper">
@@ -116,15 +116,15 @@
         </div>
       </section>
 
-      <!-- Carrusel de promociones -->
+
       <section class="carousel-section" aria-label="Promociones">
         <button class="carousel-arrow carousel-arrow--prev" id="prevBtn" aria-label="Anterior">&#8249;</button>
 
         <div class="carousel-track-wrapper">
           <div class="carousel-track" id="carouselTrack">
 
-            <!-- Las 4 promociones con actividad más reciente (cuentas -->
-            <!-- creadas o perfiles actualizados), no simplemente las más nuevas -->
+
+
             {% for promo in promociones_recientes %}
             <a href="{{ url_for('usuarios.promocion', anio=promo.anio_promocion) }}" class="promo-card">
               <div class="promo-img-wrapper">
@@ -150,21 +150,21 @@
         <button class="carousel-arrow carousel-arrow--next" id="nextBtn" aria-label="Siguiente">&#8250;</button>
       </section>
 
-      <!-- Indicadores del carrusel -->
+
       <div class="carousel-dots" id="carouselDots"></div>
 
     </main>
 
-    <!-- ══ FOOTER (molde) ══ -->
+
     {% include 'usuarios/_footer.html' %}
 
-  </div><!-- /layout-wrapper -->
+  </div>
 
-  <!-- Scripts compartidos (nav + perfil) -->
+
   <script src="/static/js/nav.js"></script>
   <script src="/static/js/perfil.js"></script>
 
-  <!-- Script propio de esta página -->
+
   <script src="/static/js/carrusel.js"></script>
 
 </body>

@@ -1,8 +1,3 @@
-/* ============================================================
-   perfil-form.js — /static/js/perfil-form.js
-   Agrega/quita filas de "métodos de contacto" en /usuarios/perfil.
-   ============================================================ */
-
 const btnAgregarContacto = document.getElementById('btnAgregarContacto');
 const listaContactos = document.getElementById('listaContactos');
 const plantillaContacto = document.getElementById('plantillaContacto');

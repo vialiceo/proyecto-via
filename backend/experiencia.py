@@ -1,9 +1,3 @@
-"""
-Lógica de dominio del "perfil extendido": lo que cada egresado mantiene
-sobre sí mismo (profesión, dónde vive, dónde estudió, edad, métodos de
-contacto). Separado de perfil.py a propósito: aquí vive la validación
-y el armado del view-model; perfil.py solo conecta HTTP <-> esto.
-"""
 from datetime import date
 
 from backend import models, utils
@@ -12,8 +6,6 @@ TIPOS_CONTACTO_VALIDOS = {"telefono", "whatsapp", "correo_alterno", "instagram",
 
 
 def construir_vista_perfil(usuario_id):
-    """Junta usuarios + perfil_extendido + contactos en un solo dict
-    listo para la plantilla o la respuesta JSON de la API."""
     usuario = models.obtener_usuario_por_id(usuario_id)
     extendido = models.obtener_perfil_extendido(usuario_id) or {}
     contactos = models.listar_contactos(usuario_id)
@@ -38,7 +30,6 @@ def construir_vista_perfil(usuario_id):
 
 
 def validar_datos_perfil(form):
-    """form: dict tipo request.form. Devuelve (errores, datos_limpios)."""
     errores = []
 
     profesion = (form.get("profesion") or "").strip() or None
@@ -76,8 +67,6 @@ def validar_datos_perfil(form):
 
 
 def validar_contactos(tipos, valores):
-    """tipos/valores: listas paralelas que llegan del formulario (varias
-    filas de contacto). Devuelve (errores, contactos_limpios)."""
     errores = []
     contactos = []
     principal_asignado = False

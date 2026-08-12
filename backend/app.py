@@ -1,4 +1,3 @@
-"""App factory: crea y ensambla la aplicación Flask."""
 import os
 
 from flask import Flask, jsonify, render_template, request
