@@ -32,7 +32,8 @@
 
       <h1 class="card-title">Recuperación de<br>contraseña</h1>
 
-      <form class="recuperar-form" action="/recuperar" method="POST" novalidate>
+      <form class="recuperar-form" action="{{ url_for('auth.recuperar') }}" method="POST" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
         <div class="field-group">
           <label for="identificador">Ingresa tu correo o tu usuario V.I.A</label>
@@ -49,7 +50,7 @@
 
       </form>
 
-      <a href="/templates/login.html" class="link-volver">← Volver al inicio de sesión</a>
+      <a href="{{ url_for('auth.login') }}" class="link-volver">← Volver al inicio de sesión</a>
 
     </main>
 

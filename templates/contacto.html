@@ -4,22 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>V.I.A – Contacto y Equipo</title>
-  <link rel="stylesheet" href="/static/js/contacto.js" />
+  <link rel="stylesheet" href="/static/css/usuarios/Base usuarios.css" />
   <link rel="stylesheet" href="/static/css/contacto.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- nav -->
-<!--
-  {% set active_page = '' %}
-  {% include 'usuarios/_nav.html' %}
--->
   <div class="layout-wrapper">
 
     <!-- ══ TOPBAR ══ -->
     <header class="topbar">
-      <a href="/usuarios/institucion" class="topbar-shield-link" aria-label="Información de la institución">
+      <a href="{{ url_for('public.index') }}" class="topbar-shield-link" aria-label="Información de la institución">
         <div class="topbar-shield">
           <span class="ts-top">EXCELSIOR</span>
           <div class="ts-stars">★ ★</div>
@@ -44,23 +39,26 @@
           </svg>
         </button>
         <div class="profile-dropdown" id="profileDropdown" aria-hidden="true">
-          <a href="/usuarios/perfil"              class="dropdown-item">
+          {% if current_user.is_authenticated %}
+          <a href="{{ url_for('usuarios.perfil') }}" class="dropdown-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             Perfil
           </a>
-          <a href="/usuarios/configuracion"       class="dropdown-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-            Configuración
-          </a>
-          <a href="/usuarios/cambiar-contrasena"  class="dropdown-item">
+          <a href="{{ url_for('auth.cambiar_password') }}" class="dropdown-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             Cambiar contraseña
           </a>
           <div class="dropdown-divider"></div>
-          <a href="/logout" class="dropdown-item dropdown-item--danger">
+          <a href="{{ url_for('auth.logout') }}" class="dropdown-item dropdown-item--danger">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Cerrar sesión
           </a>
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Iniciar sesión
+          </a>
+          {% endif %}
         </div>
       </div>
     </header>
@@ -193,6 +191,49 @@
           </div>
 
         </div>
+
+        <!-- ── Formulario: canal de soporte ── -->
+        <div class="contacto-bloque contacto-bloque--form" id="soporte">
+          <div class="bloque-header">
+            <div class="bloque-icono bloque-icono--oro">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+            </div>
+            <h2 class="bloque-titulo">Escríbenos</h2>
+          </div>
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <ul class="flash-messages">
+                {% for category, message in messages %}
+                  <li class="flash flash--{{ category }}">{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endwith %}
+
+          <form action="{{ url_for('public.contacto') }}" method="POST" class="form-soporte" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div class="campo-fila-soporte">
+              <div class="campo-soporte">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" maxlength="150" required />
+              </div>
+              <div class="campo-soporte">
+                <label for="correo">Correo</label>
+                <input type="email" id="correo" name="correo" maxlength="190" required />
+              </div>
+            </div>
+            <div class="campo-soporte">
+              <label for="asunto">Asunto</label>
+              <input type="text" id="asunto" name="asunto" maxlength="200" required />
+            </div>
+            <div class="campo-soporte">
+              <label for="mensaje">Mensaje</label>
+              <textarea id="mensaje" name="mensaje" rows="4" maxlength="2000" required></textarea>
+            </div>
+            <button type="submit" class="btn-enviar-soporte">Enviar mensaje</button>
+          </form>
+        </div>
       </section>
 
       <!-- Divisor entre secciones -->
@@ -283,11 +324,8 @@
 
   </div><!-- /layout-wrapper -->
 
- 
- <script src="/static/js/nav.js"></script>
   <script src="/static/js/perfil.js"></script>
   <script src="/static/js/contacto.js"></script>
-  
 
 </body>
 </html>

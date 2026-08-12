@@ -1,0 +1,129 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}Mi perfil{% endblock %}
+{% block topbar_titulo %}Actualizar información{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/perfil.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Mi cuenta</p>
+    <h1 class="page-title">Actualizar información</h1>
+    <p class="page-desc">Lo que capturó la institución no se puede editar aquí; lo demás sí es tuyo para mantenerlo al día.</p>
+  </div>
+
+  <div class="perfil-grid">
+
+    <!-- ── Tarjeta de identidad (solo lectura) ── -->
+    <section class="perfil-card perfil-card--identidad">
+      <div class="identidad-foto">
+        {% if perfil.foto %}
+          <img src="{{ perfil.foto }}" alt="Foto de perfil" />
+        {% else %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        {% endif %}
+        <form action="{{ url_for('usuarios.actualizar_foto') }}" method="POST" enctype="multipart/form-data" class="form-foto">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <label class="btn-foto">
+            Cambiar foto
+            <input type="file" name="foto" accept=".png,.jpg,.jpeg,.webp" onchange="this.form.submit()" hidden />
+          </label>
+        </form>
+      </div>
+
+      <h2 class="identidad-nombre">{{ perfil.nombre }}</h2>
+      <span class="identidad-rol">{{ perfil.rol|capitalize }}</span>
+
+      <dl class="identidad-datos">
+        <div><dt>Usuario</dt><dd>{{ perfil.usuario }}</dd></div>
+        <div><dt>Correo</dt><dd>{{ perfil.correo }}</dd></div>
+        {% if perfil.anio_promocion %}<div><dt>Promoción</dt><dd>{{ perfil.anio_promocion }}</dd></div>{% endif %}
+        {% if perfil.tecnico %}<div><dt>Técnico</dt><dd>{{ perfil.tecnico }}</dd></div>{% endif %}
+        {% if perfil.edad %}<div><dt>Edad</dt><dd>{{ perfil.edad }} años</dd></div>{% endif %}
+      </dl>
+
+      <p class="identidad-nota">¿Algo de esto está mal? Contacta a la institución desde <a href="{{ url_for('public.contacto') }}">Contacto</a>.</p>
+    </section>
+
+    <!-- ── Formulario editable ── -->
+    <section class="perfil-card perfil-card--editable">
+      <h2 class="card-titulo">Información visible para la comunidad</h2>
+
+      <form action="{{ url_for('usuarios.perfil') }}" method="POST" class="form-perfil" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="campo">
+          <label for="profesion">Profesión / a qué te dedicas</label>
+          <input type="text" id="profesion" name="profesion" maxlength="150" value="{{ perfil.profesion or '' }}" placeholder="Ej: Ingeniero de sistemas" />
+        </div>
+
+        <div class="campo-fila">
+          <div class="campo">
+            <label for="fecha_nacimiento">Fecha de nacimiento</label>
+            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ perfil.fecha_nacimiento or '' }}" />
+          </div>
+          <div class="campo">
+            <label for="lugar_residencia">Dónde vives</label>
+            <input type="text" id="lugar_residencia" name="lugar_residencia" maxlength="150" value="{{ perfil.lugar_residencia or '' }}" placeholder="Ciudad, país" />
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="lugar_estudio">Dónde estudiaste después del Liceo</label>
+          <input type="text" id="lugar_estudio" name="lugar_estudio" maxlength="150" value="{{ perfil.lugar_estudio or '' }}" placeholder="Universidad, institución..." />
+        </div>
+
+        <div class="campo">
+          <label for="frase">Frase o mensaje para tu promoción (opcional)</label>
+          <textarea id="frase" name="frase" maxlength="200" rows="2" placeholder="Algo que quieras que vean tus compañeros de promoción...">{{ perfil.frase or '' }}</textarea>
+          <span class="campo-ayuda">Aparece en tu tarjeta cuando alguien vea la promoción {{ perfil.anio_promocion or '' }}.</span>
+        </div>
+
+        <div class="contactos-header">
+          <label>Métodos de contacto</label>
+          <button type="button" class="btn-agregar" id="btnAgregarContacto">+ Agregar</button>
+        </div>
+
+        <div id="listaContactos" class="lista-contactos">
+          {% for c in perfil.contactos %}
+          <div class="fila-contacto">
+            <select name="contacto_tipo">
+              {% for tipo, etiqueta in [('telefono','Teléfono'),('whatsapp','WhatsApp'),('correo_alterno','Correo alterno'),('instagram','Instagram'),('facebook','Facebook'),('linkedin','LinkedIn'),('otro','Otro')] %}
+                <option value="{{ tipo }}" {% if c.tipo == tipo %}selected{% endif %}>{{ etiqueta }}</option>
+              {% endfor %}
+            </select>
+            <input type="text" name="contacto_valor" value="{{ c.valor }}" maxlength="190" placeholder="Valor" />
+            <button type="button" class="btn-quitar" onclick="this.closest('.fila-contacto').remove()" aria-label="Quitar">✕</button>
+          </div>
+          {% endfor %}
+        </div>
+
+        <template id="plantillaContacto">
+          <div class="fila-contacto">
+            <select name="contacto_tipo">
+              <option value="telefono">Teléfono</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="correo_alterno">Correo alterno</option>
+              <option value="instagram">Instagram</option>
+              <option value="facebook">Facebook</option>
+              <option value="linkedin">LinkedIn</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input type="text" name="contacto_valor" maxlength="190" placeholder="Valor" />
+            <button type="button" class="btn-quitar" onclick="this.closest('.fila-contacto').remove()" aria-label="Quitar">✕</button>
+          </div>
+        </template>
+
+        <button type="submit" class="btn-guardar">Guardar cambios</button>
+      </form>
+    </section>
+
+  </div>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="/static/js/perfil-form.js"></script>
+{% endblock %}

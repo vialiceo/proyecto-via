@@ -22,7 +22,8 @@
 
 /* ── Layout general ── */
 .layout-wrapper {
-  margin-left: var(--nav-width);
+  margin-left: 0;
+  margin-right: var(--nav-width);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -73,6 +74,31 @@
 }
 .ts-stars { color: var(--oro); font-size: 0.44rem; letter-spacing: 0.15em; }
 .ts-sun   { font-size: 0.72rem; color: var(--oro-claro); line-height: 1; }
+
+/* ── Accesos rápidos del topbar ── */
+.topbar-nav-icons { display: flex; align-items: center; gap: 0.45rem; margin-left: 1.4rem; }
+
+.topbar-nav-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.16);
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.topbar-nav-icon svg { width: 17px; height: 17px; }
+.topbar-nav-icon:hover { background: rgba(255,255,255,0.18); color: var(--oro-claro); }
+.topbar-nav-icon.active { background: var(--oro); color: var(--verde-oscuro); border-color: var(--oro); }
+
+@media (max-width: 720px) {
+  .topbar-nav-icons { display: none; }
+}
 
 /* ── Perfil ── */
 .profile-menu-wrapper {
@@ -318,6 +344,25 @@
   color: var(--verde-base);
   text-align: center;
   border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.promo-label-total {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.62rem;
+  letter-spacing: 0;
+  color: #888;
+  text-transform: none;
+}
+
+.carousel-vacio {
+  width: 100%;
+  text-align: center;
+  color: #888;
+  font-family: var(--fuente-cuerpo);
+  padding: 2rem 0;
 }
 
 /* Flechas del carrusel */
@@ -373,7 +418,7 @@
 }
 
 @media (max-width: 768px) {
-  .layout-wrapper { margin-left: 0; }
+  .layout-wrapper { margin-right: 0; }
 
   .main-content { padding: 1.5rem 1rem; }
 

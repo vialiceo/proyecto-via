@@ -1,0 +1,73 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}Panel de administración{% endblock %}
+{% block topbar_titulo %}Administración{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/admin.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Administración</p>
+    <h1 class="page-title">Panel general</h1>
+    <p class="page-desc">Resumen del sistema V.I.A. Los números se recalculan cada par de minutos, no en cada carga.</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-num">{{ stats.activo or 0 }}</span>
+      <span class="stat-label">Cuentas activas</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">{{ stats.pendiente or 0 }}</span>
+      <span class="stat-label">Pendientes de activar</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">{{ stats.inactivo or 0 }}</span>
+      <span class="stat-label">Inactivas</span>
+    </div>
+    <a class="stat-card stat-card--link" href="{{ url_for('admin.usuarios') }}">
+      <span class="stat-num">→</span>
+      <span class="stat-label">Ver todos los egresados</span>
+    </a>
+  </div>
+
+  <div class="paneles-grid">
+
+    <section class="panel">
+      <div class="panel-cabecera">
+        <h2>Tickets de soporte abiertos</h2>
+        <a href="{{ url_for('public.contacto') }}" class="panel-enlace">Ver canal de contacto</a>
+      </div>
+      <ul class="panel-lista">
+        {% for t in tickets_abiertos %}
+        <li>
+          <span class="panel-item-titulo">{{ t.asunto }}</span>
+          <span class="panel-item-meta">{{ t.nombre }} · {{ t.correo }} · {{ t.creado_en.strftime('%d/%m %H:%M') if t.creado_en else '' }}</span>
+        </li>
+        {% else %}
+        <li class="panel-vacio">No hay tickets abiertos.</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-cabecera">
+        <h2>Comentarios pendientes de revisión</h2>
+      </div>
+      <ul class="panel-lista">
+        {% for c in comentarios_pendientes %}
+        <li>
+          <span class="panel-item-titulo">{{ c.autor }}</span>
+          <span class="panel-item-meta">{{ c.contenido[:120] }}</span>
+        </li>
+        {% else %}
+        <li class="panel-vacio">No hay comentarios pendientes.</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+  </div>
+
+{% endblock %}

@@ -1,0 +1,234 @@
+/* ============================================================
+   V.I.A — layout.css
+   /static/css/usuarios/layout.css
+
+   Chrome compartido de TODAS las páginas nuevas del área de
+   usuarios (admin, perfiles, registro, perfil, comentarios):
+   topbar + menú de perfil + main-content + mensajes flash.
+   Antes esto se copiaba dentro de cada *.css de página (así quedó
+   index.css); se saca aparte para no repetirlo 5 veces más.
+   Incluir siempre junto con "Base usuarios.css" (variables + nav + footer).
+   ============================================================ */
+
+.layout-wrapper {
+  margin-left: 0;
+  margin-right: var(--nav-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ════════════════════════════
+   TOPBAR
+   ════════════════════════════ */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--topbar-height);
+  background: linear-gradient(90deg, var(--verde-base) 0%, var(--verde-medio) 100%);
+  display: flex;
+  align-items: center;
+  padding: 0 1.2rem 0 1rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+}
+
+.topbar-spacer { flex: 1; }
+
+.topbar-shield-link { text-decoration: none; flex-shrink: 0; }
+
+.topbar-shield {
+  width: 46px;
+  height: 46px;
+  background: linear-gradient(145deg, var(--verde-medio), var(--verde-oscuro));
+  border: 2px solid var(--oro);
+  border-radius: 3px 3px 40% 40% / 3px 3px 24% 24%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  box-shadow: 0 0 10px rgba(201,162,39,0.35);
+  transition: transform 0.18s;
+}
+
+.topbar-shield:hover { transform: scale(1.08); }
+
+.ts-top, .ts-bottom {
+  font-family: var(--fuente-display);
+  font-size: 0.22rem;
+  letter-spacing: 0.05em;
+  color: var(--oro-claro);
+}
+.ts-stars { color: var(--oro); font-size: 0.44rem; letter-spacing: 0.15em; }
+.ts-sun   { font-size: 0.72rem; color: var(--oro-claro); line-height: 1; }
+
+/* ── Accesos rápidos del topbar (íconos a secciones de la app) ── */
+.topbar-nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: 1.4rem;
+}
+
+.topbar-nav-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.16);
+  text-decoration: none;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.topbar-nav-icon svg { width: 17px; height: 17px; }
+
+.topbar-nav-icon:hover {
+  background: rgba(255,255,255,0.18);
+  color: var(--oro-claro);
+}
+
+.topbar-nav-icon.active {
+  background: var(--oro);
+  color: var(--verde-oscuro);
+  border-color: var(--oro);
+}
+
+@media (max-width: 720px) {
+  .topbar-nav-icons { display: none; }
+}
+
+.topbar-titulo {
+  font-family: var(--fuente-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--blanco);
+  margin-left: 0.9rem;
+}
+
+/* ── Perfil ── */
+.profile-menu-wrapper { position: relative; flex-shrink: 0; }
+
+.profile-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.10);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s, background 0.18s;
+  overflow: hidden;
+  padding: 0;
+}
+
+.profile-btn:hover {
+  border-color: var(--oro-claro);
+  background: rgba(255,255,255,0.18);
+}
+
+.profile-photo { width: 100%; height: 100%; object-fit: cover; }
+
+.profile-icon { width: 22px; height: 22px; color: rgba(255,255,255,0.85); }
+
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 200px;
+  background: var(--blanco);
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.20s, transform 0.20s;
+  z-index: 300;
+}
+
+.profile-dropdown.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.82rem;
+  color: #2a2a2a;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.dropdown-item:hover { background: #f0f4ee; }
+
+.dropdown-item svg { width: 15px; height: 15px; stroke: var(--verde-base); flex-shrink: 0; }
+
+.dropdown-divider { height: 1px; background: #e8e8e8; margin: 0.2rem 0; }
+
+.dropdown-item--danger       { color: #c0392b; }
+.dropdown-item--danger svg   { stroke: #c0392b; }
+.dropdown-item--danger:hover { background: #fdf0ee; }
+
+/* ════════════════════════════
+   MAIN CONTENT + FLASH
+   ════════════════════════════ */
+.main-content {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  background: #f4f6f2;
+}
+
+.flash-messages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+}
+
+.flash {
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.86rem;
+}
+
+.flash--error   { background: #fbe4e2; border: 1px solid #e6a49e; color: #8a2c23; }
+.flash--success { background: #e4f2e0; border: 1px solid #a9d3a0; color: #285c1f; }
+.flash--info    { background: #e6edf7; border: 1px solid #a9c2e3; color: #234a7a; }
+
+/* ── Encabezado de página estándar ── */
+.page-header { margin-bottom: 1.75rem; }
+
+.page-eyebrow {
+  font-family: var(--fuente-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  color: var(--verde-base);
+  margin-bottom: 0.4rem;
+}
+
+.page-title {
+  font-family: var(--fuente-serif);
+  font-size: 1.7rem;
+  color: var(--verde-oscuro);
+}
+
+.page-desc { font-family: var(--fuente-cuerpo); color: #555; margin-top: 0.35rem; }
+
+@media (max-width: 900px) {
+  .layout-wrapper { margin-right: 0; }
+  .main-content { padding: 1.5rem 1rem; }
+}

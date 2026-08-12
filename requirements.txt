@@ -1,0 +1,11 @@
+# V.I.A — dependencias del backend Flask
+# Versiones mínimas conocidas-estables; instala con: pip install -r requirements.txt
+Flask>=3.0
+Flask-Login>=0.6.3
+Flask-Limiter>=3.7
+Flask-Caching>=2.3
+Flask-WTF>=1.2
+Flask-Mail>=0.10
+mysql-connector-python>=9.0
+python-dotenv>=1.0
+email-validator>=2.1

@@ -43,7 +43,7 @@
 
       <!-- Nav links -->
       <nav class="navbar-links">
-        <a href="/templates/login.html" class="nav-cta">INGRESAR</a>
+        <a href="{{ url_for('auth.login') }}" class="nav-cta">INGRESAR</a>
       </nav>
 
       <!-- Hamburger móvil -->
@@ -89,7 +89,7 @@
           </div>
           <h2 class="perfil-title">EGRESADOS</h2>
           <p class="perfil-desc">Accede y actualiza tu información, conéctate con tu promoción y mantén vivo el vínculo con tu institución.</p>
-          <a href="/templates/login.html" class="perfil-btn">Ingresar →</a>
+          <a href="{{ url_for('auth.login') }}" class="perfil-btn">Ingresar →</a>
         </div>
       </div>
 
@@ -104,7 +104,7 @@
           </div>
           <h2 class="perfil-title">ADMINISTRADORES</h2>
           <p class="perfil-desc">Gestiona la información de egresados, promociones y configuración general del sistema V.I.A.</p>
-          <a href="/templates/login.html" class="perfil-btn">Ingresar →</a>
+          <a href="{{ url_for('auth.login') }}" class="perfil-btn">Ingresar →</a>
         </div>
       </div>
 
@@ -208,7 +208,7 @@
           <li><a href="#">Estatuto General</a></li>
           <li><a href="#">Estatuto Profesoral</a></li>
           <li><a href="#">Reglamento Estudiantil</a></li>
-          <li><a href="#">Política de Privacidad</a></li>
+          <li><a href="{{ url_for('public.aviso_legal') }}">Política de Privacidad</a></li>
         </ul>
       </div>
 

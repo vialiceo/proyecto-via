@@ -1,6 +1,6 @@
 <!-- ============================================================
      MOLDE FOOTER — Usuarios
-     Uso: {% include 'usuarios/_footer.html' %}
+     Uso: {% raw %}{% include 'usuarios/_footer.html' %}{% endraw %}
      ============================================================ -->
 
 <footer class="site-footer">
@@ -37,8 +37,7 @@
       <ul class="footer-links">
         <li><a href="#">Estatuto General</a></li>
         <li><a href="#">Estatuto Profesoral</a></li>
-       <!-- <li><a href="#">Reglamento Estudiantil Pregrado</a></li>
-        <li><a href="#">Reglamento Estudiantil Posgrado</a></li>-->
+        <li><a href="{{ url_for('public.aviso_legal') }}">Aviso de Privacidad</a></li>
       </ul>
     </div>
 

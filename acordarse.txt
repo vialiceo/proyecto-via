@@ -19,4 +19,5 @@ para enviar un focking git se usa git commit -m "mensaje" y luego git push
 
  profes si ven esto diganle a karla que colabore POR FAVOR 
 
+ git push 
  

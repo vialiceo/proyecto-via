@@ -25,7 +25,8 @@
 
 /* ── Layout ── */
 .layout-wrapper {
-  margin-left: var(--nav-width);
+  margin-left: 0;
+  margin-right: var(--nav-width);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -456,13 +457,76 @@
 .mr-link--gh { background: #24292e; }
 .mr-link--li { background: #0a66c2; }
 
+/* ════════════════════════════
+   FORMULARIO DE SOPORTE
+   ════════════════════════════ */
+.contacto-bloque--form { margin-top: 1.5rem; }
+
+.flash-messages { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.flash { padding: 0.65rem 0.9rem; border-radius: 8px; font-family: var(--fuente-cuerpo); font-size: 0.82rem; }
+.flash--error   { background: #fbe4e2; border: 1px solid #e6a49e; color: #8a2c23; }
+.flash--success { background: #e4f2e0; border: 1px solid #a9d3a0; color: #285c1f; }
+.flash--info    { background: #e6edf7; border: 1px solid #a9c2e3; color: #234a7a; }
+
+.form-soporte { display: flex; flex-direction: column; gap: 1rem; }
+
+.campo-fila-soporte { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.campo-soporte { display: flex; flex-direction: column; gap: 0.35rem; }
+
+.campo-soporte label {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.campo-soporte input,
+.campo-soporte textarea {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.9rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--gris-borde);
+  border-radius: 8px;
+  background: #fbfbfa;
+  resize: vertical;
+}
+
+.campo-soporte input:focus,
+.campo-soporte textarea:focus {
+  outline: none;
+  border-color: var(--verde-base);
+  background: var(--blanco);
+}
+
+.btn-enviar-soporte {
+  align-self: flex-start;
+  background: var(--verde-base);
+  color: var(--blanco);
+  border: none;
+  padding: 0.7rem 1.6rem;
+  border-radius: 8px;
+  font-family: var(--fuente-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background var(--transicion);
+}
+
+.btn-enviar-soporte:hover { background: var(--verde-oscuro); }
+
+@media (max-width: 560px) {
+  .campo-fila-soporte { grid-template-columns: 1fr; }
+}
+
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .equipo-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 768px) {
-  .layout-wrapper { margin-left: 0; }
+  .layout-wrapper { margin-right: 0; }
   .main-content   { padding: 1.5rem 1rem; }
   .contacto-grid  { grid-template-columns: 1fr; }
   .equipo-grid    { grid-template-columns: 1fr; }

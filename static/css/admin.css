@@ -1,0 +1,89 @@
+/* ============================================================
+   V.I.A — admin.css
+   /static/css/admin.css
+   Dashboard de administración (/admin).
+   ============================================================ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.4rem;
+  box-shadow: 0 2px 14px rgba(13, 35, 24, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-decoration: none;
+}
+
+.stat-num {
+  font-family: var(--fuente-display);
+  font-size: 2rem;
+  color: var(--verde-base);
+}
+
+.stat-label { font-size: 0.78rem; color: #777; }
+
+.stat-card--link { background: var(--verde-oscuro); }
+.stat-card--link .stat-num,
+.stat-card--link .stat-label { color: var(--oro-claro); }
+.stat-card--link:hover { background: var(--verde-base); }
+
+.paneles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .paneles-grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.4rem;
+  box-shadow: 0 2px 14px rgba(13, 35, 24, 0.08);
+}
+
+.panel-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.panel-cabecera h2 {
+  font-family: var(--fuente-serif);
+  font-size: 1.05rem;
+  color: var(--verde-oscuro);
+}
+
+.panel-enlace { font-size: 0.78rem; color: var(--verde-base); text-decoration: none; font-weight: 600; }
+.panel-enlace:hover { text-decoration: underline; }
+
+.panel-lista { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+
+.panel-lista li {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.panel-lista li:last-child { border-bottom: none; }
+
+.panel-item-titulo { font-weight: 700; font-size: 0.85rem; color: #222; }
+.panel-item-meta { font-size: 0.75rem; color: #888; }

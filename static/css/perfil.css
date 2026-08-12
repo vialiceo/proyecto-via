@@ -1,0 +1,224 @@
+/* ============================================================
+   V.I.A — perfil.css
+   /static/css/perfil.css
+   Página "Actualizar información" (/usuarios/perfil).
+   ============================================================ */
+
+.perfil-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .perfil-grid { grid-template-columns: 1fr; }
+}
+
+.perfil-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 14px rgba(13, 35, 24, 0.08);
+  padding: 1.75rem;
+}
+
+/* ── Identidad ── */
+.perfil-card--identidad { text-align: center; }
+
+.identidad-foto {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 0.75rem;
+  position: relative;
+}
+
+.identidad-foto img,
+.identidad-foto svg {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--oro);
+  color: var(--verde-base);
+  padding: 0;
+}
+
+.form-foto { margin-top: 0.5rem; }
+
+.btn-foto {
+  display: inline-block;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--verde-base);
+  border: 1px solid var(--verde-base);
+  border-radius: 20px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-foto:hover { background: var(--verde-base); color: #fff; }
+
+.identidad-nombre {
+  font-family: var(--fuente-serif);
+  font-size: 1.2rem;
+  color: var(--verde-oscuro);
+  margin-top: 0.6rem;
+}
+
+.identidad-rol {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-family: var(--fuente-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--oro);
+  background: var(--verde-oscuro);
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+}
+
+.identidad-datos {
+  text-align: left;
+  margin-top: 1.25rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.identidad-datos div {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  font-size: 0.85rem;
+}
+
+.identidad-datos dt { color: #888; }
+.identidad-datos dd { color: #222; font-weight: 600; text-align: right; }
+
+.identidad-nota {
+  margin-top: 1rem;
+  font-size: 0.76rem;
+  color: #999;
+}
+
+.identidad-nota a { color: var(--verde-base); }
+
+/* ── Formulario editable ── */
+.card-titulo {
+  font-family: var(--fuente-serif);
+  font-size: 1.15rem;
+  color: var(--verde-oscuro);
+  margin-bottom: 1.25rem;
+}
+
+.campo { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1.1rem; }
+
+.campo-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.campo label {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.78rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.92rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  background: #fbfbfa;
+  resize: vertical;
+}
+
+.campo-ayuda {
+  font-size: 0.72rem;
+  color: #999;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--verde-base);
+  background: #fff;
+}
+
+.contactos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.3rem 0 0.6rem;
+}
+
+.contactos-header label { font-family: var(--fuente-cuerpo); font-size: 0.78rem; font-weight: 600; color: #555; }
+
+.btn-agregar {
+  background: none;
+  border: 1px solid var(--verde-base);
+  color: var(--verde-base);
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.btn-agregar:hover { background: var(--verde-base); color: #fff; }
+
+.lista-contactos { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
+
+.fila-contacto {
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.fila-contacto select,
+.fila-contacto input {
+  font-family: var(--fuente-cuerpo);
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.btn-quitar {
+  background: #fdf0ee;
+  color: #c0392b;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.btn-guardar {
+  margin-top: 0.5rem;
+  background: var(--verde-base);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--fuente-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-guardar:hover { background: var(--verde-oscuro); }
+
+@media (max-width: 560px) {
+  .campo-fila { grid-template-columns: 1fr; }
+  .fila-contacto { grid-template-columns: 1fr; }
+}

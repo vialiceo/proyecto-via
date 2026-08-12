@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V.I.A – Aviso de privacidad</title>
+  <link rel="stylesheet" href="/static/css/ayuda.css" />
+  <link rel="stylesheet" href="/static/css/aviso_legal.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ══ TOPBAR ══ -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        contacto@liceotame.edu.co
+      </span>
+      <span class="topbar-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.72 6.72l1.06-1.52a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        (+57) 000 000 0000
+      </span>
+    </div>
+  </div>
+
+  <!-- ══ NAVBAR ══ -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a href="{{ url_for('public.index') }}" class="navbar-brand">
+        <div class="brand-shield">
+          <span class="bs-top">EXCELSIOR</span>
+          <div class="bs-stars">★ ★</div>
+          <div class="bs-sun">☀</div>
+          <span class="bs-bottom">LICEO T.</span>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Liceo Tame</span>
+          <span class="brand-sub">V.I.A — Vinculación Integral de Alumnos</span>
+        </div>
+      </a>
+
+      <nav class="navbar-links">
+        <a href="{{ url_for('auth.login') }}" class="nav-cta">INGRESAR</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ══ CONTENIDO ══ -->
+  <main class="legal-wrapper">
+    <div class="legal-header">
+      <p class="legal-eyebrow">Protección de datos</p>
+      <h1 class="legal-titulo">Aviso de privacidad y tratamiento de datos</h1>
+      <p class="legal-actualizado">Última actualización: 2026.</p>
+    </div>
+
+    <div class="legal-cuerpo">
+
+      <section class="legal-seccion">
+        <h2>1. Quiénes somos</h2>
+        <p>
+          El sistema V.I.A (Vinculación Integral de Alumnos) es administrado por la
+          Institución Educativa Liceo Tame, con sede en Tame, Arauca, Colombia, para
+          mantener el contacto con sus egresados y facilitar la gestión de sus cuentas.
+          Puedes contactarnos en <a href="mailto:contacto@liceotame.edu.co">contacto@liceotame.edu.co</a>
+          o a través del <a href="{{ url_for('public.contacto') }}">formulario de contacto</a>.
+        </p>
+      </section>
+
+      <section class="legal-seccion">
+        <h2>2. Qué datos recolectamos</h2>
+        <p>Al crear tu cuenta, la institución registra:</p>
+        <ul>
+          <li>Nombre, correo electrónico y usuario de acceso.</li>
+          <li>Año de promoción y programa técnico con el que te graduaste.</li>
+        </ul>
+        <p>De forma voluntaria, tú puedes agregar o editar desde tu perfil:</p>
+        <ul>
+          <li>Profesión actual, fecha de nacimiento, lugar de residencia y dónde estudiaste después del Liceo.</li>
+          <li>Métodos de contacto adicionales (teléfono, redes sociales, correo alterno).</li>
+          <li>Una fotografía de perfil.</li>
+          <li>Una frase o mensaje corto que se muestra a otros egresados en la página de tu promoción.</li>
+        </ul>
+        <p>
+          También registramos de forma automática la actividad de tu cuenta (inicios de
+          sesión, cambios de contraseña, actualizaciones de perfil) con fines de
+          seguridad, y la dirección IP desde la que se realizan esas acciones.
+        </p>
+      </section>
+
+      <section class="legal-seccion">
+        <h2>3. Para qué usamos tus datos</h2>
+        <ul>
+          <li>Permitirte iniciar sesión y usar el sistema V.I.A.</li>
+          <li>Mantener el vínculo entre la institución y sus egresados.</li>
+          <li>Mostrar tu nombre, foto, profesión y frase a otros egresados de tu misma promoción dentro de la plataforma.</li>
+          <li>Responder tus solicitudes de soporte o contacto.</li>
+          <li>Detectar y prevenir accesos indebidos a tu cuenta.</li>
+        </ul>
+        <p>
+          Tu correo, teléfono y demás métodos de contacto <strong>no se muestran a otros
+          egresados</strong>: son visibles únicamente para ti y para el personal
+          administrativo autorizado del Liceo Tame.
+        </p>
+      </section>
+
+      <section class="legal-seccion">
+        <h2>4. Con quién compartimos tus datos</h2>
+        <p>
+          No vendemos ni compartimos tus datos con terceros ajenos a la institución.
+          Solo el personal administrativo autorizado tiene acceso al panel donde se
+          gestionan las cuentas, y ese acceso queda registrado en la bitácora del
+          sistema.
+        </p>
+      </section>
+
+      <section class="legal-seccion">
+        <h2>5. Cómo protegemos tu información</h2>
+        <ul>
+          <li>Tu contraseña nunca se guarda en texto plano: se almacena cifrada (hash) y nadie, ni siquiera el administrador, puede verla.</li>
+          <li>Las contraseñas temporales que crea un administrador te obligan a definir una nueva en tu primer ingreso.</li>
+          <li>El acceso a la información administrativa está protegido por autenticación y control de intentos de acceso.</li>
+        </ul>
+      </section>
+
+      <section class="legal-seccion">
+        <h2>6. Tus derechos</h2>
+        <p>
+          Como titular de tus datos, en cualquier momento puedes:
+        </p>
+        <ul>
+          <li><strong>Acceder</strong> a tu información desde tu <a href="{{ url_for('usuarios.perfil') }}">perfil</a>.</li>
+          <li><strong>Actualizar o corregir</strong> los datos que tú mismo capturas.</li>
+          <li><strong>Solicitar la corrección</strong> de los datos que solo el administrador puede editar (nombre, correo, promoción, técnico).</li>
+          <li><strong>Solicitar la eliminación</strong> de tu cuenta y tus datos personales.</li>
+        </ul>
+        <p>
+          Para ejercer cualquiera de estos derechos, escríbenos desde
+          <a href="{{ url_for('public.contacto') }}">Contacto</a> o al correo
+          <a href="mailto:contacto@liceotame.edu.co">contacto@liceotame.edu.co</a>.
+        </p>
+      </section>
+
+      <section class="legal-seccion">
+        <h2>7. Cambios a este aviso</h2>
+        <p>
+          Si este aviso cambia de forma relevante, lo publicaremos en esta misma página
+          con la fecha de actualización correspondiente.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-col footer-col--brand">
+        <div class="footer-shield">
+          <span class="fs-top">EXCELSIOR</span>
+          <div class="fs-stars">★ ★</div>
+          <div class="fs-sun">☀</div>
+          <span class="fs-bottom">LICEO T.</span>
+        </div>
+        <p class="footer-brand-name">Liceo Tame</p>
+        <p class="footer-brand-sub">Institución Educativa</p>
+      </div>
+
+      <div class="footer-col">
+        <h4 class="footer-col-title">Canales de Atención</h4>
+        <ul class="footer-links">
+          <li>contacto@liceotame.edu.co</li>
+          <li>Tame, Arauca, Colombia</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Institución Educativa Liceo Tame — V.I.A. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

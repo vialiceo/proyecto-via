@@ -40,7 +40,7 @@ html, body {
 .sidebar-nav {
   position: fixed;
   top: 0;
-  left: 0;
+  right: 0;
   width: var(--nav-width);
   height: 100vh;
   background: linear-gradient(180deg, var(--verde-nav-claro) 0%, var(--verde-nav) 60%, #6e8f45 100%);
@@ -49,8 +49,8 @@ html, body {
   align-items: center;
   padding-top: 0.8rem;
   z-index: 200;
-  border-right: 2px solid rgba(255,255,255,0.22);
-  box-shadow: 3px 0 18px rgba(0,0,0,0.20);
+  border-left: 2px solid rgba(255,255,255,0.22);
+  box-shadow: -3px 0 18px rgba(0,0,0,0.20);
   transition: transform 0.28s ease;
 }
 
@@ -289,7 +289,7 @@ html, body {
    ════════════════════════════════════ */
 @media (max-width: 768px) {
   .sidebar-nav {
-    transform: translateX(-100%);
+    transform: translateX(100%);
     width: 200px;
   }
 

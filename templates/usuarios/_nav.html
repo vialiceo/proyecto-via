@@ -1,6 +1,6 @@
 <!-- ============================================================
      MOLDE NAV — Usuarios
-     Uso: {% include 'usuarios/_nav.html' %}
+     Uso: {% raw %}{% include 'usuarios/_nav.html' %}{% endraw %}
      ============================================================ -->
 
 <aside class="sidebar-nav" id="sidebarNav">
@@ -13,7 +13,7 @@
   </button>
 
   <!-- Escudo / logo -->
-  <a href="/static/img/" class="nav-shield-link" aria-label="Información de la institución">
+  <a href="{{ url_for('public.index') }}" class="nav-shield-link" aria-label="Ir al inicio">
     <div class="nav-shield">
       <span class="ns-top">EXCELSIOR</span>
       <div class="ns-stars">★ ★</div>
@@ -26,17 +26,22 @@
   <nav aria-label="Menú de usuarios">
     <ul class="nav-list">
       <li class="nav-item {% if active_page == 'principal' %}active{% endif %}">
-        <a href="/templates/index.html" class="nav-link">PRINCIPAL</a>
+        <a href="{{ url_for('public.index') }}" class="nav-link">PRINCIPAL</a>
       </li>
       <li class="nav-item {% if active_page == 'actualizar' %}active{% endif %}">
-        <a href="/templates/perfil.html class="nav-link">ACTUALIZAR INFORMACIÓN</a>
+        <a href="{{ url_for('usuarios.perfil') }}" class="nav-link">ACTUALIZAR INFORMACIÓN</a>
       </li>
       <li class="nav-item {% if active_page == 'ayuda' %}active{% endif %}">
-        <a href="/templates/ayuda.html" class="nav-link">AYUDA</a>
+        <a href="{{ url_for('public.ayuda') }}" class="nav-link">AYUDA</a>
       </li>
       <li class="nav-item {% if active_page == 'comentarios' %}active{% endif %}">
-        <a href="/templates/comentarios.html" class="nav-link">COMENTARIOS</a>
+        <a href="{{ url_for('usuarios.comentarios') }}" class="nav-link">COMENTARIOS</a>
       </li>
+      {% if current_user.is_authenticated and current_user.rol == 'administrador' %}
+      <li class="nav-item {% if active_page == 'admin' %}active{% endif %}">
+        <a href="{{ url_for('admin.dashboard') }}" class="nav-link">ADMINISTRACIÓN</a>
+      </li>
+      {% endif %}
     </ul>
   </nav>
 

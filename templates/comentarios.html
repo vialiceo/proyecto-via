@@ -1,0 +1,46 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}Comentarios{% endblock %}
+{% block topbar_titulo %}Comentarios{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/comentarios.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Comunidad</p>
+    <h1 class="page-title">Comentarios</h1>
+    <p class="page-desc">Un espacio para egresados: comparte algo con la comunidad V.I.A. Los mensajes se revisan antes de quedar públicos si algo se reporta.</p>
+  </div>
+
+  <form action="{{ url_for('usuarios.comentarios') }}" method="POST" class="form-comentario">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <textarea name="contenido" maxlength="1000" rows="3" placeholder="Escribe un comentario..." required></textarea>
+    <button type="submit" class="btn-publicar">Publicar</button>
+  </form>
+
+  <ul class="lista-comentarios">
+    {% for c in comentarios %}
+    <li class="comentario">
+      <div class="comentario-avatar">{{ c.autor[0]|upper }}</div>
+      <div class="comentario-cuerpo">
+        <div class="comentario-cabecera">
+          <span class="comentario-autor">{{ c.autor }}</span>
+          <span class="comentario-fecha">{{ c.creado_en.strftime('%d/%m/%Y %H:%M') if c.creado_en else '' }}</span>
+        </div>
+        <p class="comentario-texto">{{ c.contenido }}</p>
+      </div>
+    </li>
+    {% else %}
+    <li class="comentarios-vacio">Todavía no hay comentarios. ¡Sé el primero!</li>
+    {% endfor %}
+  </ul>
+
+  {% if comentarios|length >= 20 %}
+  <div class="paginacion">
+    <a href="?pagina={{ pagina + 1 }}" class="btn-siguiente">Ver más antiguos →</a>
+  </div>
+  {% endif %}
+
+{% endblock %}

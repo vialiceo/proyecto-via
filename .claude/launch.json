@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "via-flask",
+      "runtimeExecutable": "C:\\Users\\USER\\Documents\\proyecto-sena\\venv\\Scripts\\python.exe",
+      "runtimeArgs": ["C:\\Users\\USER\\Documents\\proyecto-sena\\run.py"],
+      "port": 5000
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{% extends 'usuarios/_layout.html' %}
+{% block active_page %}principal{% endblock %}
+{% block title %}Promoción {{ anio }}{% endblock %}
+{% block topbar_titulo %}Promoción {{ anio }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/promocion.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Egresados</p>
+    <h1 class="page-title">Promoción {{ anio }}</h1>
+    <p class="page-desc">{{ egresados|length }} egresado{{ 's' if egresados|length != 1 else '' }} de esta promoción.</p>
+  </div>
+
+  <div class="promocion-grid">
+    {% for e in egresados %}
+    <button
+      type="button"
+      class="egresado-card"
+      data-nombre="{{ e.nombre }}"
+      data-foto="{{ e.foto or '' }}"
+      data-profesion="{{ e.profesion or '' }}"
+      data-frase="{{ e.frase or '' }}"
+    >
+      <div class="egresado-foto">
+        {% if e.foto %}
+          <img src="{{ e.foto }}" alt="Foto de {{ e.nombre }}" />
+        {% else %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        {% endif %}
+      </div>
+      <span class="egresado-nombre">{{ e.nombre }}</span>
+    </button>
+    {% else %}
+    <p class="promocion-vacio">Todavía no hay egresados registrados en esta promoción.</p>
+    {% endfor %}
+  </div>
+
+  <!-- ── Pop-up de egresado ── -->
+  <div class="modal-fondo" id="modalEgresado" hidden>
+    <div class="modal-caja-egresado">
+      <button type="button" class="modal-cerrar" id="modalEgresadoCerrar" aria-label="Cerrar">✕</button>
+      <div class="modal-egresado-foto" id="modalEgresadoFoto"></div>
+      <h2 class="modal-egresado-nombre" id="modalEgresadoNombre"></h2>
+      <p class="modal-egresado-profesion" id="modalEgresadoProfesion"></p>
+      <p class="modal-egresado-frase" id="modalEgresadoFrase"></p>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="/static/js/promocion.js"></script>
+{% endblock %}
