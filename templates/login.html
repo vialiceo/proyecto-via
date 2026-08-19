@@ -6,6 +6,11 @@
   <title>V.I.A – Iniciar Sesión</title>
   <link rel="stylesheet" href="/static/css/login.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
+  <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
+  <link rel="stylesheet" href="/static/css/carga.css" />
+  <link rel="stylesheet" href="/static/css/movil.css" />
 </head>
 <body>
 
@@ -65,12 +70,12 @@
           {% endwith %}
 
           <div class="field-group">
-            <label for="usuario">USUARIO</label>
+            <label for="usuario">USUARIO O CÉDULA</label>
             <input
               type="text"
               id="usuario"
               name="usuario"
-              placeholder="Ingresa tu usuario"
+              placeholder="Tu usuario, correo o cédula"
               autocomplete="username"
               required
             />
@@ -116,6 +121,9 @@
         </form>
 
         <a href="{{ url_for('auth.recuperar') }}" class="link-recuperar">¿Olvidaste tu contraseña?</a>
+        <a href="{{ url_for('public.solicitar_cuenta') }}" class="link-solicitar">
+          ¿Eres egresado y no tienes cuenta? <strong>Solicítala aquí</strong>
+        </a>
 
       </div>
 
@@ -160,6 +168,8 @@
     btn.classList.remove('mostrando');
   }
 </script>
+
+  <script src="/static/js/carga.js"></script>
 
 </body>
 </html>

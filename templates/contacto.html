@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="/static/css/usuarios/Base usuarios.css" />
   <link rel="stylesheet" href="/static/css/contacto.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
+  <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
+  <link rel="stylesheet" href="/static/css/carga.css" />
+  <link rel="stylesheet" href="/static/css/movil.css" />
 </head>
 <body>
 
@@ -14,7 +19,10 @@
 
 
     <header class="topbar">
-      <a href="{{ url_for('public.index') }}" class="topbar-shield-link" aria-label="Información de la institución">
+      <a href="https://ieliceotame.edu.co" target="_blank" rel="noopener" class="topbar-shield-link" aria-label="Información de la institución">
+        {% if escudo_url %}
+          <img src="{{ escudo_url }}" alt="Escudo del Liceo Tame" class="topbar-shield-img" />
+        {% endif %}
         <div class="topbar-shield">
           <span class="ts-top">EXCELSIOR</span>
           <div class="ts-stars">★ ★</div>
@@ -322,6 +330,8 @@
 
   <script src="/static/js/perfil.js"></script>
   <script src="/static/js/contacto.js"></script>
+
+  <script src="/static/js/carga.js"></script>
 
 </body>
 </html>

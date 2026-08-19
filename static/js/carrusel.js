@@ -28,7 +28,7 @@ nextBtn.addEventListener('click', () => goTo(current + 1));
 
 document.getElementById('btnBuscarAno').addEventListener('click', () => {
   const ano = document.getElementById('filtroAno').value.trim();
-  if (ano) window.location.href = `/usuarios/promocion/${ano}`;
+  if (ano) window.location.href = `/usuarios/promociones?anio=${ano}`;
 });
 
 document.getElementById('filtroAno').addEventListener('keydown', (e) => {

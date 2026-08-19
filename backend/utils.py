@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import os
 import re
 import secrets
 from concurrent.futures import ThreadPoolExecutor
@@ -12,6 +13,15 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 logger = logging.getLogger("via")
+
+CORREO_SIMULADO = """CORREO SIMULADO (no se envio: falta MAIL_SERVER en .env)
+  De:     {remitente}
+  Para:   {destinatario}
+  Asunto: {asunto}
+  ----------------------------------------
+{cuerpo}
+  ----------------------------------------"""
+
 
 
 def hash_password(password_plano):
@@ -75,9 +85,26 @@ def encolar_tarea(fn, *args, **kwargs):
 
 
 def enviar_correo_async(destinatario, asunto, cuerpo_texto):
+    """Manda el correo en segundo plano para no dejar esperando al usuario.
+
+    Sin `MAIL_SERVER` configurado no falla: escribe el correo completo en
+    `logs/correos.log`, que hace las veces de bandeja de salida. Asi se puede
+    ver una contrasena temporal o una respuesta de soporte sin montar SMTP.
+    """
+
     def _enviar():
+        remitente = current_app.config.get("MAIL_DEFAULT_SENDER")
+
         if not current_app.config.get("MAIL_SERVER"):
-            logger.info("[correo simulado] para=%s asunto=%s\n%s", destinatario, asunto, cuerpo_texto)
+            logger.info(
+                CORREO_SIMULADO.format(
+                    remitente=remitente,
+                    destinatario=destinatario,
+                    asunto=asunto,
+                    cuerpo=cuerpo_texto,
+                ),
+                extra={"es_correo": True},
+            )
             return
 
         from flask_mail import Message
@@ -86,6 +113,12 @@ def enviar_correo_async(destinatario, asunto, cuerpo_texto):
 
         mensaje = Message(asunto, recipients=[destinatario], body=cuerpo_texto)
         mail.send(mensaje)
+        logger.info(
+            "CORREO ENVIADO  para=%s  asunto=%s",
+            destinatario,
+            asunto,
+            extra={"es_correo": True},
+        )
 
     encolar_tarea(_enviar)
 
@@ -108,6 +141,40 @@ _CORREO_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 def validar_correo(valor):
     return bool(valor) and bool(_CORREO_RE.match(valor.strip()))
+
+
+_CEDULA_RE = re.compile(r"^\d{6,15}$")
+
+
+def normalizar_cedula(valor):
+    if not valor:
+        return ""
+    return re.sub(r"[^\d]", "", str(valor))
+
+
+def validar_cedula(valor):
+    return bool(_CEDULA_RE.match(valor or ""))
+
+
+_ACENTOS = str.maketrans("áéíóúüñÁÉÍÓÚÜÑ", "aeiouunAEIOUUN")
+
+
+def sugerir_usuario(nombre, existe_login):
+    partes = [p for p in nombre.translate(_ACENTOS).lower().split() if p.isalpha()]
+    if not partes:
+        base = "egresado"
+    elif len(partes) == 1:
+        base = partes[0]
+    else:
+        base = f"{partes[0][0]}{partes[1]}"
+    base = re.sub(r"[^a-z0-9]", "", base)[:50] or "egresado"
+
+    candidato = base
+    sufijo = 1
+    while existe_login(candidato):
+        sufijo += 1
+        candidato = f"{base}{sufijo}"[:60]
+    return candidato
 
 
 def texto_no_vacio(valor, longitud_min=1, longitud_max=1000):
@@ -140,6 +207,40 @@ def extension_permitida(nombre_archivo):
 def nombre_archivo_seguro(usuario_id, nombre_original):
     ext = nombre_original.rsplit(".", 1)[1].lower()
     return secure_filename(f"usuario_{usuario_id}_{secrets.token_hex(6)}.{ext}")
+
+
+def es_imagen_real(stream):
+    """Mira los primeros bytes del archivo, no el nombre.
+
+    Cambiarle la extensión a un archivo es trivial; cambiarle la cabecera no.
+    Deja el cursor donde estaba para que después se pueda guardar completo.
+    """
+    posicion = stream.tell()
+    cabecera = stream.read(12)
+    stream.seek(posicion)
+
+    if cabecera.startswith(b"\x89PNG\r\n\x1a\n"):
+        return True
+    if cabecera.startswith(b"\xff\xd8\xff"):
+        return True
+    if cabecera[:4] == b"RIFF" and cabecera[8:12] == b"WEBP":
+        return True
+    return False
+
+
+def borrar_archivo_subido(ruta_publica):
+    """Borra la foto anterior para que la carpeta de subidas no crezca sin control."""
+    if not ruta_publica or not ruta_publica.startswith("/static/uploads/"):
+        return
+    nombre = os.path.basename(ruta_publica)
+    carpeta = os.path.join(current_app.root_path, current_app.config["UPLOAD_FOLDER"])
+    destino = os.path.join(carpeta, nombre)
+    if os.path.commonpath([os.path.abspath(destino), os.path.abspath(carpeta)]) != os.path.abspath(carpeta):
+        return
+    try:
+        os.remove(destino)
+    except OSError:
+        pass
 
 
 def ip_cliente():

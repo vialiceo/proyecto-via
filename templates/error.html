@@ -1,0 +1,37 @@
+{% extends '_auth_card.html' %}
+{% block titulo %}Error {{ codigo }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/error.css" />
+{% endblock %}
+
+{% block card_clase %}card-error{% endblock %}
+{% block card_titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+
+  <p class="error-codigo" aria-hidden="true">{{ codigo }}</p>
+
+  <p class="error-texto">{{ mensaje }}</p>
+
+  {% if detalle %}
+    <p class="error-detalle">{{ detalle }}</p>
+  {% endif %}
+
+  {% if pasos %}
+    <div class="error-pasos">
+      <p class="error-pasos-titulo">Cómo se arregla</p>
+      <ol>
+        {% for paso in pasos %}
+          <li>{{ paso|safe }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  {% endif %}
+
+  <div class="error-acciones">
+    <a href="{{ url_for('public.index') }}" class="btn-error">Volver al inicio</a>
+    <a href="{{ url_for('public.ayuda') }}" class="btn-error btn-error--secundario">Ir a Ayuda</a>
+  </div>
+
+{% endblock %}

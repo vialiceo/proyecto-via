@@ -6,6 +6,11 @@
   <title>V.I.A – Vinculación Integral de Alumnos</title>
   <link rel="stylesheet" href="/static/css/ayuda.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
+  <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
+  <link rel="stylesheet" href="/static/css/carga.css" />
+  <link rel="stylesheet" href="/static/css/movil.css" />
 </head>
 <body>
 
@@ -28,7 +33,7 @@
     <div class="navbar-inner">
 
 
-      <a href="#" class="navbar-brand">
+      <a href="https://ieliceotame.edu.co" target="_blank" rel="noopener" class="navbar-brand">
         <div class="brand-shield">
           <span class="bs-top">EXCELSIOR</span>
           <div class="bs-stars">★ ★</div>
@@ -43,6 +48,7 @@
 
 
       <nav class="navbar-links">
+        <a href="{{ url_for('public.solicitar_cuenta') }}" class="nav-secundario">SOLICITAR CUENTA</a>
         <a href="{{ url_for('auth.login') }}" class="nav-cta">INGRESAR</a>
       </nav>
 
@@ -90,6 +96,7 @@
           <h2 class="perfil-title">EGRESADOS</h2>
           <p class="perfil-desc">Accede y actualiza tu información, conéctate con tu promoción y mantén vivo el vínculo con tu institución.</p>
           <a href="{{ url_for('auth.login') }}" class="perfil-btn">Ingresar →</a>
+          <a href="{{ url_for('public.solicitar_cuenta') }}" class="perfil-link-secundario">Aún no tengo cuenta</a>
         </div>
       </div>
 
@@ -152,6 +159,58 @@
   </section>
 
 
+  <section class="soporte" id="ayuda-y-soporte">
+    <div class="soporte-inner">
+      <div class="soporte-header">
+        <p class="soporte-eyebrow">Ayuda y soporte</p>
+        <h2 class="soporte-titulo">¿Tienes dudas? Empecemos por aquí</h2>
+        <p class="soporte-desc">Encuentra respuestas a lo más frecuente o contáctanos directamente.</p>
+      </div>
+
+      <div class="soporte-grid">
+
+        <div class="faq-lista">
+          <details class="faq-item" open>
+            <summary>¿Cómo actualizo mi información de perfil?</summary>
+            <p>Inicia sesión y entra a "Mi perfil" desde el menú lateral. Ahí puedes editar tu profesión, contacto, dónde vives y dónde estudiaste.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Cómo solicito un certificado de egresado?</summary>
+            <p>Desde "Mis solicitudes" puedes crear una nueva solicitud eligiendo el tipo de trámite que necesitas.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Cómo funciona el Directorio de Alumnos?</summary>
+            <p>Te permite buscar y conectarte con otros egresados por nombre, programa o promoción. Tu correo y teléfono nunca se muestran ahí: solo tú y la institución los ven.</p>
+          </details>
+          <details class="faq-item">
+            <summary>¿Qué hago si tengo problemas para iniciar sesión?</summary>
+            <p>Usa "¿Olvidaste tu contraseña?" en la pantalla de ingreso. Si el problema sigue, escríbenos por el formulario de contacto.</p>
+          </details>
+        </div>
+
+        <div class="soporte-contacto">
+          <h3>Contáctanos</h3>
+          <ul class="soporte-canales">
+            <li>
+              <span class="canal-label">Centro de soporte</span>
+              <span class="canal-valor">soporte@via.liceotame.edu.co</span>
+            </li>
+            <li>
+              <span class="canal-label">Teléfono</span>
+              <span class="canal-valor">(+57) 000 000 0000</span>
+            </li>
+            <li>
+              <span class="canal-label">Horario</span>
+              <span class="canal-valor">Lunes a viernes, 8:00 a.m. – 6:00 p.m.</span>
+            </li>
+          </ul>
+          <a href="{{ url_for('public.contacto') }}" class="btn-soporte">Enviar ticket de soporte</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <footer class="footer">
     <div class="footer-inner">
 
@@ -180,7 +239,7 @@
 
 
       <div class="footer-col">
-        <h4 class="footer-col-title">Canales de Atención</h4>
+        <h3 class="footer-col-title">Canales de Atención</h3>
         <ul class="footer-links">
           <li>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.72 6.72l1.06-1.52a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
@@ -203,7 +262,7 @@
 
 
       <div class="footer-col">
-        <h4 class="footer-col-title">Información Legal</h4>
+        <h3 class="footer-col-title">Información Legal</h3>
         <ul class="footer-links footer-links--plain">
           <li><a href="#">Estatuto General</a></li>
           <li><a href="#">Estatuto Profesoral</a></li>
@@ -221,6 +280,8 @@
   </footer>
 
   <script src="/static/js/ayuda.js"></script>
+
+  <script src="/static/js/carga.js"></script>
 
 </body>
 </html>

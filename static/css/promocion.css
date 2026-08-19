@@ -130,3 +130,58 @@
   .promocion-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.9rem; }
   .egresado-foto { width: 62px; height: 62px; }
 }
+
+.promociones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.25rem;
+}
+
+.promo-mini-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(13, 35, 24, 0.08);
+  padding: 1.1rem;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.promo-mini-card:hover { transform: translateY(-2px); }
+.promo-mini-card.active { border-color: var(--oro); background: #fdf6e8; }
+
+.promo-mini-anio {
+  font-family: var(--fuente-display);
+  font-size: 1.3rem;
+  color: var(--verde-base);
+}
+
+.promo-mini-total { font-size: 0.76rem; color: #888; }
+
+.page-header--secundario {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.page-title--pequeno { font-size: 1.15rem; }
+
+.egresado-profesion { font-size: 0.72rem; color: #999; text-align: center; margin-top: -0.35rem; }
+
+.btn-enviar-mensaje-perfil {
+  display: inline-block;
+  margin-top: 1rem;
+  background: var(--verde-base);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.55rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.btn-enviar-mensaje-perfil:hover { background: var(--verde-oscuro); }

@@ -1,0 +1,157 @@
+{% extends 'usuarios/_layout.html' %}
+{% from '_paginacion.html' import paginacion %}
+{% block title %}Archivo de graduados{% endblock %}
+{% block topbar_titulo %}Administración · Archivo de graduados{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/admin_cuentas.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Archivo institucional</p>
+    <h1 class="page-title">Graduados del Liceo Tame</h1>
+    <p class="page-desc">
+      Este es el registro histórico de quienes se graduaron en la institución. No son cuentas:
+      es el listado contra el que se verifica cada solicitud de acceso al portal.
+    </p>
+  </div>
+
+  <div class="resumen-archivo">
+    <div class="resumen-item">
+      <span class="resumen-num">{{ resumen.total }}</span>
+      <span class="resumen-label">graduados registrados</span>
+    </div>
+    <div class="resumen-item">
+      <span class="resumen-num">{{ resumen.promociones }}</span>
+      <span class="resumen-label">promociones</span>
+    </div>
+    <div class="resumen-item">
+      <span class="resumen-num">{{ resumen.con_cuenta }}</span>
+      <span class="resumen-label">ya tienen cuenta</span>
+    </div>
+    <div class="resumen-item">
+      <span class="resumen-num">{{ resumen.total - resumen.con_cuenta }}</span>
+      <span class="resumen-label">sin cuenta todavía</span>
+    </div>
+  </div>
+
+  <section class="panel-carga">
+    <details class="bloque-plegable">
+      <summary>Añadir un graduado</summary>
+      <form action="{{ url_for('admin.graduados_nuevo') }}" method="POST" class="form-graduado">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="campo">
+          <label for="g_nombre">Nombre completo</label>
+          <input type="text" id="g_nombre" name="nombre" maxlength="150" required />
+        </div>
+        <div class="campo campo--corto">
+          <label for="g_cedula">Cédula (opcional)</label>
+          <input type="text" id="g_cedula" name="cedula" inputmode="numeric" maxlength="20" />
+        </div>
+        <div class="campo campo--corto">
+          <label for="g_anio">Año</label>
+          <input type="number" id="g_anio" name="anio_promocion" min="1967" max="2100" required />
+        </div>
+        <div class="campo">
+          <label for="g_tecnico">Técnico</label>
+          <select id="g_tecnico" name="tecnico_id">
+            <option value="">— No aplica —</option>
+            {% for t in tecnicos %}<option value="{{ t.id }}">{{ t.nombre }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="campo campo--corto">
+          <label for="g_acta">Libro / acta</label>
+          <input type="text" id="g_acta" name="libro_acta" maxlength="60" />
+        </div>
+        <button type="submit" class="btn-aprobar">Añadir al archivo</button>
+      </form>
+    </details>
+
+    <details class="bloque-plegable">
+      <summary>Importar desde CSV</summary>
+      <form action="{{ url_for('admin.graduados_importar') }}" method="POST" enctype="multipart/form-data" class="form-importar">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <p class="ayuda-csv">
+          El archivo debe estar en UTF-8 y tener una primera fila con los nombres de columna:
+          <code>{{ columnas_csv|join(', ') }}</code>.
+          Solo <code>nombre</code> y <code>anio_promocion</code> son obligatorios.
+          Si la cédula ya existe, la fila actualiza al graduado en vez de duplicarlo.
+        </p>
+        <div class="fila-importar">
+          <input type="file" name="archivo" accept=".csv" required />
+          <button type="submit" class="btn-aprobar">Importar</button>
+        </div>
+      </form>
+    </details>
+  </section>
+
+  <form class="filtros-archivo" action="{{ url_for('admin.graduados') }}" method="GET">
+    <input type="search" name="q" placeholder="Nombre o cédula" value="{{ filtros.q }}" />
+
+    <select name="anio_promocion">
+      <option value="">Todas las promociones</option>
+      {% for p in promociones %}
+        <option value="{{ p.anio_promocion }}" {% if filtros.anio_promocion|string == p.anio_promocion|string %}selected{% endif %}>
+          {{ p.anio_promocion }} ({{ p.total_graduados }})
+        </option>
+      {% endfor %}
+    </select>
+
+    <select name="tecnico_id">
+      <option value="">Todos los técnicos</option>
+      {% for t in tecnicos %}
+        <option value="{{ t.id }}" {% if filtros.tecnico_id|string == t.id|string %}selected{% endif %}>{{ t.nombre }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="con_cuenta">
+      <option value="">Con y sin cuenta</option>
+      <option value="si" {% if filtros.con_cuenta == 'si' %}selected{% endif %}>Solo con cuenta</option>
+      <option value="no" {% if filtros.con_cuenta == 'no' %}selected{% endif %}>Solo sin cuenta</option>
+    </select>
+
+    <button type="submit" class="btn-buscar">Filtrar</button>
+  </form>
+
+  <p class="conteo-resultados">{{ total }} resultado{{ 's' if total != 1 else '' }}</p>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-graduados">
+      <thead>
+        <tr>
+          <th>Cédula</th>
+          <th>Nombre</th>
+          <th>Promoción</th>
+          <th>Técnico</th>
+          <th>Acta</th>
+          <th>Cuenta</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for g in graduados %}
+          <tr>
+            <td class="celda-cedula">{{ g.cedula or '—' }}</td>
+            <td>{{ g.nombre }}</td>
+            <td>{{ g.anio_promocion }}</td>
+            <td>{{ g.tecnico_nombre or '—' }}</td>
+            <td>{{ g.libro_acta or '—' }}</td>
+            <td>
+              {% if g.usuario_id %}
+                <span class="pill pill-estado--aprobada">activa</span>
+              {% else %}
+                <span class="pill pill-estado--sin">sin cuenta</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="tabla-vacia">No hay graduados que coincidan con estos filtros.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {{ paginacion(pagina, por_pagina, total) }}
+
+{% endblock %}

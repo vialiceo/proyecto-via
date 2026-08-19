@@ -1,0 +1,120 @@
+{% extends 'usuarios/_layout.html' %}
+{% from '_paginacion.html' import paginacion %}
+{% block title %}Solicitudes de cuenta{% endblock %}
+{% block topbar_titulo %}Administración · Solicitudes de cuenta{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/admin_cuentas.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Administración</p>
+    <h1 class="page-title">Solicitudes de cuenta</h1>
+    <p class="page-desc">
+      Cada solicitud se contrasta contra el archivo de graduados. Al aprobarla se crea la cuenta
+      y se envía una contraseña temporal al correo registrado.
+    </p>
+  </div>
+
+  {% if pendientes %}
+    <p class="aviso-pendientes">
+      Tienes <strong>{{ pendientes }}</strong> solicitud{{ 'es' if pendientes != 1 else '' }} esperando revisión.
+    </p>
+  {% endif %}
+
+  <div class="barra-filtros">
+    <div class="tabs-estado">
+      <a href="{{ url_for('admin.solicitudes_cuenta') }}" class="tab {% if not estado %}active{% endif %}">Todas</a>
+      {% for e, etiqueta in [('pendiente','Pendientes'), ('aprobada','Aprobadas'), ('rechazada','Rechazadas')] %}
+        <a href="{{ url_for('admin.solicitudes_cuenta', estado=e) }}" class="tab {% if estado == e %}active{% endif %}">{{ etiqueta }}</a>
+      {% endfor %}
+    </div>
+
+    <form class="form-buscar" action="{{ url_for('admin.solicitudes_cuenta') }}" method="GET">
+      {% if estado %}<input type="hidden" name="estado" value="{{ estado }}" />{% endif %}
+      <input type="search" name="q" placeholder="Cédula, nombre o correo" value="{{ busqueda }}" />
+      <button type="submit" class="btn-buscar">Buscar</button>
+    </form>
+  </div>
+
+  <div class="lista-solicitudes">
+    {% for s in solicitudes %}
+      <article class="solicitud-cuenta {% if s.estado == 'pendiente' %}solicitud-cuenta--pendiente{% endif %}">
+
+        <header class="sc-cabecera">
+          <div class="sc-identidad">
+            <h2 class="sc-nombre">{{ s.nombre }}</h2>
+            <p class="sc-cedula">C.C. {{ s.cedula }} · Promoción {{ s.anio_promocion }}</p>
+          </div>
+          <div class="sc-meta">
+            <span class="pill pill-estado--{{ s.estado }}">{{ s.estado }}</span>
+            <span class="sc-radicado">#{{ s.id }} · {{ s.creado_en.strftime('%d/%m/%Y') if s.creado_en else '' }}</span>
+          </div>
+        </header>
+
+        <dl class="sc-datos">
+          <div><dt>Correo</dt><dd>{{ s.correo }}</dd></div>
+          <div><dt>Teléfono</dt><dd>{{ s.telefono or '—' }}</dd></div>
+          <div><dt>Técnico</dt><dd>{{ s.tecnico_nombre or 'No indicado' }}</dd></div>
+          <div><dt>Origen</dt><dd>{{ 'Formulario del portal' if s.origen == 'formulario' else 'Plataforma externa (API)' }}</dd></div>
+        </dl>
+
+        {% if s.mensaje %}
+          <p class="sc-mensaje">“{{ s.mensaje }}”</p>
+        {% endif %}
+
+        {% if s.graduado_id %}
+          <p class="sc-verificacion sc-verificacion--ok">
+            Coincide con <strong>{{ s.graduado_nombre }}</strong> en el archivo de graduados
+            {% if s.libro_acta %}(acta {{ s.libro_acta }}){% endif %}.
+          </p>
+        {% elif s.estado == 'pendiente' %}
+          <p class="sc-verificacion sc-verificacion--alerta">
+            No se encontró a esta persona en el archivo de graduados. Verifica el acta de grado antes de aprobar.
+          </p>
+        {% endif %}
+
+        {% if s.estado == 'pendiente' %}
+          <div class="sc-acciones">
+            <form action="{{ url_for('admin.solicitud_cuenta_aprobar', solicitud_id=s.id) }}" method="POST" class="sc-form-aprobar">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="volver_a" value="{{ estado or '' }}" />
+              {% if not s.graduado_id %}
+                <label class="sc-checkbox">
+                  <input type="checkbox" name="crear_graduado" value="1" />
+                  Añadirla también al archivo de graduados
+                </label>
+              {% endif %}
+              <button type="submit" class="btn-aprobar">Aprobar y crear cuenta</button>
+            </form>
+
+            <form action="{{ url_for('admin.solicitud_cuenta_rechazar', solicitud_id=s.id) }}" method="POST" class="sc-form-rechazar">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="volver_a" value="{{ estado or '' }}" />
+              <input type="text" name="motivo" maxlength="300" placeholder="Motivo del rechazo" required />
+              <button type="submit" class="btn-rechazar">Rechazar</button>
+            </form>
+          </div>
+        {% else %}
+          <p class="sc-resolucion">
+            {% if s.estado == 'aprobada' %}
+              Aprobada{% if s.revisor_nombre %} por {{ s.revisor_nombre }}{% endif %}
+              {% if s.revisado_en %} el {{ s.revisado_en.strftime('%d/%m/%Y') }}{% endif %}.
+            {% else %}
+              Rechazada{% if s.revisor_nombre %} por {{ s.revisor_nombre }}{% endif %}:
+              {{ s.motivo_rechazo }}
+            {% endif %}
+          </p>
+        {% endif %}
+
+      </article>
+    {% else %}
+      <p class="lista-vacia">No hay solicitudes que coincidan con este filtro.</p>
+    {% endfor %}
+  </div>
+
+  {{ paginacion(pagina, por_pagina, total) }}
+
+{% endblock %}

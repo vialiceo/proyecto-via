@@ -17,7 +17,7 @@ class Config:
     MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
     MYSQL_USER = os.getenv("MYSQL_USER", "root")
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
-    MYSQL_DB = os.getenv("MYSQL_DB", "via_db")
+    MYSQL_DB = os.getenv("MYSQL_DB", "egresados")
     MYSQL_POOL_SIZE = int(os.getenv("MYSQL_POOL_SIZE", "10"))
 
     RATELIMIT_STORAGE_URI = os.getenv("RATELIMIT_STORAGE_URI", "memory://")
@@ -45,9 +45,16 @@ class Config:
 
     ADMIN_PAGE_SIZE = 25
 
+    SOLICITUDES_API_KEY = os.getenv("SOLICITUDES_API_KEY") or None
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
+
+    # El navegador guarda los CSS y JS en caché: sin esto, al editar una hoja
+    # de estilos hay que recargar con Ctrl+F5 para ver el cambio.
+    SEND_FILE_MAX_AGE_DEFAULT = 0
+    TEMPLATES_AUTO_RELOAD = True
 
 
 class ProductionConfig(Config):

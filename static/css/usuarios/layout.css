@@ -39,6 +39,21 @@
 
 .topbar-shield:hover { transform: scale(1.08); }
 
+.topbar-shield-img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.18s;
+}
+
+.topbar-shield-link:hover .topbar-shield-img { transform: scale(1.08); }
+
+/* Si el archivo del escudo existe, se oculta el escudo dibujado con CSS.
+   Si no existe, onerror borra la <img> y vuelve a verse el de CSS. */
+.topbar-shield-img + .topbar-shield { display: none; }
+
+
 .ts-top, .ts-bottom {
   font-family: var(--fuente-display);
   font-size: 0.22rem;

@@ -1,11 +1,44 @@
 # V.I.A — dependencias del backend Flask
-# Versiones mínimas conocidas-estables; instala con: pip install -r requirements.txt
-Flask>=3.0
-Flask-Login>=0.6.3
-Flask-Limiter>=3.7
-Flask-Caching>=2.3
-Flask-WTF>=1.2
-Flask-Mail>=0.10
-mysql-connector-python>=9.0
-python-dotenv>=1.0
-email-validator>=2.1
+#
+#   pip install -r requirements.txt
+#
+# Las versiones van fijadas con == a propósito: son exactamente las que se
+# probaron en este proyecto. Con >= una instalación futura podría traer una
+# versión distinta y romperse el día de la sustentación. Para actualizar a
+# conciencia: pip install -U <paquete> y volver a correr la app.
+
+# --- Núcleo ----------------------------------------------------------------
+Flask==3.1.3
+Werkzeug==3.1.8              # hashing de contraseñas (scrypt) y utilidades WSGI
+Jinja2==3.1.6                # motor de plantillas
+MarkupSafe==3.0.3            # escapado automático en las plantillas
+itsdangerous==2.2.0          # firma de la cookie de sesión
+click==8.4.2                 # comandos de consola de Flask
+blinker==1.9.0               # señales internas de Flask
+
+# --- Extensiones -----------------------------------------------------------
+Flask-Login==0.6.3           # sesión del usuario y @login_required
+Flask-WTF==1.3.0             # protección CSRF de los formularios
+WTForms==3.2.2               # dependencia de Flask-WTF
+Flask-Limiter==4.1.1         # límite de peticiones (login, API pública)
+limits==5.8.0                # dependencia de Flask-Limiter
+Flask-Caching==2.4.1         # caché de las consultas del panel
+cachelib==0.15.4             # dependencia de Flask-Caching
+Flask-Mail==0.10.0           # correos de recuperación de contraseña
+
+# --- Base de datos ---------------------------------------------------------
+mysql-connector-python==26.7.0   # driver oficial de MySQL, con pool incluido
+
+# --- Configuración y validación -------------------------------------------
+python-dotenv==1.2.2         # lee el archivo .env
+email-validator==2.3.0       # valida que un correo exista como formato real
+dnspython==2.8.0             # dependencia de email-validator
+idna==3.18                   # dependencia de email-validator
+
+# --- Dependencias indirectas (las instala pip solo, se fijan por seguridad) -
+colorama==0.4.6
+Deprecated==1.3.1
+ordered-set==4.1.0
+packaging==26.3
+typing_extensions==4.16.0
+wrapt==2.3.0

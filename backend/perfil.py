@@ -1,12 +1,22 @@
 import os
+from datetime import datetime
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from backend import experiencia, models, utils
 from backend.extensions import cache, limiter
 
 usuarios_bp = Blueprint("usuarios", __name__, url_prefix="/usuarios")
+
+TIPOS_SOLICITUD = [
+    "Certificado de egresado",
+    "Constancia de estudios",
+    "Descuento por excelencia",
+    "Reingreso académico",
+    "Retiro temporal",
+    "Otro",
+]
 
 
 @usuarios_bp.route("/perfil", methods=["GET", "POST"])
@@ -24,10 +34,12 @@ def perfil():
             for error in errores:
                 flash(error, "error")
             vista = experiencia.construir_vista_perfil(current_user.id)
-            return render_template("perfil.html", perfil=vista, active_page="actualizar"), 400
+            return render_template("perfil.html", perfil=vista, active_page="actualizar", mostrar_edicion=True), 400
 
-        experiencia.guardar_perfil(current_user.id, datos, contactos)
+        avisos = experiencia.guardar_perfil(current_user.id, datos, contactos)
         flash("Perfil actualizado.", "success")
+        for categoria, texto in avisos:
+            flash(texto, categoria)
         return redirect(url_for("usuarios.perfil"))
 
     vista = experiencia.construir_vista_perfil(current_user.id)
@@ -47,13 +59,19 @@ def actualizar_foto():
         flash("Formato no permitido. Usa PNG, JPG o WEBP.", "error")
         return redirect(url_for("usuarios.perfil"))
 
+    if not utils.es_imagen_real(archivo.stream):
+        flash("El archivo no es una imagen válida, aunque termine en .jpg o .png.", "error")
+        return redirect(url_for("usuarios.perfil"))
+
     nombre_seguro = utils.nombre_archivo_seguro(current_user.id, archivo.filename)
     carpeta_absoluta = os.path.join(current_app.root_path, current_app.config["UPLOAD_FOLDER"])
     os.makedirs(carpeta_absoluta, exist_ok=True)
     archivo.save(os.path.join(carpeta_absoluta, nombre_seguro))
 
+    foto_anterior = current_user.foto
     ruta_publica = f"/static/uploads/perfiles/{nombre_seguro}"
     models.actualizar_foto(current_user.id, ruta_publica)
+    utils.borrar_archivo_subido(foto_anterior)
     utils.encolar_tarea(models.registrar_bitacora, current_user.id, "foto_actualizada", ip=utils.ip_cliente())
 
     flash("Foto de perfil actualizada.", "success")
@@ -84,13 +102,231 @@ def _comentarios_visibles_cacheados(pagina):
     return models.listar_comentarios_visibles(pagina=pagina, por_pagina=20)
 
 
-@usuarios_bp.route("/promocion/<int:anio>")
+@usuarios_bp.route("/promociones")
 @login_required
-def promocion(anio):
-    egresados = _egresados_por_promocion_cacheados(anio)
-    return render_template("promocion.html", anio=anio, egresados=egresados, active_page="principal")
+def promociones():
+    anio = request.args.get("anio", type=int)
+    lista_promociones = _todas_las_promociones_cacheadas()
+    egresados = _egresados_por_promocion_cacheados(anio) if anio else []
+    return render_template(
+        "promocion.html",
+        promociones=lista_promociones,
+        anio=anio,
+        egresados=egresados,
+        active_page="promociones",
+    )
+
+
+@cache.memoize(timeout=180)
+def _todas_las_promociones_cacheadas():
+    return models.listar_todas_promociones()
 
 
 @cache.memoize(timeout=120)
 def _egresados_por_promocion_cacheados(anio):
     return models.listar_egresados_por_promocion(anio, pagina=1, por_pagina=200)
+
+
+@usuarios_bp.route("/directorio")
+@login_required
+def directorio():
+    busqueda = request.args.get("q", "").strip() or None
+    tecnico_id = request.args.get("tecnico_id", type=int)
+    anio_promocion = request.args.get("anio_promocion", type=int)
+    pagina, por_pagina = utils.parametros_paginacion(valor_por_defecto=24, maximo=60)
+
+    items, total = models.listar_directorio(
+        busqueda=busqueda, tecnico_id=tecnico_id, anio_promocion=anio_promocion,
+        pagina=pagina, por_pagina=por_pagina,
+    )
+    tecnicos = models.listar_tecnicos_activos()
+
+    return render_template(
+        "perfiles.html",
+        egresados=items,
+        total=total,
+        pagina=pagina,
+        por_pagina=por_pagina,
+        tecnicos=tecnicos,
+        filtros={"q": busqueda or "", "tecnico_id": tecnico_id or "", "anio_promocion": anio_promocion or ""},
+        active_page="directorio",
+    )
+
+
+@usuarios_bp.route("/solicitudes", methods=["GET", "POST"])
+@login_required
+def solicitudes():
+    if request.method == "POST":
+        tipo = (request.form.get("tipo") or "").strip()
+        descripcion = (request.form.get("descripcion") or "").strip()
+
+        if tipo not in TIPOS_SOLICITUD:
+            flash("Selecciona un tipo de solicitud válido.", "error")
+        elif not utils.texto_no_vacio(descripcion, 5, 500):
+            flash("Describe tu solicitud en al menos 5 caracteres.", "error")
+        else:
+            models.crear_solicitud(current_user.id, tipo, descripcion)
+            flash("Solicitud enviada. Te avisaremos cuando cambie de estado.", "success")
+        return redirect(url_for("usuarios.solicitudes"))
+
+    estado = request.args.get("estado") or None
+    pagina, por_pagina = utils.parametros_paginacion(valor_por_defecto=20, maximo=50)
+
+    if current_user.rol == "administrador":
+        items, total = models.listar_solicitudes_admin(estado=estado, pagina=pagina, por_pagina=por_pagina)
+    else:
+        items = models.listar_solicitudes_usuario(current_user.id, estado=estado, pagina=pagina, por_pagina=por_pagina)
+        total = len(items)
+
+    return render_template(
+        "solicitudes.html",
+        solicitudes=items,
+        total=total,
+        estado=estado or "",
+        tipos=TIPOS_SOLICITUD,
+        active_page="solicitudes",
+    )
+
+
+@usuarios_bp.route("/solicitudes/<int:solicitud_id>/estado", methods=["POST"])
+@utils.admin_required
+def solicitud_estado(solicitud_id):
+    estado = request.form.get("estado")
+    respuesta = (request.form.get("respuesta") or "").strip() or None
+    if estado not in ("pendiente", "en_proceso", "aprobada", "rechazada", "cancelada"):
+        flash("Estado no válido.", "error")
+    else:
+        models.actualizar_estado_solicitud(solicitud_id, estado, respuesta)
+        flash("Solicitud actualizada.", "success")
+    return redirect(url_for("usuarios.solicitudes"))
+
+
+@usuarios_bp.route("/mensajes")
+@login_required
+def mensajes():
+    conversaciones = models.listar_conversaciones(current_user.id)
+
+    conversacion_id = request.args.get("con", type=int)
+    conversacion_actual = None
+    hilo = []
+    if conversacion_id:
+        conversacion_actual = models.obtener_conversacion(conversacion_id, current_user.id)
+        if conversacion_actual:
+            hilo = models.listar_mensajes(conversacion_id)
+            models.marcar_mensajes_leidos(conversacion_id, current_user.id)
+
+    return render_template(
+        "mensajes.html",
+        conversaciones=conversaciones,
+        conversacion_id=conversacion_id,
+        conversacion_actual=conversacion_actual,
+        hilo=hilo,
+        active_page="mensajes",
+    )
+
+
+@usuarios_bp.route("/mensajes/<int:conversacion_id>/enviar", methods=["POST"])
+@login_required
+@limiter.limit("30 per minute")
+def mensajes_enviar(conversacion_id):
+    conversacion = models.obtener_conversacion(conversacion_id, current_user.id)
+    if not conversacion:
+        abort(404)
+
+    contenido = (request.form.get("contenido") or "").strip()
+    if utils.texto_no_vacio(contenido, 1, 2000):
+        models.enviar_mensaje(conversacion_id, current_user.id, contenido)
+    return redirect(url_for("usuarios.mensajes", con=conversacion_id))
+
+
+@usuarios_bp.route("/mensajes/con/<int:usuario_id>")
+@login_required
+def mensajes_con(usuario_id):
+    if usuario_id == current_user.id:
+        abort(404)
+    if not models.obtener_usuario_por_id(usuario_id):
+        abort(404)
+    conversacion_id = models.obtener_o_crear_conversacion(current_user.id, usuario_id)
+    return redirect(url_for("usuarios.mensajes", con=conversacion_id))
+
+
+@usuarios_bp.route("/eventos")
+@login_required
+def eventos():
+    momento = "pasados" if request.args.get("momento") == "pasados" else "proximos"
+    pagina, por_pagina = utils.parametros_paginacion(valor_por_defecto=20, maximo=50)
+    items = models.listar_eventos(momento=momento, pagina=pagina, por_pagina=por_pagina)
+    return render_template("eventos.html", eventos=items, momento=momento, active_page="eventos")
+
+
+@usuarios_bp.route("/eventos/nuevo", methods=["GET", "POST"])
+@utils.admin_required
+def eventos_nuevo():
+    if request.method == "POST":
+        errores, datos = _validar_evento(request.form)
+        if errores:
+            for error in errores:
+                flash(error, "error")
+            return render_template("eventos.html", eventos=[], momento="proximos", evento_form=datos, active_page="eventos"), 400
+        models.crear_evento(**datos, creado_por=current_user.id)
+        flash("Evento creado.", "success")
+        return redirect(url_for("usuarios.eventos"))
+    return redirect(url_for("usuarios.eventos"))
+
+
+@usuarios_bp.route("/eventos/<int:evento_id>/editar", methods=["POST"])
+@utils.admin_required
+def eventos_editar(evento_id):
+    if not models.obtener_evento(evento_id):
+        abort(404)
+    errores, datos = _validar_evento(request.form)
+    if errores:
+        for error in errores:
+            flash(error, "error")
+    else:
+        models.actualizar_evento(evento_id, **datos)
+        flash("Evento actualizado.", "success")
+    return redirect(url_for("usuarios.eventos"))
+
+
+@usuarios_bp.route("/eventos/<int:evento_id>/eliminar", methods=["POST"])
+@utils.admin_required
+def eventos_eliminar(evento_id):
+    models.eliminar_evento(evento_id)
+    flash("Evento eliminado.", "success")
+    return redirect(url_for("usuarios.eventos"))
+
+
+def _validar_evento(form):
+    errores = []
+    titulo = (form.get("titulo") or "").strip()
+    descripcion = (form.get("descripcion") or "").strip() or None
+    categoria = form.get("categoria") or "otro"
+    lugar = (form.get("lugar") or "").strip() or None
+    fecha_raw = (form.get("fecha_inicio") or "").strip()
+
+    if not utils.texto_no_vacio(titulo, 3, 150):
+        errores.append("El título debe tener entre 3 y 150 caracteres.")
+    if categoria not in ("academico", "profesional", "egresados", "taller", "cultural", "deportivo", "otro"):
+        errores.append("Categoría no válida.")
+
+    fecha_inicio = None
+    try:
+        fecha_inicio = datetime.fromisoformat(fecha_raw)
+    except ValueError:
+        errores.append("La fecha y hora del evento no son válidas.")
+
+    return errores, {
+        "titulo": titulo,
+        "descripcion": descripcion,
+        "categoria": categoria,
+        "lugar": lugar,
+        "fecha_inicio": fecha_inicio,
+    }
+
+
+@usuarios_bp.route("/configuracion")
+@login_required
+def configuracion():
+    vista = experiencia.construir_vista_perfil(current_user.id)
+    return render_template("configuracion.html", perfil=vista, active_page="configuracion")

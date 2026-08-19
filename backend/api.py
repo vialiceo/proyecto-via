@@ -1,9 +1,11 @@
+import hmac
+
 import mysql.connector
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from flask_login import current_user, login_required
 
 from backend import experiencia, models, utils
-from backend.extensions import cache, limiter
+from backend.extensions import cache, csrf, limiter
 
 api_bp = Blueprint("api", __name__, url_prefix="/api/v1")
 
@@ -91,6 +93,43 @@ def soporte_post():
     return _ok({"id": ticket_id}, 201)
 
 
+def _api_key_valida():
+    """La clave se compara con hmac para no filtrar información por el tiempo de respuesta."""
+    esperada = current_app.config.get("SOLICITUDES_API_KEY")
+    if not esperada:
+        return False
+    recibida = request.headers.get("X-API-Key") or ""
+    return hmac.compare_digest(str(esperada), recibida)
+
+
+@api_bp.route("/solicitudes-cuenta", methods=["POST"])
+@csrf.exempt
+@limiter.limit("60 per hour")
+def solicitudes_cuenta_post():
+    """Permite que una plataforma externa deje solicitudes en la misma bandeja de aprobación."""
+    if not _api_key_valida():
+        return _error("Clave de API inválida o ausente.", 401)
+
+    from backend.routes import registrar_solicitud_cuenta, validar_solicitud_cuenta
+
+    body = request.get_json(silent=True) or {}
+    limpios, errores = validar_solicitud_cuenta(body)
+    if errores:
+        return _error(" / ".join(errores), 400)
+
+    solicitud_id, graduado = registrar_solicitud_cuenta(
+        limpios, origen="api", ip_origen=utils.ip_cliente()
+    )
+    return _ok(
+        {
+            "id": solicitud_id,
+            "estado": "pendiente",
+            "coincide_con_archivo": graduado is not None,
+        },
+        201,
+    )
+
+
 @api_bp.route("/admin/usuarios", methods=["GET"])
 @utils.admin_required
 def admin_usuarios_get():
@@ -165,8 +204,8 @@ def admin_usuario_estado(usuario_id):
         models.registrar_bitacora, current_user.id, "usuario_estado_cambiado",
         detalle=f"Cuenta #{usuario_id} -> {estado}", ip=utils.ip_cliente(),
     )
-    from backend.admin import _invalidar_stats
-    _invalidar_stats()
+    from backend.routes import invalidar_stats_dashboard
+    invalidar_stats_dashboard()
     return _ok({"id": usuario_id, "estado": estado})
 
 

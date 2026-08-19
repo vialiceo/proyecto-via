@@ -21,9 +21,16 @@
     <form action="{{ url_for('admin.usuarios_nuevo') }}" method="POST" class="form-registro" novalidate>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-      <div class="campo">
-        <label for="nombre">Nombre completo</label>
-        <input type="text" id="nombre" name="nombre" maxlength="150" required value="{{ form.nombre or '' }}" />
+      <div class="campo-fila">
+        <div class="campo">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" name="nombre" maxlength="150" required value="{{ form.nombre or '' }}" />
+        </div>
+        <div class="campo">
+          <label for="cedula">Cédula</label>
+          <input type="text" id="cedula" name="cedula" inputmode="numeric" maxlength="20" value="{{ form.cedula or '' }}" />
+          <span class="field-ayuda">Opcional, pero es lo que enlaza la cuenta con el archivo de graduados.</span>
+        </div>
       </div>
 
       <div class="campo-fila">

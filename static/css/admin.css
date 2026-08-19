@@ -34,6 +34,9 @@
 .stat-card--link .stat-label { color: var(--oro-claro); }
 .stat-card--link:hover { background: var(--verde-base); }
 
+.stat-card--alerta { background: #8a6d10; }
+.stat-card--alerta:hover { background: #a8830f; }
+
 .paneles-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

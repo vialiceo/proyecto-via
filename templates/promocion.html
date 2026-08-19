@@ -1,7 +1,6 @@
 {% extends 'usuarios/_layout.html' %}
-{% block active_page %}principal{% endblock %}
-{% block title %}Promoción {{ anio }}{% endblock %}
-{% block topbar_titulo %}Promoción {{ anio }}{% endblock %}
+{% block title %}Ver promociones{% endblock %}
+{% block topbar_titulo %}Ver promociones{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="/static/css/promocion.css" />
@@ -11,8 +10,25 @@
 
   <div class="page-header">
     <p class="page-eyebrow">Egresados</p>
-    <h1 class="page-title">Promoción {{ anio }}</h1>
-    <p class="page-desc">{{ egresados|length }} egresado{{ 's' if egresados|length != 1 else '' }} de esta promoción.</p>
+    <h1 class="page-title">Ver promociones</h1>
+    <p class="page-desc">Consulta las promociones de egresados y conéctate con tu comunidad.</p>
+  </div>
+
+  <div class="promociones-grid">
+    {% for p in promociones %}
+    <a href="{{ url_for('usuarios.promociones', anio=p.anio_promocion) }}" class="promo-mini-card {% if anio == p.anio_promocion %}active{% endif %}">
+      <span class="promo-mini-anio">{{ p.anio_promocion }}</span>
+      <span class="promo-mini-total">{{ p.total_egresados }} egresado{{ 's' if p.total_egresados != 1 else '' }}</span>
+    </a>
+    {% else %}
+    <p class="promocion-vacio">Todavía no hay promociones con egresados registrados.</p>
+    {% endfor %}
+  </div>
+
+  {% if anio %}
+  <div class="page-header page-header--secundario">
+    <h2 class="page-title page-title--pequeno">Egresados promoción {{ anio }}</h2>
+    <span class="page-desc">{{ egresados|length }} egresado{{ 's' if egresados|length != 1 else '' }}</span>
   </div>
 
   <div class="promocion-grid">
@@ -20,6 +36,7 @@
     <button
       type="button"
       class="egresado-card"
+      data-id="{{ e.id }}"
       data-nombre="{{ e.nombre }}"
       data-foto="{{ e.foto or '' }}"
       data-profesion="{{ e.profesion or '' }}"
@@ -33,25 +50,28 @@
         {% endif %}
       </div>
       <span class="egresado-nombre">{{ e.nombre }}</span>
+      {% if e.profesion %}<span class="egresado-profesion">{{ e.profesion }}</span>{% endif %}
     </button>
     {% else %}
     <p class="promocion-vacio">Todavía no hay egresados registrados en esta promoción.</p>
     {% endfor %}
   </div>
+  {% endif %}
 
-
-  <div class="modal-fondo" id="modalEgresado" hidden>
+  <div class="modal-fondo" id="modalEgresado" role="dialog" aria-modal="true" aria-labelledby="modalEgresadoNombre" hidden>
     <div class="modal-caja-egresado">
       <button type="button" class="modal-cerrar" id="modalEgresadoCerrar" aria-label="Cerrar">✕</button>
       <div class="modal-egresado-foto" id="modalEgresadoFoto"></div>
       <h2 class="modal-egresado-nombre" id="modalEgresadoNombre"></h2>
       <p class="modal-egresado-profesion" id="modalEgresadoProfesion"></p>
       <p class="modal-egresado-frase" id="modalEgresadoFrase"></p>
+      <a href="#" id="modalEgresadoMensaje" class="btn-enviar-mensaje-perfil">Enviar mensaje</a>
     </div>
   </div>
 
 {% endblock %}
 
 {% block extra_js %}
+  <script src="/static/js/modal.js"></script>
   <script src="/static/js/promocion.js"></script>
 {% endblock %}

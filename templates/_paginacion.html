@@ -1,0 +1,40 @@
+{#
+  Paginación reutilizable.
+
+  Dos cosas que las versiones anteriores hacían mal:
+
+  1. Decidían si había página siguiente con `items|length == por_pagina`.
+     Si la última página traía justo el tamaño del bloque, aparecía
+     "Siguiente" hacia una página vacía. Aquí se usa el total real.
+
+  2. Los enlaces eran `?pagina=N` a secas, así que al cambiar de página se
+     perdían los filtros. `request.args` conserva todo lo demás.
+
+  Uso:  {% from '_paginacion.html' import paginacion %}
+        {{ paginacion(pagina, por_pagina, total) }}
+#}
+{% macro paginacion(pagina, por_pagina, total) %}
+  {% set paginas = (total // por_pagina) + (1 if total % por_pagina else 0) %}
+  {% if paginas > 1 %}
+    <nav class="paginacion" aria-label="Paginación">
+      {% if pagina > 1 %}
+        <a class="pag-link" rel="prev"
+           href="{{ url_for(request.endpoint, **dict(request.args.to_dict(), pagina=pagina - 1, **request.view_args)) }}">← Anterior</a>
+      {% else %}
+        <span class="pag-link pag-link--inerte" aria-hidden="true">← Anterior</span>
+      {% endif %}
+
+      <span class="pag-info">
+        Página {{ pagina }} de {{ paginas }}
+        <span class="pag-total">({{ total }} en total)</span>
+      </span>
+
+      {% if pagina < paginas %}
+        <a class="pag-link" rel="next"
+           href="{{ url_for(request.endpoint, **dict(request.args.to_dict(), pagina=pagina + 1, **request.view_args)) }}">Siguiente →</a>
+      {% else %}
+        <span class="pag-link pag-link--inerte" aria-hidden="true">Siguiente →</span>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% endmacro %}

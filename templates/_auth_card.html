@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V.I.A – {% block titulo %}{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/recuperar.css" />
+  {% block extra_css %}{% endblock %}
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
+  <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
+  <link rel="stylesheet" href="/static/css/carga.css" />
+  <link rel="stylesheet" href="/static/css/movil.css" />
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <header class="top-brand">
+      <span class="via-letters">V.I.A</span>
+      <p class="via-sub">VINCULACIÓN INTEGRAL DE ALUMNOS</p>
+    </header>
+
+    <main class="card-center {% block card_clase %}{% endblock %}">
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flash-messages">
+            {% for category, message in messages %}
+              <li class="flash flash--{{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      <h1 class="card-title">{% block card_titulo %}{% endblock %}</h1>
+
+      {% block contenido %}{% endblock %}
+
+    </main>
+
+  </div>
+
+  <footer class="site-footer">
+    <span class="footer-link">EQUIPO DE TRABAJO</span>
+    <span class="footer-link">CONTACTO</span>
+    <span class="footer-copy">©2026 V I A</span>
+  </footer>
+
+  <script src="/static/js/carga.js"></script>
+
+</body>
+</html>

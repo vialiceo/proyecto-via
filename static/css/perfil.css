@@ -1,12 +1,23 @@
 .perfil-grid {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 260px 1fr 240px;
   gap: 1.5rem;
   align-items: start;
 }
 
-@media (max-width: 900px) {
-  .perfil-grid { grid-template-columns: 1fr; }
+.perfil-grid--edicion {
+  grid-template-columns: 300px 1fr;
+}
+
+@media (max-width: 1100px) {
+  .perfil-grid { grid-template-columns: 260px 1fr; }
+  .perfil-card--contacto { grid-column: 1 / -1; }
+}
+
+@media (max-width: 700px) {
+  .perfil-grid,
+  .perfil-grid--edicion { grid-template-columns: 1fr; }
+  .perfil-card--contacto { grid-column: auto; }
 }
 
 .perfil-card {
@@ -73,6 +84,22 @@
   border-radius: 20px;
 }
 
+.btn-editar-perfil {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  background: var(--verde-base);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-editar-perfil:hover { background: var(--verde-oscuro); }
+
 .identidad-datos {
   text-align: left;
   margin-top: 1.25rem;
@@ -104,6 +131,35 @@
   color: var(--verde-oscuro);
   margin-bottom: 1.25rem;
 }
+
+.datos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem 1.5rem;
+}
+
+.datos-grid div { display: flex; flex-direction: column; gap: 0.25rem; }
+.datos-grid dt { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: #999; }
+.datos-grid dd { font-size: 0.92rem; color: #222; font-weight: 600; }
+
+@media (max-width: 500px) {
+  .datos-grid { grid-template-columns: 1fr; }
+}
+
+.acerca-de-mi {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #eee;
+}
+.acerca-de-mi h3 { font-family: var(--fuente-serif); font-size: 0.95rem; color: var(--verde-oscuro); margin-bottom: 0.5rem; }
+.acerca-de-mi p { font-size: 0.9rem; color: #555; line-height: 1.6; }
+
+.perfil-card--contacto .card-titulo { font-size: 1rem; }
+
+.contacto-lista-lectura { display: flex; flex-direction: column; gap: 0.7rem; }
+.contacto-lista-lectura li { display: flex; flex-direction: column; font-size: 0.85rem; gap: 0.15rem; border-bottom: 1px solid #f4f4f4; padding-bottom: 0.6rem; }
+.contacto-tipo { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: #999; }
+.contacto-vacio { font-size: 0.85rem; color: #999; }
 
 .campo { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 1.1rem; }
 
@@ -213,4 +269,12 @@
 @media (max-width: 560px) {
   .campo-fila { grid-template-columns: 1fr; }
   .fila-contacto { grid-template-columns: 1fr; }
+}
+
+.foto-ayuda {
+  font-size: 0.66rem;
+  line-height: 1.45;
+  color: #8a9a90;
+  text-align: center;
+  margin-top: 0.5rem;
 }

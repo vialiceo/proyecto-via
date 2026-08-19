@@ -1,135 +1,78 @@
 {% extends 'usuarios/_layout.html' %}
-{% block title %}Egresados{% endblock %}
-{% block topbar_titulo %}Administración · Egresados{% endblock %}
+{% from '_paginacion.html' import paginacion %}
+{% block title %}Directorio de alumnos{% endblock %}
+{% block topbar_titulo %}Directorio de alumnos{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="/static/css/perfiles.css" />
+  <link rel="stylesheet" href="/static/css/promocion.css" />
 {% endblock %}
 
 {% block content %}
 
   <div class="page-header">
-    <p class="page-eyebrow">Administración</p>
-    <h1 class="page-title">Cuentas de egresados</h1>
-    <p class="page-desc">{{ total }} cuenta{{ 's' if total != 1 else '' }} en total.</p>
+    <p class="page-eyebrow">Comunidad</p>
+    <h1 class="page-title">Directorio de alumnos</h1>
+    <p class="page-desc">Busca y conéctate con egresados de nuestra comunidad. {{ total }} en total.</p>
   </div>
 
-  <div class="admin-toolbar">
-    <form method="GET" class="filtros-form">
-      <input type="search" name="q" value="{{ filtros.q }}" placeholder="Buscar por nombre, correo o usuario..." class="filtro-busqueda" />
+  <form method="GET" class="filtros-form">
+    <input type="search" name="q" value="{{ filtros.q }}" placeholder="Buscar por nombre o profesión..." class="filtro-busqueda" />
 
-      <select name="rol">
-        <option value="">Todos los roles</option>
-        <option value="egresado" {% if filtros.rol == 'egresado' %}selected{% endif %}>Egresado</option>
-        <option value="administrador" {% if filtros.rol == 'administrador' %}selected{% endif %}>Administrador</option>
-        <option value="institucion" {% if filtros.rol == 'institucion' %}selected{% endif %}>Institución</option>
-      </select>
+    <select name="tecnico_id">
+      <option value="">Todos los programas</option>
+      {% for t in tecnicos %}
+        <option value="{{ t.id }}" {% if filtros.tecnico_id == t.id %}selected{% endif %}>{{ t.nombre }}</option>
+      {% endfor %}
+    </select>
 
-      <select name="estado">
-        <option value="">Todos los estados</option>
-        <option value="activo" {% if filtros.estado == 'activo' %}selected{% endif %}>Activo</option>
-        <option value="inactivo" {% if filtros.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
-        <option value="pendiente" {% if filtros.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-      </select>
+    <input type="number" name="anio_promocion" value="{{ filtros.anio_promocion }}" placeholder="Año de promoción" min="1967" max="2100" class="filtro-anio" />
 
-      <select name="tecnico_id">
-        <option value="">Todos los técnicos</option>
-        {% for t in tecnicos %}
-          <option value="{{ t.id }}" {% if filtros.tecnico_id == t.id %}selected{% endif %}>{{ t.nombre }}</option>
-        {% endfor %}
-      </select>
+    <button type="submit" class="btn-filtrar">Filtrar</button>
+  </form>
 
-      <button type="submit" class="btn-filtrar">Filtrar</button>
-    </form>
-
-    <a href="{{ url_for('admin.usuarios_nuevo') }}" class="btn-nuevo">+ Nueva cuenta</a>
-  </div>
-
-  <div class="tabla-wrapper">
-    <table class="tabla-usuarios">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Usuario</th>
-          <th>Rol</th>
-          <th>Promoción</th>
-          <th>Técnico</th>
-          <th>Estado</th>
-          <th>Último ingreso</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="cuerpoTabla">
-        {% for u in usuarios %}
-        <tr data-id="{{ u.id }}">
-          <td>{{ u.nombre }}<br /><span class="celda-secundaria">{{ u.correo }}</span></td>
-          <td>{{ u.usuario }}</td>
-          <td><span class="pill pill--{{ u.rol }}">{{ u.rol }}</span></td>
-          <td>{{ u.anio_promocion or '—' }}</td>
-          <td>{{ u.tecnico_nombre or '—' }}</td>
-          <td><span class="pill pill-estado--{{ u.estado }}">{{ u.estado }}</span></td>
-          <td>{{ u.ultimo_login.strftime('%d/%m/%Y %H:%M') if u.ultimo_login else 'Nunca' }}</td>
-          <td><button type="button" class="btn-gestionar" data-usuario-id="{{ u.id }}">Gestionar</button></td>
-        </tr>
+  <div class="promocion-grid">
+    {% for e in egresados %}
+    <button
+      type="button"
+      class="egresado-card"
+      data-id="{{ e.id }}"
+      data-nombre="{{ e.nombre }}"
+      data-foto="{{ e.foto or '' }}"
+      data-profesion="{{ e.profesion or '' }}"
+      data-frase="{{ e.frase or '' }}"
+    >
+      <div class="egresado-foto">
+        {% if e.foto %}
+          <img src="{{ e.foto }}" alt="Foto de {{ e.nombre }}" />
         {% else %}
-        <tr><td colspan="8" class="tabla-vacia">No hay cuentas que coincidan con el filtro.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        {% endif %}
+      </div>
+      <span class="egresado-nombre">{{ e.nombre }}</span>
+      <span class="egresado-profesion">{{ e.tecnico_nombre or e.profesion or '' }}</span>
+    </button>
+    {% else %}
+    <p class="promocion-vacio">No hay egresados que coincidan con el filtro.</p>
+    {% endfor %}
   </div>
 
-  <div class="paginacion">
-    {% if pagina > 1 %}<a href="?pagina={{ pagina - 1 }}">← Anterior</a>{% endif %}
-    <span>Página {{ pagina }}</span>
-    {% if usuarios|length == por_pagina %}<a href="?pagina={{ pagina + 1 }}">Siguiente →</a>{% endif %}
-  </div>
+  {{ paginacion(pagina, por_pagina, total) }}
 
-
-  <div class="modal-fondo" id="modalGestion" hidden>
-    <div class="modal-caja">
-      <button type="button" class="modal-cerrar" id="modalCerrar" aria-label="Cerrar">✕</button>
-      <h2 class="modal-titulo">Gestionar cuenta</h2>
-
-      <form id="formEditarUsuario" class="modal-form">
-        <div class="campo"><label>Nombre</label><input type="text" name="nombre" required /></div>
-        <div class="campo"><label>Correo</label><input type="email" name="correo" required /></div>
-        <div class="campo"><label>Usuario</label><input type="text" name="usuario" required /></div>
-        <div class="campo-fila">
-          <div class="campo">
-            <label>Rol</label>
-            <select name="rol">
-              <option value="egresado">Egresado</option>
-              <option value="administrador">Administrador</option>
-              <option value="institucion">Institución</option>
-            </select>
-          </div>
-          <div class="campo"><label>Promoción</label><input type="number" name="anio_promocion" min="1967" max="2100" /></div>
-        </div>
-        <div class="campo">
-          <label>Técnico</label>
-          <select name="tecnico_id">
-            <option value="">—</option>
-            {% for t in tecnicos %}<option value="{{ t.id }}">{{ t.nombre }}</option>{% endfor %}
-          </select>
-        </div>
-        <button type="submit" class="btn-guardar">Guardar cambios</button>
-      </form>
-
-      <div class="modal-acciones">
-        <button type="button" id="btnActivar" class="btn-accion btn-accion--ok">Activar</button>
-        <button type="button" id="btnDesactivar" class="btn-accion btn-accion--warn">Desactivar</button>
-        <button type="button" id="btnResetPassword" class="btn-accion">Resetear contraseña</button>
-      </div>
-
-      <div class="modal-bitacora">
-        <h3>Actividad reciente</h3>
-        <ul id="listaBitacora" class="bitacora-lista"></ul>
-      </div>
+  <div class="modal-fondo" id="modalEgresado" role="dialog" aria-modal="true" aria-labelledby="modalEgresadoNombre" hidden>
+    <div class="modal-caja-egresado">
+      <button type="button" class="modal-cerrar" id="modalEgresadoCerrar" aria-label="Cerrar">✕</button>
+      <div class="modal-egresado-foto" id="modalEgresadoFoto"></div>
+      <h2 class="modal-egresado-nombre" id="modalEgresadoNombre"></h2>
+      <p class="modal-egresado-profesion" id="modalEgresadoProfesion"></p>
+      <p class="modal-egresado-frase" id="modalEgresadoFrase"></p>
+      <a href="#" id="modalEgresadoMensaje" class="btn-enviar-mensaje-perfil">Enviar mensaje</a>
     </div>
   </div>
 
 {% endblock %}
 
 {% block extra_js %}
-  <script src="/static/js/admin.js"></script>
+  <script src="/static/js/modal.js"></script>
+  <script src="/static/js/promocion.js"></script>
 {% endblock %}

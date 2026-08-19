@@ -1,0 +1,101 @@
+{% extends 'usuarios/_layout.html' %}
+{% from '_paginacion.html' import paginacion %}
+{% block title %}Soporte{% endblock %}
+{% block topbar_titulo %}Administración · Soporte{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/admin_cuentas.css" />
+  <link rel="stylesheet" href="/static/css/soporte.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Administración</p>
+    <h1 class="page-title">Tickets de soporte</h1>
+    <p class="page-desc">
+      Mensajes que llegan desde la página de Contacto. Al responder uno se envía
+      un correo a quien escribió y el ticket queda cerrado.
+    </p>
+  </div>
+
+  <div class="soporte-conteos">
+    <span class="conteo conteo--abierto">{{ conteos.get('abierto', 0) }} abiertos</span>
+    <span class="conteo conteo--en_proceso">{{ conteos.get('en_proceso', 0) }} en proceso</span>
+    <span class="conteo conteo--cerrado">{{ conteos.get('cerrado', 0) }} cerrados</span>
+  </div>
+
+  <div class="barra-filtros">
+    <div class="tabs-estado">
+      <a href="{{ url_for('admin.soporte') }}" class="tab {% if not estado %}active{% endif %}">Todos</a>
+      {% for e, etiqueta in [('abierto','Abiertos'), ('en_proceso','En proceso'), ('cerrado','Cerrados')] %}
+        <a href="{{ url_for('admin.soporte', estado=e) }}" class="tab {% if estado == e %}active{% endif %}">{{ etiqueta }}</a>
+      {% endfor %}
+    </div>
+
+    <form class="form-buscar" action="{{ url_for('admin.soporte') }}" method="GET">
+      {% if estado %}<input type="hidden" name="estado" value="{{ estado }}" />{% endif %}
+      <input type="search" name="q" placeholder="Nombre, correo o asunto" value="{{ busqueda }}" />
+      <button type="submit" class="btn-buscar">Buscar</button>
+    </form>
+  </div>
+
+  <div class="lista-tickets">
+    {% for t in tickets %}
+      <article class="ticket ticket--{{ t.estado }}">
+
+        <header class="ticket-cabecera">
+          <div>
+            <h2 class="ticket-asunto">{{ t.asunto }}</h2>
+            <p class="ticket-de">
+              {{ t.nombre }} · <a href="mailto:{{ t.correo }}">{{ t.correo }}</a>
+              {% if t.usuario_id %}<span class="ticket-etiqueta">cuenta registrada</span>{% endif %}
+            </p>
+          </div>
+          <div class="ticket-meta">
+            <span class="pill pill-estado--{{ t.estado }}">{{ t.estado.replace('_', ' ') }}</span>
+            <span class="ticket-radicado">#{{ t.id }} · {{ t.creado_en.strftime('%d/%m/%Y %H:%M') if t.creado_en else '' }}</span>
+          </div>
+        </header>
+
+        <p class="ticket-mensaje">{{ t.mensaje }}</p>
+
+        {% if t.respuesta %}
+          <div class="ticket-respuesta">
+            <p class="ticket-respuesta-titulo">
+              Respondido{% if t.revisor_nombre %} por {{ t.revisor_nombre }}{% endif %}
+              {% if t.respondido_en %} el {{ t.respondido_en.strftime('%d/%m/%Y') }}{% endif %}
+            </p>
+            <p>{{ t.respuesta }}</p>
+          </div>
+        {% else %}
+          <form action="{{ url_for('admin.soporte_responder', ticket_id=t.id) }}" method="POST" class="ticket-form-responder">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="volver_a" value="{{ estado or '' }}" />
+            <label for="respuesta-{{ t.id }}" class="ticket-label">Responder a {{ t.correo }}</label>
+            <textarea id="respuesta-{{ t.id }}" name="respuesta" rows="3" maxlength="2000"
+                      placeholder="Escribe la respuesta que se enviará por correo..." required></textarea>
+            <div class="ticket-acciones">
+              <button type="submit" class="btn-aprobar">Enviar respuesta y cerrar</button>
+            </div>
+          </form>
+
+          <form action="{{ url_for('admin.soporte_estado', ticket_id=t.id) }}" method="POST" class="ticket-form-estado">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="volver_a" value="{{ estado or '' }}" />
+            {% if t.estado == 'abierto' %}
+              <button type="submit" name="estado" value="en_proceso" class="btn-accion">Marcar en proceso</button>
+            {% endif %}
+            <button type="submit" name="estado" value="cerrado" class="btn-accion btn-accion--warn">Cerrar sin responder</button>
+          </form>
+        {% endif %}
+
+      </article>
+    {% else %}
+      <p class="lista-vacia">No hay tickets que coincidan con este filtro.</p>
+    {% endfor %}
+  </div>
+
+  {{ paginacion(pagina, por_pagina, total) }}
+
+{% endblock %}

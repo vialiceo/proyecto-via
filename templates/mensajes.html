@@ -1,0 +1,61 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}Mensajes{% endblock %}
+{% block topbar_titulo %}Mensajes{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/mensajes.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Comunidad</p>
+    <h1 class="page-title">Mensajes</h1>
+    <p class="page-desc">Comunícate con compañeros, egresados y el equipo institucional.</p>
+  </div>
+
+  <div class="mensajes-layout">
+
+    <aside class="conversaciones-lista">
+      {% for c in conversaciones %}
+      <a href="{{ url_for('usuarios.mensajes', con=c.id) }}" class="conversacion-item {% if c.id == conversacion_id %}active{% endif %}">
+        <div class="conversacion-avatar">
+          {% if c.otro_foto %}<img src="{{ c.otro_foto }}" alt="" />{% else %}{{ c.otro_nombre[0]|upper }}{% endif %}
+        </div>
+        <div class="conversacion-info">
+          <span class="conversacion-nombre">{{ c.otro_nombre }}</span>
+          <span class="conversacion-preview">{{ c.ultimo_mensaje or 'Sin mensajes todavía' }}</span>
+        </div>
+        {% if c.no_leidos %}<span class="conversacion-badge">{{ c.no_leidos }}</span>{% endif %}
+      </a>
+      {% else %}
+      <p class="conversaciones-vacio">Todavía no tienes conversaciones. Escríbele a alguien desde el <a href="{{ url_for('usuarios.directorio') }}">Directorio de Alumnos</a>.</p>
+      {% endfor %}
+    </aside>
+
+    <section class="hilo-mensajes">
+      {% if conversacion_actual %}
+        <div class="hilo-cuerpo">
+          {% for m in hilo %}
+          <div class="mensaje {% if m.remitente_id == current_user.id %}mensaje--propio{% endif %}">
+            <span class="mensaje-autor">{{ m.remitente_nombre }}</span>
+            <p class="mensaje-texto">{{ m.contenido }}</p>
+            <span class="mensaje-hora">{{ m.creado_en.strftime('%d/%m %H:%M') if m.creado_en else '' }}</span>
+          </div>
+          {% else %}
+          <p class="hilo-vacio">Todavía no hay mensajes. ¡Escribe el primero!</p>
+          {% endfor %}
+        </div>
+        <form action="{{ url_for('usuarios.mensajes_enviar', conversacion_id=conversacion_id) }}" method="POST" class="form-mensaje">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input type="text" name="contenido" maxlength="2000" placeholder="Escribe un mensaje..." required autocomplete="off" />
+          <button type="submit" class="btn-enviar-mensaje" aria-label="Enviar">➤</button>
+        </form>
+      {% else %}
+        <p class="hilo-vacio">Selecciona una conversación para ver los mensajes.</p>
+      {% endif %}
+    </section>
+
+  </div>
+
+{% endblock %}

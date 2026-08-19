@@ -1,0 +1,85 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}Mis solicitudes{% endblock %}
+{% block topbar_titulo %}{{ 'Solicitudes' if current_user.rol == 'administrador' else 'Mis solicitudes' }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/solicitudes.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">{{ 'Administración' if current_user.rol == 'administrador' else 'Trámites' }}</p>
+    <h1 class="page-title">{{ 'Solicitudes de egresados' if current_user.rol == 'administrador' else 'Mis solicitudes' }}</h1>
+    <p class="page-desc">Consulta el estado de tus solicitudes y su historial.</p>
+  </div>
+
+  {% if current_user.rol != 'administrador' %}
+  <section class="solicitud-card solicitud-card--form">
+    <h2 class="card-titulo">Nueva solicitud</h2>
+    <form action="{{ url_for('usuarios.solicitudes') }}" method="POST" class="form-solicitud">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="campo">
+        <label for="tipo">Tipo de solicitud</label>
+        <select id="tipo" name="tipo" required>
+          {% for t in tipos %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="campo">
+        <label for="descripcion">Describe tu solicitud</label>
+        <textarea id="descripcion" name="descripcion" rows="3" maxlength="500" required></textarea>
+      </div>
+      <button type="submit" class="btn-enviar">Enviar solicitud</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <div class="tabs-estado">
+    <a href="{{ url_for('usuarios.solicitudes') }}" class="tab {% if not estado %}active{% endif %}">Todas</a>
+    {% for e, etiqueta in [('pendiente','Pendientes'), ('en_proceso','En proceso'), ('aprobada','Aprobadas'), ('rechazada','Rechazadas'), ('cancelada','Canceladas')] %}
+      <a href="{{ url_for('usuarios.solicitudes', estado=e) }}" class="tab {% if estado == e %}active{% endif %}">{{ etiqueta }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="tabla-wrapper">
+    <table class="tabla-solicitudes">
+      <thead>
+        <tr>
+          {% if current_user.rol == 'administrador' %}<th>Solicitante</th>{% endif %}
+          <th>Tipo</th>
+          <th>Descripción</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          {% if current_user.rol == 'administrador' %}<th></th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in solicitudes %}
+        <tr>
+          {% if current_user.rol == 'administrador' %}<td>{{ s.solicitante }}</td>{% endif %}
+          <td>{{ s.tipo }}</td>
+          <td class="celda-descripcion">{{ s.descripcion }}</td>
+          <td>{{ s.creado_en.strftime('%d/%m/%Y') if s.creado_en else '' }}</td>
+          <td><span class="pill pill-estado--{{ s.estado }}">{{ s.estado.replace('_', ' ') }}</span></td>
+          {% if current_user.rol == 'administrador' %}
+          <td>
+            <form action="{{ url_for('usuarios.solicitud_estado', solicitud_id=s.id) }}" method="POST" class="form-estado-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <select name="estado">
+                {% for e in ('pendiente','en_proceso','aprobada','rechazada','cancelada') %}
+                  <option value="{{ e }}" {% if s.estado == e %}selected{% endif %}>{{ e.replace('_',' ') }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn-guardar-mini">Guardar</button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="tabla-vacia">No hay solicitudes para mostrar.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

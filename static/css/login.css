@@ -331,6 +331,33 @@ html, body {
   text-decoration: underline;
 }
 
+.link-solicitar {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  text-align: center;
+  margin-top: -0.5rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  width: 100%;
+  transition: color 0.18s;
+}
+
+.link-solicitar strong {
+  color: var(--oro-claro);
+  font-weight: 700;
+}
+
+.link-solicitar:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.link-solicitar:hover strong {
+  text-decoration: underline;
+}
+
 .social-rail {
   position: absolute;
   right: 1rem;

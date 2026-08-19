@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="/static/css/ayuda.css" />
   <link rel="stylesheet" href="/static/css/aviso_legal.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
+  <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
+  <link rel="stylesheet" href="/static/css/carga.css" />
+  <link rel="stylesheet" href="/static/css/movil.css" />
 </head>
 <body>
 
@@ -27,7 +32,7 @@
 
   <header class="navbar">
     <div class="navbar-inner">
-      <a href="{{ url_for('public.index') }}" class="navbar-brand">
+      <a href="https://ieliceotame.edu.co" target="_blank" rel="noopener" class="navbar-brand">
         <div class="brand-shield">
           <span class="bs-top">EXCELSIOR</span>
           <div class="bs-stars">★ ★</div>
@@ -167,7 +172,7 @@
       </div>
 
       <div class="footer-col">
-        <h4 class="footer-col-title">Canales de Atención</h4>
+        <h3 class="footer-col-title">Canales de Atención</h3>
         <ul class="footer-links">
           <li>contacto@liceotame.edu.co</li>
           <li>Tame, Arauca, Colombia</li>
@@ -179,6 +184,8 @@
       <p>© 2026 Institución Educativa Liceo Tame — V.I.A. Todos los derechos reservados.</p>
     </div>
   </footer>
+
+  <script src="/static/js/carga.js"></script>
 
 </body>
 </html>

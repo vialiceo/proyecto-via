@@ -1,6 +1,6 @@
 {% extends 'usuarios/_layout.html' %}
 {% block title %}Mi perfil{% endblock %}
-{% block topbar_titulo %}Actualizar información{% endblock %}
+{% block topbar_titulo %}Mi perfil{% endblock %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="/static/css/perfil.css" />
@@ -10,12 +10,11 @@
 
   <div class="page-header">
     <p class="page-eyebrow">Mi cuenta</p>
-    <h1 class="page-title">Actualizar información</h1>
-    <p class="page-desc">Lo que capturó la institución no se puede editar aquí; lo demás sí es tuyo para mantenerlo al día.</p>
+    <h1 class="page-title">Mi perfil</h1>
+    <p class="page-desc">Información personal y profesional.</p>
   </div>
 
-  <div class="perfil-grid">
-
+  <div class="perfil-grid" id="vistaLectura" {% if mostrar_edicion %}hidden{% endif %}>
 
     <section class="perfil-card perfil-card--identidad">
       <div class="identidad-foto">
@@ -33,26 +32,83 @@
         </form>
       </div>
 
+      <p class="foto-ayuda">Cuadrada, mínimo 400×400 px. PNG, JPG o WEBP, hasta 3 MB.</p>
+
+      <h2 class="identidad-nombre">{{ perfil.nombre }}</h2>
+      <span class="identidad-rol">{{ perfil.rol|capitalize }}</span>
+
+      <button type="button" class="btn-editar-perfil" id="btnEditarPerfil">✎ Editar información</button>
+    </section>
+
+    <section class="perfil-card perfil-card--datos">
+      <h2 class="card-titulo">Información personal y profesional</h2>
+      <dl class="datos-grid">
+        <div><dt>Nombre completo</dt><dd>{{ perfil.nombre }}</dd></div>
+        <div><dt>Año de promoción</dt><dd>{{ perfil.anio_promocion or '—' }}</dd></div>
+        <div><dt>Programa académico</dt><dd>{{ perfil.tecnico or '—' }}</dd></div>
+        <div><dt>Correo electrónico</dt><dd>{{ perfil.correo }}</dd></div>
+        <div><dt>Profesión</dt><dd>{{ perfil.profesion or '—' }}</dd></div>
+        <div><dt>Ciudad de residencia</dt><dd>{{ perfil.lugar_residencia or '—' }}</dd></div>
+        <div><dt>Dónde estudió</dt><dd>{{ perfil.lugar_estudio or '—' }}</dd></div>
+        {% if perfil.edad %}<div><dt>Edad</dt><dd>{{ perfil.edad }} años</dd></div>{% endif %}
+      </dl>
+
+      {% if perfil.frase %}
+      <div class="acerca-de-mi">
+        <h3>Acerca de mí</h3>
+        <p>{{ perfil.frase }}</p>
+      </div>
+      {% endif %}
+    </section>
+
+    <aside class="perfil-card perfil-card--contacto">
+      <h2 class="card-titulo">Métodos de contacto</h2>
+      {% if perfil.contactos %}
+      <ul class="contacto-lista-lectura">
+        {% for c in perfil.contactos %}
+        <li><span class="contacto-tipo">{{ c.tipo.replace('_',' ')|capitalize }}</span><span>{{ c.valor }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="contacto-vacio">Todavía no agregaste métodos de contacto.</p>
+      {% endif %}
+    </aside>
+
+  </div>
+
+  <div class="perfil-grid perfil-grid--edicion" id="vistaEdicion" {% if not mostrar_edicion %}hidden{% endif %}>
+
+    <section class="perfil-card perfil-card--identidad">
+      <div class="identidad-foto">
+        {% if perfil.foto %}
+          <img src="{{ perfil.foto }}" alt="Foto de perfil" />
+        {% else %}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        {% endif %}
+      </div>
       <h2 class="identidad-nombre">{{ perfil.nombre }}</h2>
       <span class="identidad-rol">{{ perfil.rol|capitalize }}</span>
 
       <dl class="identidad-datos">
         <div><dt>Usuario</dt><dd>{{ perfil.usuario }}</dd></div>
         <div><dt>Correo</dt><dd>{{ perfil.correo }}</dd></div>
-        {% if perfil.anio_promocion %}<div><dt>Promoción</dt><dd>{{ perfil.anio_promocion }}</dd></div>{% endif %}
-        {% if perfil.tecnico %}<div><dt>Técnico</dt><dd>{{ perfil.tecnico }}</dd></div>{% endif %}
-        {% if perfil.edad %}<div><dt>Edad</dt><dd>{{ perfil.edad }} años</dd></div>{% endif %}
       </dl>
 
       <p class="identidad-nota">¿Algo de esto está mal? Contacta a la institución desde <a href="{{ url_for('public.contacto') }}">Contacto</a>.</p>
+      <button type="button" class="btn-editar-perfil" id="btnCancelarEdicion">✕ Cancelar</button>
     </section>
-
 
     <section class="perfil-card perfil-card--editable">
       <h2 class="card-titulo">Información visible para la comunidad</h2>
 
       <form action="{{ url_for('usuarios.perfil') }}" method="POST" class="form-perfil" novalidate>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="campo">
+          <label for="correo">Correo de contacto</label>
+          <input type="email" id="correo" name="correo" maxlength="190" value="{{ perfil.correo or '' }}" required />
+          <span class="campo-ayuda">Es con el que inicias sesión y al que llegan los avisos. Solo tú lo ves.</span>
+        </div>
 
         <div class="campo">
           <label for="profesion">Profesión / a qué te dedicas</label>
@@ -76,9 +132,9 @@
         </div>
 
         <div class="campo">
-          <label for="frase">Frase o mensaje para tu promoción (opcional)</label>
-          <textarea id="frase" name="frase" maxlength="200" rows="2" placeholder="Algo que quieras que vean tus compañeros de promoción...">{{ perfil.frase or '' }}</textarea>
-          <span class="campo-ayuda">Aparece en tu tarjeta cuando alguien vea la promoción {{ perfil.anio_promocion or '' }}.</span>
+          <label for="frase">Acerca de mí / frase para tu promoción (opcional)</label>
+          <textarea id="frase" name="frase" maxlength="200" rows="2" placeholder="Algo que quieras compartir...">{{ perfil.frase or '' }}</textarea>
+          <span class="campo-ayuda">También aparece en tu tarjeta cuando alguien vea la promoción {{ perfil.anio_promocion or '' }}.</span>
         </div>
 
         <div class="contactos-header">

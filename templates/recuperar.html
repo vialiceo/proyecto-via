@@ -1,67 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>V.I.A – Recuperar Contraseña</title>
-  <link rel="stylesheet" href="/static/css/recuperar.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
-</head>
-<body>
+{% extends '_auth_card.html' %}
+{% block titulo %}Recuperar Contraseña{% endblock %}
+{% block card_titulo %}Recuperación de<br>contraseña{% endblock %}
 
-  <div class="page-wrapper">
+{% block contenido %}
+  <form class="recuperar-form" action="{{ url_for('auth.recuperar') }}" method="POST" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
+    <div class="field-group">
+      <label for="identificador">Ingresa tu correo o tu usuario V.I.A</label>
+      <input
+        type="text"
+        id="identificador"
+        name="identificador"
+        autocomplete="username email"
+        required
+      />
+    </div>
 
-    <header class="top-brand">
-      <span class="via-letters">V.I.A</span>
-      <p class="via-sub">VINCULACIÓN INTEGRAL DE ALUMNOS</p>
-    </header>
+    <button class="btn-restablecer" type="submit">RESTABLECER CONTRASEÑA</button>
+  </form>
 
-
-    <main class="card-center">
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <ul class="flash-messages">
-            {% for category, message in messages %}
-              <li class="flash flash--{{ category }}">{{ message }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      {% endwith %}
-
-      <h1 class="card-title">Recuperación de<br>contraseña</h1>
-
-      <form class="recuperar-form" action="{{ url_for('auth.recuperar') }}" method="POST" novalidate>
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-        <div class="field-group">
-          <label for="identificador">Ingresa tu correo o tu usuario V.I.A</label>
-          <input
-            type="text"
-            id="identificador"
-            name="identificador"
-            autocomplete="username email"
-            required
-          />
-        </div>
-
-        <button class="btn-restablecer" type="submit">RESTABLECER CONTRASEÑA</button>
-
-      </form>
-
-      <a href="{{ url_for('auth.login') }}" class="link-volver">← Volver al inicio de sesión</a>
-
-    </main>
-
-  </div>
-
-
-  <footer class="site-footer">
-    <span class="footer-link">EQUIPO DE TRABAJO</span>
-    <span class="footer-link">CONTACTO</span>
-    <span class="footer-copy">©2026 V I A</span>
-  </footer>
-
-</body>
-</html>
+  <a href="{{ url_for('auth.login') }}" class="link-volver">← Volver al inicio de sesión</a>
+{% endblock %}

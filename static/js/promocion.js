@@ -4,6 +4,7 @@ const modalFoto = document.getElementById('modalEgresadoFoto');
 const modalNombre = document.getElementById('modalEgresadoNombre');
 const modalProfesion = document.getElementById('modalEgresadoProfesion');
 const modalFrase = document.getElementById('modalEgresadoFrase');
+const modalMensaje = document.getElementById('modalEgresadoMensaje');
 
 function iconoGenerico() {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
@@ -13,12 +14,13 @@ function iconoGenerico() {
 
 document.querySelectorAll('.egresado-card').forEach((tarjeta) => {
   tarjeta.addEventListener('click', () => {
-    const { nombre, foto, profesion, frase } = tarjeta.dataset;
+    const { id, nombre, foto, profesion, frase } = tarjeta.dataset;
 
     modalFoto.innerHTML = foto ? `<img src="${foto}" alt="Foto de ${nombre}" />` : iconoGenerico();
     modalNombre.textContent = nombre;
     modalProfesion.textContent = profesion || '';
     modalFrase.textContent = frase ? `“${frase}”` : '';
+    if (modalMensaje) modalMensaje.href = `/usuarios/mensajes/con/${id}`;
 
     modal.hidden = false;
   });

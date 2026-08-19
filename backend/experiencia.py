@@ -13,6 +13,7 @@ def construir_vista_perfil(usuario_id):
     return {
         "id": usuario["id"],
         "nombre": usuario["nombre"],
+        "cedula": usuario.get("cedula"),
         "correo": usuario["correo"],
         "usuario": usuario["usuario"],
         "rol": usuario["rol"],
@@ -56,7 +57,14 @@ def validar_datos_perfil(form):
         except ValueError:
             errores.append("La fecha de nacimiento no es válida.")
 
+    correo = (form.get("correo") or "").strip().lower() or None
+    if correo and not utils.validar_correo(correo):
+        errores.append("El correo no tiene un formato válido.")
+    if correo and len(correo) > 190:
+        errores.append("El correo es demasiado largo (máximo 190 caracteres).")
+
     datos = {
+        "correo": correo,
         "profesion": profesion,
         "lugar_residencia": lugar_residencia,
         "lugar_estudio": lugar_estudio,
@@ -92,6 +100,19 @@ def validar_contactos(tipos, valores):
 
 
 def guardar_perfil(usuario_id, datos, contactos):
+    """Devuelve la lista de avisos que la ruta debe mostrar al usuario."""
+    avisos = []
+
+    correo = datos.get("correo")
+    if correo:
+        actual = models.obtener_usuario_por_id(usuario_id)
+        if actual and correo != actual["correo"]:
+            if models.correo_ocupado_por_otro(correo, usuario_id):
+                avisos.append(("error", "Ese correo ya está registrado en otra cuenta."))
+            else:
+                models.actualizar_correo(usuario_id, correo)
+                avisos.append(("success", f"Tu correo quedó en {correo}."))
+
     models.upsert_perfil_extendido(
         usuario_id,
         datos["profesion"],
@@ -102,3 +123,4 @@ def guardar_perfil(usuario_id, datos, contactos):
     )
     models.reemplazar_contactos(usuario_id, contactos)
     utils.encolar_tarea(models.registrar_bitacora, usuario_id, "perfil_actualizado", ip=utils.ip_cliente())
+    return avisos

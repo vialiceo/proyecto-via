@@ -3,16 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{ csrf_token() }}" />
   <title>V.I.A – Principal</title>
 
   <link rel="stylesheet" href="/static/css/usuarios/Base usuarios.css" />
-
   <link rel="stylesheet" href="/static/css/index.css" />
+  {% if current_user.rol == 'administrador' %}
+  <link rel="stylesheet" href="/static/css/admin.css" />
+  <link rel="stylesheet" href="/static/css/perfiles.css" />
+  {% endif %}
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
+  <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
+  <link rel="stylesheet" href="/static/css/carga.css" />
+  <link rel="stylesheet" href="/static/css/movil.css" />
 </head>
 <body>
 
 
+  {% from '_paginacion.html' import paginacion %}
   {% set active_page = 'principal' %}
   {% include 'usuarios/_nav.html' %}
 
@@ -23,7 +33,10 @@
     <header class="topbar">
 
 
-      <a href="{{ url_for('public.ayuda') }}" class="topbar-shield-link" aria-label="Información de la institución">
+      <a href="https://ieliceotame.edu.co" target="_blank" rel="noopener" class="topbar-shield-link" aria-label="Información de la institución">
+        {% if escudo_url %}
+          <img src="{{ escudo_url }}" alt="Escudo del Liceo Tame" class="topbar-shield-img" />
+        {% endif %}
         <div class="topbar-shield">
           <span class="ts-top">EXCELSIOR</span>
           <div class="ts-stars">★ ★</div>
@@ -45,11 +58,6 @@
         <a href="{{ url_for('public.ayuda') }}" class="topbar-nav-icon" aria-label="Ayuda" title="Ayuda">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </a>
-        {% if current_user.rol == 'administrador' %}
-        <a href="{{ url_for('admin.dashboard') }}" class="topbar-nav-icon" aria-label="Administración" title="Administración">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        </a>
-        {% endif %}
       </nav>
 
       <span class="topbar-spacer"></span>
@@ -74,12 +82,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             Perfil
           </a>
-          {% if current_user.rol == 'administrador' %}
-          <a href="{{ url_for('admin.dashboard') }}" class="dropdown-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Administración
+          <a href="{{ url_for('usuarios.configuracion') }}" class="dropdown-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            Configuración
           </a>
-          {% endif %}
           <a href="{{ url_for('auth.cambiar_password') }}" class="dropdown-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             Cambiar contraseña
@@ -97,9 +103,151 @@
 
     <main class="main-content">
 
+      <h1 class="index-titulo">
+        {% if current_user.rol == 'administrador' %}
+          Panel de administración
+        {% else %}
+          Promociones del Liceo Tame
+        {% endif %}
+      </h1>
+
+      {% if current_user.rol == 'administrador' %}
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-num">{{ stats.activo or 0 }}</span>
+          <span class="stat-label">Cuentas activas</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">{{ stats.pendiente or 0 }}</span>
+          <span class="stat-label">Pendientes de activar</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">{{ total_solicitudes_abiertas }}</span>
+          <span class="stat-label">Solicitudes pendientes</span>
+        </div>
+        <a class="stat-card stat-card--link {% if total_tickets_abiertos %}stat-card--alerta{% endif %}"
+           href="{{ url_for('admin.soporte', estado='abierto') }}">
+          <span class="stat-num">{{ total_tickets_abiertos }}</span>
+          <span class="stat-label">Tickets de soporte</span>
+        </a>
+        <a class="stat-card stat-card--link {% if total_solicitudes_cuenta %}stat-card--alerta{% endif %}"
+           href="{{ url_for('admin.solicitudes_cuenta', estado='pendiente') }}">
+          <span class="stat-num">{{ total_solicitudes_cuenta }}</span>
+          <span class="stat-label">Solicitudes de cuenta</span>
+        </a>
+        <a class="stat-card stat-card--link" href="{{ url_for('admin.graduados') }}">
+          <span class="stat-num">→</span>
+          <span class="stat-label">Archivo de graduados</span>
+        </a>
+        <a class="stat-card stat-card--link" href="{{ url_for('usuarios.directorio') }}">
+          <span class="stat-num">→</span>
+          <span class="stat-label">Directorio de alumnos</span>
+        </a>
+      </div>
+
+      <div class="admin-toolbar">
+        <form method="GET" class="filtros-form">
+          <input type="search" name="q" value="{{ filtros.q }}" placeholder="Buscar por nombre, cédula, correo o usuario..." class="filtro-busqueda" />
+          <select name="rol">
+            <option value="">Todos los roles</option>
+            <option value="egresado" {% if filtros.rol == 'egresado' %}selected{% endif %}>Egresado</option>
+            <option value="administrador" {% if filtros.rol == 'administrador' %}selected{% endif %}>Administrador</option>
+            <option value="institucion" {% if filtros.rol == 'institucion' %}selected{% endif %}>Institución</option>
+          </select>
+          <select name="estado">
+            <option value="">Todos los estados</option>
+            <option value="activo" {% if filtros.estado == 'activo' %}selected{% endif %}>Activo</option>
+            <option value="inactivo" {% if filtros.estado == 'inactivo' %}selected{% endif %}>Inactivo</option>
+            <option value="pendiente" {% if filtros.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+          </select>
+          <select name="tecnico_id">
+            <option value="">Todos los técnicos</option>
+            {% for t in tecnicos %}
+              <option value="{{ t.id }}" {% if filtros.tecnico_id == t.id %}selected{% endif %}>{{ t.nombre }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn-filtrar">Filtrar</button>
+        </form>
+        <a href="{{ url_for('admin.usuarios_nuevo') }}" class="btn-nuevo">+ Nueva cuenta</a>
+      </div>
+
+      <div class="tabla-wrapper">
+        <table class="tabla-usuarios">
+          <thead>
+            <tr>
+              <th>Nombre</th><th>Usuario</th><th>Rol</th><th>Promoción</th>
+              <th>Técnico</th><th>Estado</th><th>Último ingreso</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in usuarios %}
+            <tr data-id="{{ u.id }}">
+              <td>{{ u.nombre }}<br /><span class="celda-secundaria">{% if u.cedula %}C.C. {{ u.cedula }} · {% endif %}{{ u.correo }}</span></td>
+              <td>{{ u.usuario }}</td>
+              <td><span class="pill pill--{{ u.rol }}">{{ u.rol }}</span></td>
+              <td>{{ u.anio_promocion or '—' }}</td>
+              <td>{{ u.tecnico_nombre or '—' }}</td>
+              <td><span class="pill pill-estado--{{ u.estado }}">{{ u.estado }}</span></td>
+              <td>{{ u.ultimo_login.strftime('%d/%m/%Y %H:%M') if u.ultimo_login else 'Nunca' }}</td>
+              <td><button type="button" class="btn-gestionar" data-usuario-id="{{ u.id }}">Gestionar</button></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" class="tabla-vacia">No hay cuentas que coincidan con el filtro.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {{ paginacion(pagina, por_pagina, total_usuarios) }}
+
+      <div class="modal-fondo" id="modalGestion" role="dialog" aria-modal="true" aria-labelledby="modalGestionTitulo" hidden>
+        <div class="modal-caja">
+          <button type="button" class="modal-cerrar" id="modalCerrar" aria-label="Cerrar">✕</button>
+          <h2 class="modal-titulo" id="modalGestionTitulo">Gestionar cuenta</h2>
+
+          <form id="formEditarUsuario" class="modal-form">
+            <div class="campo"><label>Nombre</label><input type="text" name="nombre" required /></div>
+            <div class="campo"><label>Correo</label><input type="email" name="correo" required /></div>
+            <div class="campo"><label>Usuario</label><input type="text" name="usuario" required /></div>
+            <div class="campo-fila">
+              <div class="campo">
+                <label>Rol</label>
+                <select name="rol">
+                  <option value="egresado">Egresado</option>
+                  <option value="administrador">Administrador</option>
+                  <option value="institucion">Institución</option>
+                </select>
+              </div>
+              <div class="campo"><label>Promoción</label><input type="number" name="anio_promocion" min="1967" max="2100" /></div>
+            </div>
+            <div class="campo">
+              <label>Técnico</label>
+              <select name="tecnico_id">
+                <option value="">—</option>
+                {% for t in tecnicos %}<option value="{{ t.id }}">{{ t.nombre }}</option>{% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="btn-guardar">Guardar cambios</button>
+          </form>
+
+          <div class="modal-acciones">
+            <button type="button" id="btnActivar" class="btn-accion btn-accion--ok">Activar</button>
+            <button type="button" id="btnDesactivar" class="btn-accion btn-accion--warn">Desactivar</button>
+            <button type="button" id="btnResetPassword" class="btn-accion">Resetear contraseña</button>
+          </div>
+
+          <div class="modal-bitacora">
+            <h3>Actividad reciente</h3>
+            <ul id="listaBitacora" class="bitacora-lista"></ul>
+          </div>
+        </div>
+      </div>
+
+      {% else %}
 
       <section class="filter-section">
-        <h2 class="filter-label">AÑO</h2>
+        <label class="filter-label" for="filtroAno">AÑO</label>
         <div class="search-bar-wrapper">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -116,17 +264,14 @@
         </div>
       </section>
 
-
       <section class="carousel-section" aria-label="Promociones">
         <button class="carousel-arrow carousel-arrow--prev" id="prevBtn" aria-label="Anterior">&#8249;</button>
 
         <div class="carousel-track-wrapper">
           <div class="carousel-track" id="carouselTrack">
 
-
-
             {% for promo in promociones_recientes %}
-            <a href="{{ url_for('usuarios.promocion', anio=promo.anio_promocion) }}" class="promo-card">
+            <a href="{{ url_for('usuarios.promociones', anio=promo.anio_promocion) }}" class="promo-card">
               <div class="promo-img-wrapper">
                 <img src="{{ url_for('static', filename='img/promociones/' ~ promo.anio_promocion ~ '.jpg') }}"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -150,22 +295,26 @@
         <button class="carousel-arrow carousel-arrow--next" id="nextBtn" aria-label="Siguiente">&#8250;</button>
       </section>
 
-
       <div class="carousel-dots" id="carouselDots"></div>
 
-    </main>
+      {% endif %}
 
+    </main>
 
     {% include 'usuarios/_footer.html' %}
 
   </div>
 
-
   <script src="/static/js/nav.js"></script>
   <script src="/static/js/perfil.js"></script>
-
-
+  {% if current_user.rol == 'administrador' %}
+  <script src="/static/js/admin.js"></script>
+  {% else %}
   <script src="/static/js/carrusel.js"></script>
+  {% endif %}
 
+  <script src="/static/js/carga.js"></script>
+
+  <script src="/static/js/modal.js"></script>
 </body>
 </html>

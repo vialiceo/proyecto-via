@@ -20,6 +20,7 @@
 }
 
 .filtro-busqueda { flex: 1; min-width: 200px; }
+.filtro-anio { max-width: 160px; }
 
 .btn-filtrar, .btn-nuevo {
   font-family: var(--fuente-display);

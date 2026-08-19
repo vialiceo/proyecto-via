@@ -1,0 +1,176 @@
+/* Animaciones de carga y transición. Se carga en todas las páginas. */
+
+@keyframes via-girar {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes via-aparecer {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes via-brillo {
+  0%   { background-position: -420px 0; }
+  100% { background-position: 420px 0; }
+}
+
+@keyframes via-pulso {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.45; }
+}
+
+/* --- Entrada de la página ------------------------------------------------ */
+/* El contenido principal aparece de abajo hacia arriba al cargar. */
+
+.main-content,
+.card-center,
+.page-wrapper > main {
+  animation: via-aparecer 0.42s ease-out both;
+}
+
+/* Las tarjetas de una grilla entran escalonadas, no todas de golpe. */
+.stats-grid > *,
+.promocion-grid > *,
+.config-grid > *,
+.lista-solicitudes > * {
+  animation: via-aparecer 0.4s ease-out both;
+}
+
+.stats-grid > *:nth-child(1),
+.promocion-grid > *:nth-child(1),
+.config-grid > *:nth-child(1),
+.lista-solicitudes > *:nth-child(1) { animation-delay: 0.04s; }
+
+.stats-grid > *:nth-child(2),
+.promocion-grid > *:nth-child(2),
+.config-grid > *:nth-child(2),
+.lista-solicitudes > *:nth-child(2) { animation-delay: 0.08s; }
+
+.stats-grid > *:nth-child(3),
+.promocion-grid > *:nth-child(3),
+.config-grid > *:nth-child(3),
+.lista-solicitudes > *:nth-child(3) { animation-delay: 0.12s; }
+
+.stats-grid > *:nth-child(4),
+.promocion-grid > *:nth-child(4),
+.lista-solicitudes > *:nth-child(4) { animation-delay: 0.16s; }
+
+.stats-grid > *:nth-child(n+5),
+.promocion-grid > *:nth-child(n+5),
+.lista-solicitudes > *:nth-child(n+5) { animation-delay: 0.2s; }
+
+/* --- Barra de progreso al navegar --------------------------------------- */
+/* La pinta carga.js cuando se hace clic en un enlace o se envía un formulario. */
+
+.via-barra-carga {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  z-index: 9999;
+  background: linear-gradient(90deg, #c9a227, #f0c84a);
+  box-shadow: 0 0 8px rgba(201, 162, 39, 0.6);
+  transition: width 0.25s ease-out, opacity 0.3s ease-out;
+  pointer-events: none;
+}
+
+.via-barra-carga--lista {
+  opacity: 0;
+}
+
+/* --- Spinner ------------------------------------------------------------- */
+
+.via-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: via-girar 0.7s linear infinite;
+  vertical-align: -0.15em;
+}
+
+.via-spinner--grande {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-width: 3px;
+}
+
+.via-cargando-bloque {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 3rem 1rem;
+  color: #3a6b4a;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* --- Botones y formularios ocupados -------------------------------------- */
+/* carga.js le pone .esta-cargando al botón cuando se envía el formulario. */
+
+.esta-cargando {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+.esta-cargando::after {
+  content: "";
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-left: 0.55em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: via-girar 0.7s linear infinite;
+  vertical-align: -0.1em;
+}
+
+/* --- Esqueletos (placeholders grises que laten) -------------------------- */
+
+.via-esqueleto {
+  background: #e3e8e0;
+  background-image: linear-gradient(90deg, #e3e8e0 0px, #eef2ec 220px, #e3e8e0 440px);
+  background-size: 840px 100%;
+  border-radius: 6px;
+  animation: via-brillo 1.25s linear infinite;
+}
+
+.via-esqueleto--linea   { height: 0.85rem; margin-bottom: 0.55rem; }
+.via-esqueleto--titulo  { height: 1.4rem;  width: 45%; margin-bottom: 1rem; }
+.via-esqueleto--foto    { width: 100%; aspect-ratio: 4 / 3; }
+.via-esqueleto--avatar  { width: 72px; height: 72px; border-radius: 50%; }
+
+/* --- Imágenes que aparecen al terminar de descargar ---------------------- */
+/* carga.js les quita .via-img-cargando cuando el navegador termina. */
+
+.via-img-cargando {
+  opacity: 0;
+}
+
+img[data-carga] {
+  transition: opacity 0.35s ease-out;
+}
+
+/* --- Respeta a quien pide menos movimiento ------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .via-spinner,
+  .esta-cargando::after {
+    animation: via-pulso 1.2s ease-in-out infinite !important;
+  }
+}

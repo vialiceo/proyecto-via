@@ -1,0 +1,155 @@
+/* Ajustes de móvil que aplican a todas las páginas.
+   Se carga después de la hoja de cada página, así que gana sin !important. */
+
+@media (max-width: 768px) {
+
+  /* --- Objetivos táctiles ------------------------------------------------
+     44px es el mínimo que un dedo acierta con fiabilidad. Por debajo de eso
+     la gente le pega al control de al lado y se frustra. */
+
+  button,
+  input[type="submit"],
+  input[type="button"],
+  .btn-filtrar,
+  .btn-buscar,
+  .btn-crear,
+  .btn-guardar,
+  .btn-aprobar,
+  .btn-rechazar,
+  .btn-accion,
+  .btn-nuevo,
+  .btn-config,
+  .btn-error,
+  .btn-editar-perfil,
+  .search-btn,
+  .red-btn {
+    min-height: 44px;
+  }
+
+  /* --- Campos de formulario ---------------------------------------------
+     16px no es capricho: por debajo de eso Safari en iPhone hace zoom
+     automático al enfocar el campo y descuadra toda la página. */
+
+  /* `input` a secas cubre también los que no declaran type (por defecto son
+     de texto): `input[type="text"]` NO los alcanza si falta el atributo. */
+  /* Los `:not()` no son decorativos: suben la especificidad lo suficiente
+     para ganarle a reglas como `.filtros-form select` (0,1,1) sin recurrir
+     a `!important`. Un `select` a secas es (0,0,1) y perdería. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+  select:not([multiple]):not([size]),
+  textarea:not([readonly]):not([disabled]) {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  /* Las casillas también se tocan con el dedo. */
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 20px;
+    height: 20px;
+  }
+
+  textarea {
+    min-height: 96px;
+  }
+
+  /* --- Formularios en columna -------------------------------------------
+     En pantalla angosta los campos lado a lado quedan inservibles. */
+
+  .campo-fila,
+  .filtros-form,
+  .form-buscar,
+  .barra-filtros,
+  .admin-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .campo-fila > *,
+  .filtros-form > *,
+  .form-buscar > * {
+    width: 100%;
+  }
+
+  /* --- Tablas anchas -----------------------------------------------------
+     No se encogen: se desplazan dentro de su propia caja, para que la
+     página nunca se mueva de lado. */
+
+  .tabla-wrapper,
+  .tabla-graduados-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* --- Espacio para el botón del menú ------------------------------------
+     El botón flotante va arriba a la derecha; el título de la barra
+     superior no debe quedar debajo. */
+
+  .topbar {
+    padding-right: 68px;
+  }
+
+  .topbar-titulo {
+    font-size: 0.7rem;
+  }
+
+  /* --- Acciones de las solicitudes --------------------------------------- */
+
+  .sc-acciones,
+  .modal-acciones {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  /* El formulario de rechazo pone el motivo y el botón en fila: a 320px no
+     caben, y `min-width: 0` es lo que permite que un hijo flex se encoja por
+     debajo del ancho de su contenido. */
+  .sc-form-aprobar,
+  .sc-form-rechazar {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .sc-form-aprobar > *,
+  .sc-form-rechazar > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* --- Modales -----------------------------------------------------------
+     A pantalla casi completa, con scroll propio: en un teléfono un modal
+     centrado y pequeño no cabe. */
+
+  .modal-caja,
+  .modal-caja-egresado {
+    width: calc(100vw - 1.6rem);
+    max-width: none;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .modal-cerrar {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* En pantallas muy angostas (iPhone SE) el texto de las tarjetas aprieta. */
+@media (max-width: 400px) {
+  .main-content {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Con un modal abierto la pagina de atras no debe poder desplazarse. */
+body.modal-abierto {
+  overflow: hidden;
+}

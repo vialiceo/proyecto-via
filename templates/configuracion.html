@@ -1,0 +1,53 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}Configuración{% endblock %}
+{% block topbar_titulo %}Configuración{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/configuracion.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Mi cuenta</p>
+    <h1 class="page-title">Configuración</h1>
+    <p class="page-desc">Administra los datos de tu cuenta y tu seguridad.</p>
+  </div>
+
+  <div class="config-grid">
+
+    <section class="config-card">
+      <h2 class="card-titulo">Información de la cuenta</h2>
+      <dl class="config-datos">
+        <div><dt>Nombre completo</dt><dd>{{ perfil.nombre }}</dd></div>
+        {% if perfil.cedula %}<div><dt>Cédula</dt><dd>{{ perfil.cedula }}</dd></div>{% endif %}
+        <div><dt>Usuario</dt><dd>{{ perfil.usuario }}</dd></div>
+        <div><dt>Correo</dt><dd>{{ perfil.correo }}</dd></div>
+        <div><dt>Rol</dt><dd>{{ perfil.rol|capitalize }}</dd></div>
+        {% if perfil.anio_promocion %}<div><dt>Promoción</dt><dd>{{ perfil.anio_promocion }}</dd></div>{% endif %}
+      </dl>
+      <p class="config-nota">El nombre, correo, promoción y técnico solo los puede corregir la institución. Escríbenos desde <a href="{{ url_for('public.contacto') }}">Contacto</a> si algo está mal.</p>
+      <a href="{{ url_for('usuarios.perfil') }}" class="btn-config">Editar información visible</a>
+    </section>
+
+    <section class="config-card">
+      <h2 class="card-titulo">Seguridad</h2>
+      <a href="{{ url_for('auth.cambiar_password') }}" class="config-link">
+        <span>Cambiar contraseña</span>
+        <span class="config-link-flecha">→</span>
+      </a>
+    </section>
+
+    <section class="config-card">
+      <h2 class="card-titulo">Privacidad y datos</h2>
+      <p class="config-texto">Tu correo, teléfono y demás datos de contacto nunca se muestran a otros egresados: solo tú y el personal administrativo autorizado los ven.</p>
+      <a href="{{ url_for('public.aviso_legal') }}" class="config-link">
+        <span>Aviso de privacidad</span>
+        <span class="config-link-flecha">→</span>
+      </a>
+      <p class="config-texto config-texto--pequeno">¿Quieres eliminar tu cuenta? Escríbenos desde <a href="{{ url_for('public.contacto') }}">Contacto</a> y lo gestionamos contigo.</p>
+    </section>
+
+  </div>
+
+{% endblock %}

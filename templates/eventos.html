@@ -1,0 +1,107 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}Eventos{% endblock %}
+{% block topbar_titulo %}Eventos{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/eventos.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Comunidad</p>
+    <h1 class="page-title">Eventos</h1>
+    <p class="page-desc">Descubre y participa en eventos académicos, institucionales y de egresados.</p>
+  </div>
+
+  <div class="eventos-toolbar">
+    <div class="tabs-estado">
+      <a href="{{ url_for('usuarios.eventos') }}" class="tab {% if momento == 'proximos' %}active{% endif %}">Próximos eventos</a>
+      <a href="{{ url_for('usuarios.eventos', momento='pasados') }}" class="tab {% if momento == 'pasados' %}active{% endif %}">Eventos pasados</a>
+    </div>
+    {% if current_user.rol == 'administrador' %}
+    <button type="button" class="btn-nuevo" id="btnNuevoEvento">+ Crear evento</button>
+    {% endif %}
+  </div>
+
+  <div class="eventos-lista">
+    {% for e in eventos %}
+    <article class="evento-card">
+      <div class="evento-fecha">
+        <span class="evento-dia">{{ e.fecha_inicio.strftime('%d') }}</span>
+        <span class="evento-mes">{{ e.fecha_inicio.strftime('%b').upper() }}</span>
+      </div>
+      <div class="evento-info">
+        <span class="evento-categoria">{{ e.categoria }}</span>
+        <h2 class="evento-titulo">{{ e.titulo }}</h2>
+        {% if e.descripcion %}<p class="evento-desc">{{ e.descripcion }}</p>{% endif %}
+        <div class="evento-meta">
+          <span>🕒 {{ e.fecha_inicio.strftime('%d/%m/%Y %H:%M') }}</span>
+          {% if e.lugar %}<span>📍 {{ e.lugar }}</span>{% endif %}
+        </div>
+      </div>
+      {% if current_user.rol == 'administrador' %}
+      <div class="evento-acciones">
+        <button type="button" class="btn-icono btn-editar-evento"
+          data-id="{{ e.id }}" data-titulo="{{ e.titulo }}" data-descripcion="{{ e.descripcion or '' }}"
+          data-categoria="{{ e.categoria }}" data-lugar="{{ e.lugar or '' }}"
+          data-fecha="{{ e.fecha_inicio.strftime('%Y-%m-%dT%H:%M') }}" aria-label="Editar">✎</button>
+        <form action="{{ url_for('usuarios.eventos_eliminar', evento_id=e.id) }}" method="POST" onsubmit="return confirm('¿Eliminar este evento?');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button type="submit" class="btn-icono btn-icono--danger" aria-label="Eliminar">🗑</button>
+        </form>
+      </div>
+      {% endif %}
+    </article>
+    {% else %}
+    <p class="eventos-vacio">No hay eventos {{ 'próximos' if momento == 'proximos' else 'pasados' }} por ahora.</p>
+    {% endfor %}
+  </div>
+
+  {% if current_user.rol == 'administrador' %}
+  <div class="modal-fondo" id="modalEvento" role="dialog" aria-modal="true" aria-labelledby="modalEventoTitulo" hidden>
+    <div class="modal-caja">
+      <button type="button" class="modal-cerrar" id="modalEventoCerrar" aria-label="Cerrar">✕</button>
+      <h2 class="modal-titulo" id="modalEventoTitulo">Crear evento</h2>
+      <form id="formEvento" method="POST" class="modal-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="campo">
+          <label>Título</label>
+          <input type="text" name="titulo" maxlength="150" required />
+        </div>
+        <div class="campo">
+          <label>Descripción</label>
+          <textarea name="descripcion" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="campo-fila">
+          <div class="campo">
+            <label>Categoría</label>
+            <select name="categoria">
+              {% for c in ('academico','profesional','egresados','taller','cultural','deportivo','otro') %}
+                <option value="{{ c }}">{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="campo">
+            <label>Fecha y hora</label>
+            <input type="datetime-local" name="fecha_inicio" required />
+          </div>
+        </div>
+        <div class="campo">
+          <label>Lugar</label>
+          <input type="text" name="lugar" maxlength="150" />
+        </div>
+        <button type="submit" class="btn-guardar">Guardar evento</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="/static/js/modal.js"></script>
+  {% if current_user.rol == 'administrador' %}
+  <script src="/static/js/eventos.js"></script>
+  {% endif %}
+{% endblock %}
