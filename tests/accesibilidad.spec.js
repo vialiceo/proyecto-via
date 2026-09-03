@@ -65,19 +65,20 @@ test.describe('Menú en móvil', () => {
     await expect(page.locator('#sidebarNav')).toHaveClass(/open/);
     await expect(page.locator('#navFondo')).toBeVisible();
 
-    // El panel entra con una transición de 0.28s. Medir justo después del
-    // clic da la posición de mitad de camino, no la final: expect.poll
-    // reintenta hasta que la animación termina.
-    const ancho = page.viewportSize().width;
+    // El cajón entra desde la IZQUIERDA con una transición de 0.28s: pasa de
+    // x = -ancho (oculto) a x = 0 (abierto). Medir justo tras el clic da un
+    // valor intermedio, así que expect.poll reintenta hasta que llega a 0.
     await expect
       .poll(async () => {
         const caja = await page.locator('#sidebarNav').boundingBox();
-        return Math.round(caja.x + caja.width);
+        return Math.round(caja.x);
       })
-      .toBeLessThanOrEqual(ancho + 1);
+      .toBeGreaterThanOrEqual(0);
 
     const panel = await page.locator('#sidebarNav').boundingBox();
-    expect(panel.x).toBeGreaterThanOrEqual(0);
+    const ancho = page.viewportSize().width;
+    // el cajón queda completamente dentro de la pantalla
+    expect(panel.x + panel.width).toBeLessThanOrEqual(ancho + 1);
     expect(panel.width).toBeGreaterThan(200);
   });
 });

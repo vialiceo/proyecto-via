@@ -55,6 +55,7 @@ def create_app():
     _inicializar_extensiones(app)
     _registrar_blueprints(app)
     _registrar_manejadores_error(app)
+    _registrar_cabeceras_seguridad(app)
     _registrar_contexto(app)
 
     os.makedirs(os.path.join(app.static_folder, "uploads", "perfiles"), exist_ok=True)
@@ -129,6 +130,86 @@ def _configurar_logging(app):
     correos.setFormatter(formato)
     correos.addFilter(lambda registro: getattr(registro, "es_correo", False))
     logger.addHandler(correos)
+
+
+def _registrar_cabeceras_seguridad(app):
+    """Cabeceras de seguridad + CORS en cada respuesta.
+
+    - Las cabeceras defienden contra clickjacking, sniffing de tipo MIME y
+      fuga del referer. Son baratas y no cambian el comportamiento del sitio.
+    - CORS aquí es RESTRICTIVO: solo los orígenes de CORS_ORIGINS pueden hacer
+      peticiones cruzadas al API, y solo si el navegador manda ese origen. Sin
+      la lista, ninguna web externa recibe encabezados CORS, que es justo lo
+      que se quiere en una app de un solo dominio.
+    """
+    origenes = set(app.config.get("CORS_ORIGINS") or [])
+
+    # Métodos y cabeceras que el API acepta en una petición cruzada.
+    METODOS = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    CABECERAS = "Content-Type, X-API-Key, X-Requested-With"
+
+    def _aplicar_cors(respuesta):
+        # CORS solo aplica al API: las páginas HTML son navegación del mismo
+        # sitio y nunca deben reflejar un origen externo.
+        if not request.path.startswith("/api/"):
+            return respuesta
+        origen = request.headers.get("Origin")
+        # Solo se responde CORS si el origen está en la lista blanca. La
+        # comparación es exacta: nada de comodines ni de "termina en".
+        if origen and origen in origenes:
+            respuesta.headers["Access-Control-Allow-Origin"] = origen
+            # Cambia según el Origin: los proxys no deben cachear una
+            # respuesta de un origen y servírsela a otro.
+            respuesta.headers.add("Vary", "Origin")
+            respuesta.headers["Access-Control-Allow-Credentials"] = "true"
+            respuesta.headers["Access-Control-Allow-Methods"] = METODOS
+            respuesta.headers["Access-Control-Allow-Headers"] = CABECERAS
+            respuesta.headers["Access-Control-Max-Age"] = "600"
+        return respuesta
+
+    @app.after_request
+    def _cabeceras(respuesta):
+        # --- Cabeceras de seguridad -------------------------------------
+        # El sitio no debe poder incrustarse en un iframe de otra página
+        # (defensa contra clickjacking).
+        respuesta.headers.setdefault("X-Frame-Options", "DENY")
+        # El navegador respeta el Content-Type declarado y no "adivina".
+        respuesta.headers.setdefault("X-Content-Type-Options", "nosniff")
+        # No filtrar la URL completa a sitios externos.
+        respuesta.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        # Apagar APIs del navegador que el sitio no usa.
+        respuesta.headers.setdefault(
+            "Permissions-Policy", "geolocation=(), microphone=(), camera=(), payment=()"
+        )
+        # CSP: por defecto todo del mismo origen. Se permiten estilos y la
+        # fuente de Google Fonts, que es lo único externo que carga el sitio.
+        respuesta.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'self'; "
+            "img-src 'self' data:; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "script-src 'self' 'unsafe-inline'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'",
+        )
+        # HSTS solo bajo HTTPS: obliga al navegador a volver siempre por TLS.
+        if request.is_secure:
+            respuesta.headers.setdefault(
+                "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
+            )
+        return _aplicar_cors(respuesta)
+
+    @app.before_request
+    def _preflight_cors():
+        # El navegador manda un OPTIONS antes de una petición cruzada "no
+        # simple". Se responde aquí con 204 y los encabezados que arma
+        # _aplicar_cors, sin entrar a la lógica de la ruta.
+        if request.method == "OPTIONS" and request.headers.get("Origin"):
+            from flask import Response
+
+            return _aplicar_cors(Response(status=204))
 
 
 def _registrar_contexto(app):

@@ -47,6 +47,22 @@ class Config:
 
     SOLICITUDES_API_KEY = os.getenv("SOLICITUDES_API_KEY") or None
 
+    # --- CORS -------------------------------------------------------------
+    # Lista blanca de orígenes que pueden hacer peticiones cruzadas al API.
+    # VACÍA a propósito: la aplicación es de una sola página servida por el
+    # mismo Flask, así que no necesita CORS para funcionar. Solo se llena si
+    # una plataforma externa (otro dominio) va a consumir /api/v1.
+    #
+    #   CORS_ORIGINS=https://plataforma.example.com,https://otra.example.com
+    #
+    # NUNCA poner "*": con cookies de sesión, un comodín deja que cualquier
+    # web lea los datos del usuario. La lista se compara exacta.
+    CORS_ORIGINS = [
+        o.strip()
+        for o in (os.getenv("CORS_ORIGINS") or "").split(",")
+        if o.strip()
+    ]
+
 
 class DevelopmentConfig(Config):
     DEBUG = True

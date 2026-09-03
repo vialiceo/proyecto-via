@@ -33,6 +33,7 @@
   <header class="navbar">
     <div class="navbar-inner">
       <a href="https://ieliceotame.edu.co" target="_blank" rel="noopener" class="navbar-brand">
+        {% if escudo_url %}<img src="{{ escudo_url }}" alt="Escudo del Liceo Tame" class="brand-shield-img" />{% endif %}
         <div class="brand-shield">
           <span class="bs-top">EXCELSIOR</span>
           <div class="bs-stars">★ ★</div>
@@ -161,6 +162,7 @@
   <footer class="footer">
     <div class="footer-inner">
       <div class="footer-col footer-col--brand">
+        {% if escudo_url %}<img src="{{ escudo_url }}" alt="Escudo del Liceo Tame" class="footer-shield-img" />{% endif %}
         <div class="footer-shield">
           <span class="fs-top">EXCELSIOR</span>
           <div class="fs-stars">★ ★</div>

@@ -20,6 +20,9 @@
   </button>
 
   <a href="https://ieliceotame.edu.co" target="_blank" rel="noopener" class="nav-shield-link" aria-label="Sitio de la institución">
+    {% if escudo_url %}
+      <img src="{{ escudo_url }}" alt="Escudo del Liceo Tame" class="nav-shield-img" />
+    {% endif %}
     <div class="nav-shield">
       <span class="ns-top">EXCELSIOR</span>
       <div class="ns-stars">★ ★</div>

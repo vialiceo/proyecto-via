@@ -27,9 +27,19 @@ function cerrarModal() {
   usuarioActualId = null;
 }
 
+// Filas de esqueleto: barras grises que laten mientras llega la respuesta.
+// Da sensación de que algo está pasando en vez de una pausa en blanco.
+function filasEsqueleto(n) {
+  let html = '';
+  for (let i = 0; i < n; i++) {
+    html += '<li class="bitacora-skel"><span class="via-esqueleto via-esqueleto--linea"></span></li>';
+  }
+  return html;
+}
+
 function cargarBitacora(usuarioId) {
   if (!listaBitacora) return;
-  listaBitacora.innerHTML = '<li>Cargando…</li>';
+  listaBitacora.innerHTML = filasEsqueleto(3);
   apiFetch(`/api/v1/admin/usuarios/${usuarioId}/bitacora`)
     .then((entradas) => {
       if (!entradas.length) {
@@ -48,6 +58,14 @@ function cargarBitacora(usuarioId) {
 
 function abrirModal(usuarioId) {
   usuarioActualId = usuarioId;
+
+  // El modal aparece de una vez con los campos marcados como "cargando":
+  // así el clic responde al instante y el usuario ve que va en camino, en
+  // lugar de una pausa antes de que salga la ventana.
+  if (formEditar) formEditar.classList.add('form-cargando');
+  if (modal) modal.hidden = false;
+  if (listaBitacora) listaBitacora.innerHTML = filasEsqueleto(3);
+
   apiFetch(`/api/v1/admin/usuarios/${usuarioId}`)
     .then((usuario) => {
       formEditar.nombre.value = usuario.nombre || '';
@@ -56,10 +74,13 @@ function abrirModal(usuarioId) {
       formEditar.rol.value = usuario.rol || 'egresado';
       formEditar.anio_promocion.value = usuario.anio_promocion || '';
       formEditar.tecnico_id.value = usuario.tecnico_id || '';
-      modal.hidden = false;
+      formEditar.classList.remove('form-cargando');
       cargarBitacora(usuarioId);
     })
-    .catch((error) => alert(error.message));
+    .catch((error) => {
+      cerrarModal();
+      alert(error.message);
+    });
 }
 
 document.querySelectorAll('.btn-gestionar').forEach((boton) => {

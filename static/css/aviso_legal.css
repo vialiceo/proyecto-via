@@ -82,3 +82,9 @@
   .legal-cuerpo { padding: 1.75rem 1.25rem; }
   .legal-titulo { font-size: 1.5rem; }
 }
+
+/* Escudo por imagen: si existe el archivo, reemplaza al dibujo CSS. */
+.brand-shield-img { width: 42px; height: 42px; object-fit: contain; display: block; }
+.brand-shield-img + .brand-shield { display: none; }
+.footer-shield-img { width: 56px; height: 56px; object-fit: contain; display: block; }
+.footer-shield-img + .footer-shield { display: none; }

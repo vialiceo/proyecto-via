@@ -286,6 +286,36 @@ limitado a 60 solicitudes por hora.
 - **Consultas parametrizadas** en toda la capa de datos (`backend/models.py`
   vía `backend/db.py`) — nunca se concatena SQL con datos del usuario.
 
+### Cabeceras de seguridad y CORS
+
+`_registrar_cabeceras_seguridad()` en `backend/app.py` añade en cada respuesta:
+
+| Cabecera | Contra qué protege |
+|---|---|
+| `Content-Security-Policy` | Restringe de dónde se cargan scripts, estilos e imágenes: corta el XSS. Permite solo el mismo origen más Google Fonts. |
+| `X-Frame-Options: DENY` | Clickjacking: el sitio no se puede meter en un `<iframe>` de otra página. |
+| `X-Content-Type-Options: nosniff` | Que el navegador no "adivine" el tipo de un archivo y ejecute algo que no debía. |
+| `Referrer-Policy` | Que la URL completa no se filtre a sitios externos. |
+| `Permissions-Policy` | Apaga cámara, micrófono, geolocalización y pagos, que el sitio no usa. |
+| `Strict-Transport-Security` | Solo bajo HTTPS: obliga al navegador a volver siempre por TLS. |
+
+**CORS restrictivo.** Solo se aplica a las rutas `/api/`; las páginas HTML son
+navegación del mismo sitio y nunca reflejan un origen externo. Un origen recibe
+cabeceras CORS **solo si está en la lista blanca `CORS_ORIGINS`** (variable de
+entorno, separada por comas), comparada de forma exacta.
+
+La lista va **vacía por defecto**: la aplicación es de un solo dominio y no
+necesita CORS para funcionar. Solo se llena si otra plataforma en otro dominio
+va a consumir el API.
+
+Nunca se usa `Access-Control-Allow-Origin: *`. Con cookies de sesión, un
+comodín dejaría que cualquier web del mundo leyera los datos del usuario que
+tenga sesión abierta — es el error de CORS más común y más grave. Por eso el
+origen se compara contra la lista y se refleja solo si coincide.
+
+Las peticiones `OPTIONS` de preflight se responden con 204 y los encabezados
+de la lista, sin entrar a la lógica de la ruta.
+
 ## Caché y tareas asíncronas
 
 Flask-Caching (`SimpleCache` en memoria por defecto; cambiar `CACHE_TYPE` a

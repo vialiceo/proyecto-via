@@ -226,3 +226,59 @@
   .layout-wrapper { margin-right: 0; }
   .main-content { padding: 1.5rem 1rem; }
 }
+
+/* ============================================================
+   Ajustes de navegación (sidebar como cajón + topbar)
+   Van al final para ganar por orden de cascada, sin tocar las
+   reglas originales de arriba.
+   ============================================================ */
+
+/* El contenido ocupa todo el ancho: el menú lateral ahora es un cajón que
+   flota por encima, no reserva espacio fijo. */
+.layout-wrapper {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* Hueco a la izquierda de la topbar para el botón de la hamburguesa. */
+.topbar {
+  padding-left: 64px;
+  position: relative;
+  /* Topbar más alta y con más aire; el escudo NO cambia de tamaño. */
+  height: 72px;
+}
+
+/* Escudo de la topbar más grande. */
+.topbar-shield,
+.topbar-shield-img {
+  width: 54px;
+  height: 54px;
+}
+.ts-top, .ts-bottom { font-size: 0.26rem; }
+.ts-stars { font-size: 0.52rem; }
+.ts-sun   { font-size: 0.86rem; }
+
+/* Los iconos de navegación: 10% más grandes y centrados en la topbar. */
+.topbar-nav-icons {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-left: 0;
+  gap: 0.6rem;
+}
+
+.topbar-nav-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.topbar-nav-icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+@media (max-width: 720px) {
+  /* En móvil los iconos centrados chocarían con el escudo y el perfil:
+     se ocultan, el cajón lateral cubre esa navegación. */
+  .topbar-nav-icons { display: none; }
+}

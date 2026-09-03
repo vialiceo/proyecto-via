@@ -147,6 +147,39 @@
 .via-esqueleto--foto    { width: 100%; aspect-ratio: 4 / 3; }
 .via-esqueleto--avatar  { width: 72px; height: 72px; border-radius: 50%; }
 
+/* Fila de esqueleto para listas (bitácora del modal de admin). */
+.bitacora-skel {
+  list-style: none;
+  padding: 0.4rem 0;
+}
+.bitacora-skel .via-esqueleto--linea {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+.bitacora-skel:nth-child(2) .via-esqueleto--linea { width: 80%; }
+.bitacora-skel:nth-child(3) .via-esqueleto--linea { width: 60%; }
+
+/* Formulario a la espera de datos: se atenúa y no se puede tocar hasta que
+   llegan los valores. Un spinner en la esquina indica la carga. */
+.form-cargando {
+  position: relative;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.form-cargando::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 2px solid var(--verde-boton, #1a3d2b);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: via-girar 0.7s linear infinite;
+}
+
 /* --- Imágenes que aparecen al terminar de descargar ---------------------- */
 /* carga.js les quita .via-img-cargando cuando el navegador termina. */
 

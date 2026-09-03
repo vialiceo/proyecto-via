@@ -11,7 +11,7 @@
   --oro-claro:       #f0c84a;
   --blanco:          #ffffff;
   --texto-tenue:     rgba(255,255,255,0.50);
-  --nav-width:       120px;
+  --nav-width:       288px;
   --topbar-height:   60px;
   --fuente-display:  'Cinzel', serif;
   --fuente-serif:    'Playfair Display', Georgia, serif;
@@ -28,7 +28,7 @@ html, body {
 .sidebar-nav {
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   width: var(--nav-width);
   height: 100vh;
   background: linear-gradient(180deg, var(--verde-nav-claro) 0%, var(--verde-nav) 60%, #6e8f45 100%);
@@ -37,43 +37,57 @@ html, body {
   align-items: center;
   padding-top: 0.8rem;
   overflow-y: auto;
-  z-index: 200;
-  border-left: 2px solid rgba(255,255,255,0.22);
-  box-shadow: -3px 0 18px rgba(0,0,0,0.20);
+  z-index: 300;
+  border-right: 2px solid rgba(255,255,255,0.22);
+  box-shadow: 3px 0 24px rgba(0,0,0,0.28);
+  /* Cajón oculto: entra desde la izquierda cuando se pulsa la hamburguesa. */
+  transform: translateX(-100%);
   transition: transform 0.28s ease;
 }
 
+.sidebar-nav.open {
+  transform: translateX(0);
+}
+
 .nav-toggle {
-  width: 36px;
-  height: 28px;
+  position: relative;
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 2px 0;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.6rem;
+  align-self: flex-end;
+  margin-right: 0.4rem;
+  border-radius: 8px;
+  transition: background 0.18s;
 }
 
+.nav-toggle:hover { background: rgba(255,255,255,0.35); }
+
+/* Este botón, dentro del cajón, siempre cierra: es una X fija. Las tres
+   barras se centran por posición absoluta y dos se cruzan a ±45°, así la X
+   queda perfecta sin depender del alto exacto del botón. */
 .nav-toggle span {
-  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
   height: 3px;
-  width: 100%;
+  margin: -1.5px 0 0 -12px;
   background: var(--verde-oscuro);
   border-radius: 2px;
-  transition: all 0.22s;
 }
 
-.sidebar-nav.open .nav-toggle span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
-.sidebar-nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
-.sidebar-nav.open .nav-toggle span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+.nav-toggle span:nth-child(1) { transform: rotate(45deg); }
+.nav-toggle span:nth-child(2) { opacity: 0; }
+.nav-toggle span:nth-child(3) { transform: rotate(-45deg); }
 
 .nav-shield-link { text-decoration: none; margin-bottom: 1rem; }
 
 .nav-shield {
-  width: 68px;
-  height: 68px;
+  width: 88px;
+  height: 88px;
   background: linear-gradient(145deg, var(--verde-medio), var(--verde-oscuro));
   border: 2px solid var(--oro);
   border-radius: 3px 3px 40% 40% / 3px 3px 24% 24%;
@@ -88,14 +102,26 @@ html, body {
 
 .nav-shield:hover { transform: scale(1.06); box-shadow: 0 0 20px rgba(201,162,39,0.55); }
 
+/* Imagen del escudo en la sidebar: si el archivo existe, reemplaza al escudo
+   dibujado con CSS (mismo patrón que en la topbar). */
+.nav-shield-img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.18s;
+}
+.nav-shield-link:hover .nav-shield-img { transform: scale(1.06); }
+.nav-shield-img + .nav-shield { display: none; }
+
 .ns-top, .ns-bottom {
   font-family: var(--fuente-display);
-  font-size: 0.28rem;
+  font-size: 0.36rem;
   letter-spacing: 0.06em;
   color: var(--oro-claro);
 }
-.ns-stars { color: var(--oro); font-size: 0.55rem; letter-spacing: 0.18em; }
-.ns-sun   { font-size: 0.88rem; color: var(--oro-claro); line-height: 1; }
+.ns-stars { color: var(--oro); font-size: 0.7rem; letter-spacing: 0.18em; }
+.ns-sun   { font-size: 1.1rem; color: var(--oro-claro); line-height: 1; }
 
 .nav-list {
   list-style: none;
@@ -106,30 +132,41 @@ html, body {
 
 .nav-item {
   width: 100%;
-  border-bottom: 1px solid rgba(255,255,255,0.28);
+  padding: 0 0.85rem;      /* aire a los lados: el texto no toca el borde */
+  margin-bottom: 0.4rem;
 }
 
-.nav-item:first-child { border-top: 1px solid rgba(255,255,255,0.28); }
+.nav-item:first-child { margin-top: 0.2rem; }
 
 .nav-link {
-  display: block;
-  padding: 0.95rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;           /* tarjetas más altas y parejas */
+  padding: 0.9rem 1.1rem;
   text-align: center;
   font-family: var(--fuente-display);
-  font-size: 0.54rem;
-  letter-spacing: 0.07em;
+  font-size: 0.72rem;         /* legible, centrada */
+  letter-spacing: 0.05em;     /* menos apretado: las palabras largas caben */
   font-weight: 700;
   color: var(--verde-oscuro);
   text-decoration: none;
-  line-height: 1.4;
-  transition: background 0.18s, color 0.18s;
+  line-height: 1.35;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.14);
+  transition: background 0.18s, color 0.18s, transform 0.12s;
 }
 
-.nav-link:hover           { background: var(--verde-nav-hover); color: #0d1f15; }
-.nav-item.active .nav-link {
+.nav-link:hover {
   background: rgba(255,255,255,0.42);
   color: #0d1f15;
-  border-left: 3px solid var(--oro);
+  transform: translateY(-1px);
+}
+
+.nav-item.active .nav-link {
+  background: rgba(255,255,255,0.55);
+  color: #0d1f15;
+  box-shadow: inset 0 0 0 2px var(--oro);
 }
 
 .nav-list--salir {
@@ -176,6 +213,14 @@ html, body {
   gap: 1px;
   box-shadow: 0 0 10px rgba(201,162,39,0.3);
 }
+
+.footer-shield-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+}
+.footer-shield-img + .footer-shield { display: none; }
 
 .fs-top, .fs-bottom { font-family: var(--fuente-display); font-size: 0.24rem; color: var(--oro-claro); letter-spacing: 0.06em; }
 .fs-stars { color: var(--oro); font-size: 0.48rem; letter-spacing: 0.16em; }
@@ -274,21 +319,30 @@ html, body {
    dentro, al deslizarse el panel fuera de la pantalla se iría con él y no
    habría forma de volver a abrirlo. En escritorio se oculta. */
 .nav-abrir {
-  display: none;
+  /* Siempre visible, arriba a la izquierda, encima de la topbar. Es lo que
+     abre el cajón lateral en cualquier tamaño de pantalla. */
+  display: flex;
   position: fixed;
-  top: 10px;
-  right: 12px;
-  z-index: 400;
+  top: 8px;
+  left: 12px;
+  z-index: 250;
   width: 44px;
   height: 44px;
   padding: 11px 10px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 8px;
-  background: rgba(26, 61, 43, 0.92);
+  background: rgba(255, 255, 255, 0.10);
   cursor: pointer;
   flex-direction: column;
   justify-content: space-between;
+  transition: background 0.18s, opacity 0.2s;
 }
+
+.nav-abrir:hover { background: rgba(255, 255, 255, 0.22); }
+
+/* Con el cajón abierto, su propio botón de cerrar toma el relevo. */
+.sidebar-nav.open ~ .nav-abrir,
+body.nav-abierto .nav-abrir { opacity: 0; pointer-events: none; }
 
 .nav-abrir span {
   display: block;
@@ -298,49 +352,38 @@ html, body {
   border-radius: 2px;
 }
 
+/* La barra de progreso y el spinner viven en carga.css. */
+
 .nav-fondo {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 150;
+  z-index: 250;
   background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+/* El overlay opaca la página detrás del cajón, en cualquier pantalla. */
+.nav-fondo:not([hidden]) {
+  display: block;
+  opacity: 1;
+}
+
+/* Con el cajón abierto la página de atrás no se desplaza. */
+body.nav-abierto { overflow: hidden; }
+
+/* El botón de cerrar dentro del cajón: cómodo de tocar. */
+/* Los enlaces del cajón: ahora que es más ancho, texto más legible. */
+.nav-link {
+  font-size: 0.72rem;
+  padding: 0.9rem 1rem;
+  letter-spacing: 0.1em;
 }
 
 @media (max-width: 768px) {
-  .sidebar-nav {
-    transform: translateX(100%);
-    width: 260px;
-  }
-
-  .sidebar-nav.open {
-    transform: translateX(0);
-  }
-
-  .nav-abrir { display: flex; }
-
-  /* Cuando el menú está abierto, su propio botón de cerrar toma el relevo. */
-  .sidebar-nav.open ~ .nav-abrir,
-  body.nav-abierto .nav-abrir { display: none; }
-
-  .nav-fondo:not([hidden]) { display: block; }
-
-  body.nav-abierto { overflow: hidden; }
-
-  /* Objetivos táctiles: 44px es el mínimo que se puede tocar con el dedo
-     sin fallar. Debajo de eso la gente le pega al enlace de al lado. */
-  .nav-toggle {
-    width: 44px;
-    height: 44px;
-    padding: 9px 4px;
-    align-self: flex-end;
-    margin-right: 0.6rem;
-  }
-
-  .nav-link {
-    padding-top: 0.85rem;
-    padding-bottom: 0.85rem;
-    font-size: 0.72rem;
-  }
+  /* En móvil el cajón ocupa casi toda la pantalla. */
+  :root { --nav-width: 82vw; }
 
   .footer-inner {
     grid-template-columns: 1fr;

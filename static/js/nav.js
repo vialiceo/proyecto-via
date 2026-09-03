@@ -38,9 +38,4 @@ if (sidebarNav) {
     }
   });
 
-  /* Si se agranda la ventana con el menú abierto, el panel vuelve a ser fijo
-     y el fondo oscuro se quedaría tapando la página. */
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 768 && sidebarNav.classList.contains('open')) cerrar();
-  });
 }

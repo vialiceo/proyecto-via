@@ -69,9 +69,20 @@ def login():
             return redirect(url_for("auth.cambiar_password"))
 
         siguiente = utils.redireccion_segura(request.args.get("next"), url_for("public.index"))
-        return redirect(siguiente)
+        # No se salta directo al destino: primero la pantalla de bienvenida,
+        # que da un respiro visual y confirma que la sesión quedó lista.
+        return redirect(url_for("auth.preparando", next=siguiente))
 
     return render_template("login.html")
+
+
+@auth_bp.route("/preparando")
+@login_required
+def preparando():
+    """Pantalla breve tras iniciar sesión. Muestra el loader y, con JS, salta
+    sola al destino. El `next` se valida para no permitir redirección abierta."""
+    destino = utils.redireccion_segura(request.args.get("next"), url_for("public.index"))
+    return render_template("preparando.html", destino=destino)
 
 
 @auth_bp.route("/logout")
