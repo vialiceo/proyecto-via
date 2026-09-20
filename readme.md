@@ -90,6 +90,14 @@ Crea la base `egresados` y el usuario `via_app`, que solo tiene permisos
 lograra inyectar SQL, `via_app` no puede leer ni borrar otras bases del servidor ni cambiar
 la configuración de MySQL.
 
+> **Rotar el usuario o la contraseña (mantenimiento).** Para cambiar la clave del
+> usuario sin tocar nada más, entra como root (`mysql -u root -p`) y corre
+> `ALTER USER 'via_app'@'localhost' IDENTIFIED BY 'nueva-clave';`; luego actualiza
+> `MYSQL_PASSWORD` en el `.env`. Si en su lugar prefieres otro nombre de usuario,
+> créalo con los mismos permisos (`GRANT SELECT, INSERT, UPDATE, DELETE ON egresados.*`)
+> y cambia `MYSQL_USER` en el `.env`. La contraseña real **nunca** va en
+> `crear_usuario_mysql.sql` (ese archivo sí está en git): déjalo con el placeholder.
+
 **3. Configuración (`.env`)**
 
 Crea un archivo `.env` en la raíz (no se sube a git). El detalle de cada variable está en

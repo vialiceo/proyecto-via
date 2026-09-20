@@ -11,6 +11,11 @@ para enviar un focking git se usa git commit -m "mensaje" y luego git push
  creo que esta quedando un poquito pesado el sitio :v
  ya que al menos me gusta como quedando
 
+ verificar el funcionamiento de los pop ups de cambio de informacion
+
+ pajazo mental con la ciber seguridad aaaaah todo sea por evitar la demanda
+ 
+
  git push 
  
  comentarios:
@@ -35,5 +40,5 @@ cursos:
         ciberseguridad:
             https://www.youtube.com/watch?v=gzES0MuWqHE&t=306s&pp=ygUSY2liZXJzZWd1cmlkYWQgd2Vi
             https://www.youtube.com/watch?v=jVLcvLB4IJs
-            
+
 
