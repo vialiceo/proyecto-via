@@ -175,7 +175,12 @@ def admin_usuario_put(usuario_id):
     except mysql.connector.IntegrityError:
         return _error("Ya existe una cuenta con ese correo o usuario.", 409)
 
-    if rowcount == 0:
+    """
+    MySQL devuelve 0 filas afectadas tanto cuando la cuenta no existe como
+    cuando se guardó sin cambiar ningún valor. Solo es error si de verdad no
+    existe; guardar sin cambios es válido.
+    """
+    if rowcount == 0 and not models.obtener_usuario_por_id(usuario_id):
         return _error("Usuario no encontrado.", 404)
 
     utils.encolar_tarea(
@@ -229,7 +234,16 @@ def admin_usuario_reset_password(usuario_id):
         f"Hola {usuario['nombre']},\n\nUn administrador restableció tu contraseña.\n"
         f"Contraseña temporal: {password_temporal}\n\nTe pedirá cambiarla en tu próximo ingreso.",
     )
-    return _ok({"password_temporal": password_temporal})
+    """
+    Si hay servidor de correo, la clave va por email y el admin no la ve.
+    Si no (desarrollo), se devuelve como respaldo para poder entregarla a mano.
+    """
+    enviado = bool(current_app.config.get("MAIL_SERVER"))
+    return _ok({
+        "correo": usuario["correo"],
+        "enviado_por_correo": enviado,
+        "password_temporal": None if enviado else password_temporal,
+    })
 
 
 @api_bp.route("/admin/usuarios/<int:usuario_id>/bitacora", methods=["GET"])

@@ -13,6 +13,12 @@ function apiFetch(url, opciones = {}) {
 }
 
 const modal = document.getElementById('modalGestion');
+/*
+ * Se saca el modal al <body>: dentro de .main-content (que tiene transform por
+ * la animacion de entrada) su position:fixed se centra respecto al documento y
+ * no a la pantalla. En el body queda centrado en la ventana.
+ */
+if (modal && modal.parentElement !== document.body) document.body.appendChild(modal);
 const modalCerrar = document.getElementById('modalCerrar');
 const formEditar = document.getElementById('formEditarUsuario');
 const btnActivar = document.getElementById('btnActivar');
@@ -27,8 +33,10 @@ function cerrarModal() {
   usuarioActualId = null;
 }
 
-// Filas de esqueleto: barras grises que laten mientras llega la respuesta.
-// Da sensación de que algo está pasando en vez de una pausa en blanco.
+/*
+ * Filas de esqueleto: barras grises que laten mientras llega la respuesta.
+ * Da sensación de que algo está pasando en vez de una pausa en blanco.
+ */
 function filasEsqueleto(n) {
   let html = '';
   for (let i = 0; i < n; i++) {
@@ -59,9 +67,11 @@ function cargarBitacora(usuarioId) {
 function abrirModal(usuarioId) {
   usuarioActualId = usuarioId;
 
-  // El modal aparece de una vez con los campos marcados como "cargando":
-  // así el clic responde al instante y el usuario ve que va en camino, en
-  // lugar de una pausa antes de que salga la ventana.
+  /*
+   * El modal aparece de una vez con los campos marcados como "cargando":
+   * así el clic responde al instante y el usuario ve que va en camino, en
+   * lugar de una pausa antes de que salga la ventana.
+   */
   if (formEditar) formEditar.classList.add('form-cargando');
   if (modal) modal.hidden = false;
   if (listaBitacora) listaBitacora.innerHTML = filasEsqueleto(3);
@@ -126,7 +136,55 @@ if (btnResetPassword) {
     if (!confirm('¿Restablecer la contraseña de esta cuenta?')) return;
 
     apiFetch(`/api/v1/admin/usuarios/${usuarioActualId}/reset-password`, { method: 'POST' })
-      .then((datos) => alert(`Contraseña temporal: ${datos.password_temporal}\n\nCompártela por un canal seguro.`))
+      .then((datos) => {
+        if (datos.enviado_por_correo) {
+          alert(`Contraseña temporal enviada al correo de la persona (${datos.correo}).`);
+        } else {
+          alert(`Se restableció la contraseña.\n\nEl correo no está configurado, así que entrégala tú por un canal seguro:\nContraseña temporal: ${datos.password_temporal}`);
+        }
+      })
       .catch((error) => alert(error.message));
   });
 }
+
+/* --- Menú de 3 puntos por fila: "Gestionar" y "Ver perfil" ----------------- */
+document.querySelectorAll('.btn-tres-puntos').forEach((boton) => {
+  boton.addEventListener('click', (evento) => {
+    evento.stopPropagation();
+    const lista = boton.nextElementSibling;
+    const estabaAbierto = !lista.hidden;
+    document.querySelectorAll('.fila-menu-lista').forEach((l) => (l.hidden = true));
+    lista.hidden = estabaAbierto;
+    boton.setAttribute('aria-expanded', String(!estabaAbierto));
+  });
+});
+
+/* Un clic en cualquier parte cierra los menús abiertos. */
+document.addEventListener('click', () => {
+  document.querySelectorAll('.fila-menu-lista').forEach((l) => (l.hidden = true));
+});
+
+/* "Ver perfil": abre el modal de egresado con los datos de la fila (todo, admin). */
+document.querySelectorAll('.btn-ver-perfil').forEach((boton) => {
+  boton.addEventListener('click', () => {
+    const fila = boton.closest('tr');
+    if (fila && window.abrirModalEgresado) window.abrirModalEgresado(fila.dataset, fila);
+  });
+});
+
+/* Si desde el modal se destaca/quita a alguien, refleja la estrella en su fila. */
+document.addEventListener('destacado-cambiado', (evento) => {
+  const fila = document.querySelector(`tr[data-id="${evento.detail.id}"]`);
+  const avatar = fila ? fila.querySelector('.celda-avatar') : null;
+  if (!avatar) return;
+  let estrella = avatar.querySelector('.celda-avatar-estrella');
+  if (evento.detail.destacado && !estrella) {
+    estrella = document.createElement('span');
+    estrella.className = 'celda-avatar-estrella';
+    estrella.title = 'Destacado';
+    estrella.textContent = '★';
+    avatar.appendChild(estrella);
+  } else if (!evento.detail.destacado && estrella) {
+    estrella.remove();
+  }
+});

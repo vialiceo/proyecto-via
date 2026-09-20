@@ -18,11 +18,7 @@
 
     <section class="perfil-card perfil-card--identidad">
       <div class="identidad-foto">
-        {% if perfil.foto %}
-          <img src="{{ perfil.foto }}" alt="Foto de perfil" />
-        {% else %}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        {% endif %}
+        <img src="{{ perfil.foto or url_for('static', filename='img/avatar.svg') }}" onerror="this.src='/static/img/avatar.svg'" alt="Foto de perfil" />
         <form action="{{ url_for('usuarios.actualizar_foto') }}" method="POST" enctype="multipart/form-data" class="form-foto">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <label class="btn-foto">
@@ -49,8 +45,6 @@
         <div><dt>Correo electrónico</dt><dd>{{ perfil.correo }}</dd></div>
         <div><dt>Profesión</dt><dd>{{ perfil.profesion or '—' }}</dd></div>
         <div><dt>Ciudad de residencia</dt><dd>{{ perfil.lugar_residencia or '—' }}</dd></div>
-        <div><dt>Dónde estudió</dt><dd>{{ perfil.lugar_estudio or '—' }}</dd></div>
-        {% if perfil.edad %}<div><dt>Edad</dt><dd>{{ perfil.edad }} años</dd></div>{% endif %}
       </dl>
 
       {% if perfil.frase %}
@@ -61,17 +55,44 @@
       {% endif %}
     </section>
 
-    <aside class="perfil-card perfil-card--contacto">
-      <h2 class="card-titulo">Métodos de contacto</h2>
-      {% if perfil.contactos %}
-      <ul class="contacto-lista-lectura">
-        {% for c in perfil.contactos %}
-        <li><span class="contacto-tipo">{{ c.tipo.replace('_',' ')|capitalize }}</span><span>{{ c.valor }}</span></li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p class="contacto-vacio">Todavía no agregaste métodos de contacto.</p>
-      {% endif %}
+    <aside class="perfil-col-lateral">
+      <section class="perfil-card perfil-card--adicional">
+        <h2 class="card-titulo">Información adicional</h2>
+        <ul class="info-adicional-lista">
+          <li>
+            <span class="info-ad-icono">🎓</span>
+            <span class="info-ad-texto"><span class="info-ad-label">Dónde estudió</span><span class="info-ad-valor">{{ perfil.lugar_estudio or '—' }}</span></span>
+          </li>
+          <li>
+            <span class="info-ad-icono">💼</span>
+            <span class="info-ad-texto"><span class="info-ad-label">Profesión</span><span class="info-ad-valor">{{ perfil.profesion or '—' }}</span></span>
+          </li>
+          <li>
+            <span class="info-ad-icono">📍</span>
+            <span class="info-ad-texto"><span class="info-ad-label">Ciudad de residencia</span><span class="info-ad-valor">{{ perfil.lugar_residencia or '—' }}</span></span>
+          </li>
+          <li>
+            <span class="info-ad-icono">📅</span>
+            <span class="info-ad-texto"><span class="info-ad-label">{{ 'Edad' if perfil.edad else 'Año de promoción' }}</span><span class="info-ad-valor">{{ (perfil.edad ~ ' años') if perfil.edad else (perfil.anio_promocion or '—') }}</span></span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="perfil-card perfil-card--redes">
+        <h2 class="card-titulo">Redes y contacto</h2>
+        {% if perfil.contactos %}
+        <ul class="redes-lista">
+          {% for c in perfil.contactos %}
+          <li class="red-item red-item--{{ c.tipo }}">
+            <span class="red-icono">{{ {'instagram':'📷','facebook':'📘','linkedin':'in','whatsapp':'🟢','telefono':'📞','correo_alterno':'✉','otro':'🔗'}.get(c.tipo, '🔗') }}</span>
+            <span class="red-texto"><span class="red-tipo">{{ c.tipo.replace('_',' ')|capitalize }}</span><span class="red-valor">{{ c.valor }}</span></span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="contacto-vacio">Todavía no agregaste redes ni métodos de contacto.</p>
+        {% endif %}
+      </section>
     </aside>
 
   </div>
@@ -80,11 +101,7 @@
 
     <section class="perfil-card perfil-card--identidad">
       <div class="identidad-foto">
-        {% if perfil.foto %}
-          <img src="{{ perfil.foto }}" alt="Foto de perfil" />
-        {% else %}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        {% endif %}
+        <img src="{{ perfil.foto or url_for('static', filename='img/avatar.svg') }}" onerror="this.src='/static/img/avatar.svg'" alt="Foto de perfil" />
       </div>
       <h2 class="identidad-nombre">{{ perfil.nombre }}</h2>
       <span class="identidad-rol">{{ perfil.rol|capitalize }}</span>
@@ -100,6 +117,7 @@
 
     <section class="perfil-card perfil-card--editable">
       <h2 class="card-titulo">Información visible para la comunidad</h2>
+      <p class="form-intro">Marca <strong>“Mostrar en el directorio”</strong> en los datos que quieras que otros egresados vean en tu tarjeta. Lo que no marques, solo lo ve la administración.</p>
 
       <form action="{{ url_for('usuarios.perfil') }}" method="POST" class="form-perfil" novalidate>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -107,12 +125,14 @@
         <div class="campo">
           <label for="correo">Correo de contacto</label>
           <input type="email" id="correo" name="correo" maxlength="190" value="{{ perfil.correo or '' }}" required />
-          <span class="campo-ayuda">Es con el que inicias sesión y al que llegan los avisos. Solo tú lo ves.</span>
+          <span class="campo-ayuda">Es con el que inicias sesión y al que llegan los avisos.</span>
+          <label class="campo-publico"><input type="checkbox" name="publico_correo" {% if 'correo' in perfil.campos_publicos %}checked{% endif %} /> Mostrar mi correo en el directorio</label>
         </div>
 
         <div class="campo">
           <label for="profesion">Profesión / a qué te dedicas</label>
           <input type="text" id="profesion" name="profesion" maxlength="150" value="{{ perfil.profesion or '' }}" placeholder="Ej: Ingeniero de sistemas" />
+          <label class="campo-publico"><input type="checkbox" name="publico_profesion" {% if 'profesion' in perfil.campos_publicos %}checked{% endif %} /> Mostrar en el directorio</label>
         </div>
 
         <div class="campo-fila">
@@ -123,18 +143,21 @@
           <div class="campo">
             <label for="lugar_residencia">Dónde vives</label>
             <input type="text" id="lugar_residencia" name="lugar_residencia" maxlength="150" value="{{ perfil.lugar_residencia or '' }}" placeholder="Ciudad, país" />
+          <label class="campo-publico"><input type="checkbox" name="publico_lugar_residencia" {% if 'lugar_residencia' in perfil.campos_publicos %}checked{% endif %} /> Mostrar en el directorio</label>
           </div>
         </div>
 
         <div class="campo">
           <label for="lugar_estudio">Dónde estudiaste después del Liceo</label>
           <input type="text" id="lugar_estudio" name="lugar_estudio" maxlength="150" value="{{ perfil.lugar_estudio or '' }}" placeholder="Universidad, institución..." />
+          <label class="campo-publico"><input type="checkbox" name="publico_lugar_estudio" {% if 'lugar_estudio' in perfil.campos_publicos %}checked{% endif %} /> Mostrar en el directorio</label>
         </div>
 
         <div class="campo">
           <label for="frase">Acerca de mí / frase para tu promoción (opcional)</label>
           <textarea id="frase" name="frase" maxlength="200" rows="2" placeholder="Algo que quieras compartir...">{{ perfil.frase or '' }}</textarea>
           <span class="campo-ayuda">También aparece en tu tarjeta cuando alguien vea la promoción {{ perfil.anio_promocion or '' }}.</span>
+          <label class="campo-publico"><input type="checkbox" name="publico_frase" {% if 'frase' in perfil.campos_publicos %}checked{% endif %} /> Mostrar en el directorio</label>
         </div>
 
         <div class="contactos-header">

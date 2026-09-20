@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import re
+import base64
 import secrets
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta
@@ -9,6 +10,8 @@ from functools import wraps
 
 from flask import abort, current_app, flash, redirect, request, url_for
 from flask_login import current_user, login_required
+from cryptography.hazmat.primitives.ciphers.aead import AESSIV
+from markupsafe import escape
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
@@ -84,43 +87,96 @@ def encolar_tarea(fn, *args, **kwargs):
     _executor.submit(_envoltura)
 
 
-def enviar_correo_async(destinatario, asunto, cuerpo_texto):
-    """Manda el correo en segundo plano para no dejar esperando al usuario.
+def _cuerpo_html(asunto, cuerpo_texto):
+    """Envuelve el texto del correo en una plantilla HTML con la identidad del
+    Liceo (verde + dorado). El texto se escapa y se respeta en párrafos, así que
+    sirve igual para una contraseña temporal que para un aviso largo. Usa estilos
+    en línea y tablas porque es lo único que los clientes de correo renderizan
+    de forma fiable."""
+    bloques = [b.strip() for b in cuerpo_texto.split("\n\n") if b.strip()]
+    parrafos = "".join(
+        '<p style="margin:0 0 16px;line-height:1.6;color:#333333;font-size:15px;">'
+        + str(escape(b)).replace("\n", "<br>")
+        + "</p>"
+        for b in bloques
+    ) or '<p style="margin:0;color:#333333;font-size:15px;">&nbsp;</p>'
+
+    return f"""<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#eef2ea;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2ea;padding:24px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 14px rgba(13,35,24,0.10);font-family:'Segoe UI',Roboto,Arial,sans-serif;">
+        <tr><td style="background-color:#1a3d2b;background-image:linear-gradient(135deg,#0d2318,#1a3d2b);padding:26px 32px;">
+          <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:1px;">V.I.A</div>
+          <div style="font-size:11px;color:#c9a227;letter-spacing:2px;text-transform:uppercase;margin-top:4px;">Liceo Tame &middot; Vinculaci&oacute;n Integral de Alumnos</div>
+        </td></tr>
+        <tr><td style="height:4px;background:#c9a227;font-size:0;line-height:0;">&nbsp;</td></tr>
+        <tr><td style="padding:32px;">
+          <h1 style="margin:0 0 20px;font-size:18px;color:#0d2318;font-family:Georgia,serif;font-weight:bold;">{str(escape(asunto))}</h1>
+          {parrafos}
+        </td></tr>
+        <tr><td style="padding:18px 32px;background:#f4f6f2;border-top:1px solid #e3e8e0;">
+          <p style="margin:0;font-size:12px;color:#8a9a90;line-height:1.5;">
+            Mensaje autom&aacute;tico del sistema V.I.A de la Instituci&oacute;n Educativa Liceo Tame. Por favor no respondas a este correo.
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>"""
+
+
+def enviar_correo_sync(destinatario, asunto, cuerpo_texto):
+    """Envía un correo AQUÍ MISMO (sin hilo). La usan los scripts como
+    enviar_recordatorios.py, que terminan enseguida y no pueden dejar el envío
+    en un hilo en segundo plano.
 
     Sin `MAIL_SERVER` configurado no falla: escribe el correo completo en
-    `logs/correos.log`, que hace las veces de bandeja de salida. Asi se puede
-    ver una contrasena temporal o una respuesta de soporte sin montar SMTP.
+    `logs/correos.log`, que hace las veces de bandeja de salida.
     """
+    remitente = current_app.config.get("MAIL_DEFAULT_SENDER")
 
-    def _enviar():
-        remitente = current_app.config.get("MAIL_DEFAULT_SENDER")
-
-        if not current_app.config.get("MAIL_SERVER"):
-            logger.info(
-                CORREO_SIMULADO.format(
-                    remitente=remitente,
-                    destinatario=destinatario,
-                    asunto=asunto,
-                    cuerpo=cuerpo_texto,
-                ),
-                extra={"es_correo": True},
-            )
-            return
-
-        from flask_mail import Message
-
-        from backend.extensions import mail
-
-        mensaje = Message(asunto, recipients=[destinatario], body=cuerpo_texto)
-        mail.send(mensaje)
+    if not current_app.config.get("MAIL_SERVER"):
         logger.info(
-            "CORREO ENVIADO  para=%s  asunto=%s",
-            destinatario,
-            asunto,
+            CORREO_SIMULADO.format(
+                remitente=remitente,
+                destinatario=destinatario,
+                asunto=asunto,
+                cuerpo=cuerpo_texto,
+            ),
             extra={"es_correo": True},
         )
+        return
 
-    encolar_tarea(_enviar)
+    from flask_mail import Message
+
+    from backend.extensions import mail
+
+    """
+    Se manda texto plano (body) Y una versión HTML con la identidad del Liceo.
+    El cliente de correo muestra el HTML; si no puede, cae al texto plano.
+    """
+    mensaje = Message(
+        asunto,
+        recipients=[destinatario],
+        body=cuerpo_texto,
+        html=_cuerpo_html(asunto, cuerpo_texto),
+    )
+    mail.send(mensaje)
+    logger.info(
+        "CORREO ENVIADO  para=%s  asunto=%s",
+        destinatario,
+        asunto,
+        extra={"es_correo": True},
+    )
+
+
+def enviar_correo_async(destinatario, asunto, cuerpo_texto):
+    """Manda el correo en segundo plano para no dejar esperando al usuario.
+    Delega el envío en `enviar_correo_sync` dentro de una tarea del pool."""
+    encolar_tarea(enviar_correo_sync, destinatario, asunto, cuerpo_texto)
 
 
 def parametros_paginacion(valor_por_defecto=25, maximo=100):
@@ -154,6 +210,40 @@ def normalizar_cedula(valor):
 
 def validar_cedula(valor):
     return bool(_CEDULA_RE.match(valor or ""))
+
+
+def _clave_cedula():
+    b64 = current_app.config.get("CEDULA_ENC_KEY")
+    return base64.b64decode(b64) if b64 else None
+
+
+def cifrar_cedula(cedula):
+    """Cifra la cedula de forma DETERMINISTA (AES-SIV): el mismo numero da
+    siempre el mismo texto cifrado, asi se conservan la unicidad, el login por
+    cedula y el cruce con el archivo de graduados. Devuelve None si no hay
+    cedula; y el valor tal cual si no hay clave (modo desarrollo)."""
+    cedula = (cedula or "").strip()
+    if not cedula:
+        return None
+    clave = _clave_cedula()
+    if not clave:
+        return cedula
+    token = AESSIV(clave).encrypt(cedula.encode("utf-8"), [])
+    return base64.b64encode(token).decode("ascii")
+
+
+def descifrar_cedula(token):
+    """Devuelve la cedula en claro. Si el valor no esta cifrado (dato viejo) o
+    no hay clave configurada, lo devuelve tal cual."""
+    if not token:
+        return None
+    clave = _clave_cedula()
+    if not clave:
+        return token
+    try:
+        return AESSIV(clave).decrypt(base64.b64decode(token), []).decode("utf-8")
+    except Exception:
+        return token
 
 
 _ACENTOS = str.maketrans("áéíóúüñÁÉÍÓÚÜÑ", "aeiouunAEIOUUN")
@@ -233,7 +323,7 @@ def borrar_archivo_subido(ruta_publica):
     if not ruta_publica or not ruta_publica.startswith("/static/uploads/"):
         return
     nombre = os.path.basename(ruta_publica)
-    carpeta = os.path.join(current_app.root_path, current_app.config["UPLOAD_FOLDER"])
+    carpeta = os.path.join(current_app.static_folder, "uploads", "perfiles")
     destino = os.path.join(carpeta, nombre)
     if os.path.commonpath([os.path.abspath(destino), os.path.abspath(carpeta)]) != os.path.abspath(carpeta):
         return

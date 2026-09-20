@@ -5,6 +5,8 @@ from logging.handlers import RotatingFileHandler
 import mysql.connector
 from flask import Flask, jsonify, render_template, request
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 from config import get_config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -50,6 +52,20 @@ def create_app():
         static_folder=os.path.join(BASE_DIR, "static"),
     )
     app.config.from_object(get_config())
+    """
+    La sesion dura un tiempo FIJO desde el login: no se renueva al navegar.
+    Sin esto, Flask repone la caducidad de la cookie en cada respuesta y la
+    sesion se volveria "rodante". La caducidad real la fija session["expira_en"]
+    al iniciar sesion (backend/auth.py) y la hace cumplir _enforce_expiracion_sesion.
+    """
+    app.config["SESSION_REFRESH_EACH_REQUEST"] = False
+
+    """
+    Detrás del proxy de PythonAnywhere: confía en 1 salto para leer el
+    esquema real (https), el host y la IP del cliente (X-Forwarded-*).
+    Así funcionan bien las cookies "Secure", HSTS y el rate-limiting por IP.
+    """
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     _configurar_logging(app)
     _inicializar_extensiones(app)
@@ -113,17 +129,21 @@ def _configurar_logging(app):
     carpeta = os.path.join(BASE_DIR, "logs")
     os.makedirs(carpeta, exist_ok=True)
 
-    # 1 MB por archivo y 3 de respaldo: suficiente para revisar qué pasó ayer
-    # sin que el disco se llene solo.
+    """
+    1 MB por archivo y 3 de respaldo: suficiente para revisar qué pasó ayer
+    sin que el disco se llene solo.
+    """
     archivo = RotatingFileHandler(
         os.path.join(carpeta, "via.log"), maxBytes=1_000_000, backupCount=3, encoding="utf-8"
     )
     archivo.setFormatter(formato)
     logger.addHandler(archivo)
 
-    # Los correos van además a su propio archivo. Con MAIL_SERVER vacío este
-    # archivo ES la bandeja de salida: ahí se leen las contraseñas temporales
-    # y las respuestas de soporte sin montar un servidor SMTP.
+    """
+    Los correos van además a su propio archivo. Con MAIL_SERVER vacío este
+    archivo ES la bandeja de salida: ahí se leen las contraseñas temporales
+    y las respuestas de soporte sin montar un servidor SMTP.
+    """
     correos = RotatingFileHandler(
         os.path.join(carpeta, "correos.log"), maxBytes=1_000_000, backupCount=3, encoding="utf-8"
     )
@@ -144,22 +164,28 @@ def _registrar_cabeceras_seguridad(app):
     """
     origenes = set(app.config.get("CORS_ORIGINS") or [])
 
-    # Métodos y cabeceras que el API acepta en una petición cruzada.
+    """Métodos y cabeceras que el API acepta en una petición cruzada."""
     METODOS = "GET, POST, PUT, PATCH, DELETE, OPTIONS"
     CABECERAS = "Content-Type, X-API-Key, X-Requested-With"
 
     def _aplicar_cors(respuesta):
-        # CORS solo aplica al API: las páginas HTML son navegación del mismo
-        # sitio y nunca deben reflejar un origen externo.
+        """
+        CORS solo aplica al API: las páginas HTML son navegación del mismo
+        sitio y nunca deben reflejar un origen externo.
+        """
         if not request.path.startswith("/api/"):
             return respuesta
         origen = request.headers.get("Origin")
-        # Solo se responde CORS si el origen está en la lista blanca. La
-        # comparación es exacta: nada de comodines ni de "termina en".
+        """
+        Solo se responde CORS si el origen está en la lista blanca. La
+        comparación es exacta: nada de comodines ni de "termina en".
+        """
         if origen and origen in origenes:
             respuesta.headers["Access-Control-Allow-Origin"] = origen
-            # Cambia según el Origin: los proxys no deben cachear una
-            # respuesta de un origen y servírsela a otro.
+            """
+            Cambia según el Origin: los proxys no deben cachear una
+            respuesta de un origen y servírsela a otro.
+            """
             respuesta.headers.add("Vary", "Origin")
             respuesta.headers["Access-Control-Allow-Credentials"] = "true"
             respuesta.headers["Access-Control-Allow-Methods"] = METODOS
@@ -169,20 +195,24 @@ def _registrar_cabeceras_seguridad(app):
 
     @app.after_request
     def _cabeceras(respuesta):
-        # --- Cabeceras de seguridad -------------------------------------
-        # El sitio no debe poder incrustarse en un iframe de otra página
-        # (defensa contra clickjacking).
+        """
+        --- Cabeceras de seguridad -------------------------------------
+        El sitio no debe poder incrustarse en un iframe de otra página
+        (defensa contra clickjacking).
+        """
         respuesta.headers.setdefault("X-Frame-Options", "DENY")
-        # El navegador respeta el Content-Type declarado y no "adivina".
+        """El navegador respeta el Content-Type declarado y no "adivina"."""
         respuesta.headers.setdefault("X-Content-Type-Options", "nosniff")
-        # No filtrar la URL completa a sitios externos.
+        """No filtrar la URL completa a sitios externos."""
         respuesta.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
-        # Apagar APIs del navegador que el sitio no usa.
+        """Apagar APIs del navegador que el sitio no usa."""
         respuesta.headers.setdefault(
             "Permissions-Policy", "geolocation=(), microphone=(), camera=(), payment=()"
         )
-        # CSP: por defecto todo del mismo origen. Se permiten estilos y la
-        # fuente de Google Fonts, que es lo único externo que carga el sitio.
+        """
+        CSP: por defecto todo del mismo origen. Se permiten estilos y la
+        fuente de Google Fonts, que es lo único externo que carga el sitio.
+        """
         respuesta.headers.setdefault(
             "Content-Security-Policy",
             "default-src 'self'; "
@@ -194,7 +224,7 @@ def _registrar_cabeceras_seguridad(app):
             "base-uri 'self'; "
             "form-action 'self'",
         )
-        # HSTS solo bajo HTTPS: obliga al navegador a volver siempre por TLS.
+        """HSTS solo bajo HTTPS: obliga al navegador a volver siempre por TLS."""
         if request.is_secure:
             respuesta.headers.setdefault(
                 "Strict-Transport-Security", "max-age=31536000; includeSubDomains"
@@ -203,9 +233,11 @@ def _registrar_cabeceras_seguridad(app):
 
     @app.before_request
     def _preflight_cors():
-        # El navegador manda un OPTIONS antes de una petición cruzada "no
-        # simple". Se responde aquí con 204 y los encabezados que arma
-        # _aplicar_cors, sin entrar a la lógica de la ruta.
+        """
+        El navegador manda un OPTIONS antes de una petición cruzada "no
+        simple". Se responde aquí con 204 y los encabezados que arma
+        _aplicar_cors, sin entrar a la lógica de la ruta.
+        """
         if request.method == "OPTIONS" and request.headers.get("Origin"):
             from flask import Response
 
@@ -221,17 +253,27 @@ def _registrar_contexto(app):
     carpeta = os.path.join(app.static_folder, "img", "escudo")
 
     def _buscar_escudo():
+        """
+        Primero los nombres recomendados; si no, cualquier imagen que haya
+        en la carpeta (así funciona aunque el archivo tenga otro nombre).
+        """
         for nombre in ("escudo-liceo.svg", "escudo-liceo.png", "escudo-liceo.webp"):
             if os.path.isfile(os.path.join(carpeta, nombre)):
                 return f"/static/img/escudo/{nombre}"
+        if os.path.isdir(carpeta):
+            for nombre in sorted(os.listdir(carpeta)):
+                if nombre.lower().endswith((".svg", ".png", ".webp", ".jpg", ".jpeg")):
+                    return f"/static/img/escudo/{nombre}"
         return None
 
     encontrado = _buscar_escudo()
 
     @app.context_processor
     def inyectar_escudo():
-        # En desarrollo se vuelve a mirar, para no tener que reiniciar
-        # el servidor después de copiar el archivo.
+        """
+        En desarrollo se vuelve a mirar, para no tener que reiniciar
+        el servidor después de copiar el archivo.
+        """
         return {"escudo_url": _buscar_escudo() if app.debug else encontrado}
 
 

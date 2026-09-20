@@ -1,0 +1,59 @@
+{% extends 'usuarios/_layout.html' %}
+{% block title %}{{ evento.titulo }}{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="/static/css/eventos.css" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="page-header">
+    <p class="page-eyebrow">Eventos</p>
+    <a href="{{ url_for('usuarios.eventos') }}" class="volver-eventos">← Volver a eventos</a>
+  </div>
+
+  <article class="evento-detalle">
+    <div class="evento-detalle-cabecera">
+      <div class="evento-detalle-fecha">
+        <span class="evento-dia">{{ evento.fecha_inicio.strftime('%d') }}</span>
+        <span class="evento-mes">{{ evento.fecha_inicio.strftime('%b').upper() }}</span>
+        <span class="evento-anio">{{ evento.fecha_inicio.strftime('%Y') }}</span>
+      </div>
+      <div>
+        <span class="evento-categoria">{{ evento.categoria }}</span>
+        <h1 class="evento-detalle-titulo">{{ evento.titulo }}</h1>
+      </div>
+    </div>
+
+    <dl class="evento-detalle-datos">
+      <div><dt>Fecha y hora</dt><dd>{{ evento.fecha_inicio.strftime('%d/%m/%Y a las %H:%M') }}</dd></div>
+      {% if evento.fecha_fin %}<div><dt>Termina</dt><dd>{{ evento.fecha_fin.strftime('%d/%m/%Y %H:%M') }}</dd></div>{% endif %}
+      {% if evento.lugar %}<div><dt>Lugar</dt><dd>{{ evento.lugar }}</dd></div>{% endif %}
+      {% if evento.creador_nombre %}<div><dt>Publicado por</dt><dd>{{ evento.creador_nombre }}</dd></div>{% endif %}
+      <div><dt>Interesados</dt><dd>{{ evento.total_favoritos }} persona{{ 's' if evento.total_favoritos != 1 else '' }}</dd></div>
+    </dl>
+
+    {% if evento.descripcion %}
+    <div class="evento-detalle-desc">
+      <h2>Sobre el evento</h2>
+      <p>{{ evento.descripcion }}</p>
+    </div>
+    {% endif %}
+
+    <div class="evento-detalle-favorito">
+      <form action="{{ url_for('usuarios.evento_favorito', evento_id=evento.id) }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="volver_a" value="{{ url_for('usuarios.evento_detalle', evento_id=evento.id) }}" />
+        <button type="submit" class="btn-favorito-grande {% if evento.es_favorito %}activo{% endif %}">
+          <span class="favorito-estrella">{{ '★' if evento.es_favorito else '☆' }}</span>
+          {{ 'Recordatorio activado — te avisaremos por correo el día del evento' if evento.es_favorito
+             else 'Recordarme por correo el día del evento' }}
+        </button>
+      </form>
+      {% if evento.es_favorito %}
+      <p class="favorito-nota">El día del evento recibirás un correo en {{ current_user.correo if current_user.correo else 'tu correo registrado' }}.</p>
+      {% endif %}
+    </div>
+  </article>
+
+{% endblock %}

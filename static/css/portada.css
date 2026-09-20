@@ -10,9 +10,9 @@
   --blanco:         #ffffff;
   --tenue:          rgba(255,255,255,0.62);
   --muy-tenue:      rgba(255,255,255,0.38);
-  --fuente-display: 'Cinzel', serif;
-  --fuente-serif:   'Playfair Display', Georgia, serif;
-  --fuente-cuerpo:  'Lato', sans-serif;
+  --fuente-display: 'Marcellus', serif;
+  --fuente-serif: 'Cormorant Garamond', Georgia, serif;
+  --fuente-cuerpo: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
 }
 
 body {

@@ -1,13 +1,13 @@
-# V.I.A — dependencias del backend Flask
-#
-#   pip install -r requirements.txt
-#
-# Las versiones van fijadas con == a propósito: son exactamente las que se
-# probaron en este proyecto. Con >= una instalación futura podría traer una
-# versión distinta y romperse el día de la sustentación. Para actualizar a
-# conciencia: pip install -U <paquete> y volver a correr la app.
+'''V.I.A — dependencias del backend Flask
 
-# --- Núcleo ----------------------------------------------------------------
+pip install -r requirements.txt
+
+Las versiones van fijadas con == a propósito: son exactamente las que se
+probaron en este proyecto. Con >= una instalación futura podría traer una
+versión distinta y romperse el día de la sustentación. Para actualizar a
+conciencia: pip install -U <paquete> y volver a correr la app.
+'''
+
 Flask==3.1.3
 Werkzeug==3.1.8              # hashing de contraseñas (scrypt) y utilidades WSGI
 Jinja2==3.1.6                # motor de plantillas
@@ -28,6 +28,7 @@ Flask-Mail==0.10.0           # correos de recuperación de contraseña
 
 # --- Base de datos ---------------------------------------------------------
 mysql-connector-python==26.7.0   # driver oficial de MySQL, con pool incluido
+cryptography==50.0.1          # cifrado por columna de la cedula (AES-SIV)
 
 # --- Configuración y validación -------------------------------------------
 python-dotenv==1.2.2         # lee el archivo .env
@@ -35,7 +36,7 @@ email-validator==2.3.0       # valida que un correo exista como formato real
 dnspython==2.8.0             # dependencia de email-validator
 idna==3.18                   # dependencia de email-validator
 
-# --- Dependencias indirectas (las instala pip solo, se fijan por seguridad) -
+
 colorama==0.4.6
 Deprecated==1.3.1
 ordered-set==4.1.0

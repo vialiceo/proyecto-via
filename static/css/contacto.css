@@ -12,9 +12,9 @@
   --texto-medio:    #4a4a4a;
   --nav-width:      288px;
   --topbar-height:  60px;
-  --fuente-display: 'Cinzel', serif;
-  --fuente-serif:   'Playfair Display', Georgia, serif;
-  --fuente-cuerpo:  'Lato', sans-serif;
+  --fuente-display: 'Marcellus', serif;
+  --fuente-serif: 'Cormorant Garamond', Georgia, serif;
+  --fuente-cuerpo: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
   --transicion:     0.22s ease;
 }
 
@@ -366,9 +366,9 @@
 }
 
 .miembro-avatar {
+  position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  max-height: 180px;
+  aspect-ratio: 1 / 1;   /* cuadrado real: las fotos 1:1 se ven completas */
   background: linear-gradient(135deg, var(--verde-claro) 0%, var(--verde-base) 60%, var(--verde-oscuro) 100%);
   display: flex;
   align-items: center;
@@ -383,9 +383,12 @@
 }
 
 .miembro-avatar img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 42%;
 }
 
 .miembro-info {
@@ -443,6 +446,7 @@
 
 .mr-link--gh { background: #24292e; }
 .mr-link--li { background: #0a66c2; }
+.mr-link--ig { background: #E4405F; }
 
 .contacto-bloque--form { margin-top: 1.5rem; }
 
@@ -570,3 +574,52 @@
      se ocultan, el cajón lateral cubre esa navegación. */
   .topbar-nav-icons { display: none; }
 }
+
+/* Botón "Inicio" en la topbar (volver al dashboard/portada). */
+.topbar-inicio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  transition: background 0.15s, color 0.15s;
+}
+.topbar-inicio svg { width: 16px; height: 16px; }
+.topbar-inicio:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+@media (max-width: 640px) { .topbar-inicio span { display: none; } }
+
+/* ---- Realce visual: que no se vea tan "seco" ---------------------------- */
+body { background: linear-gradient(180deg, #f4f6f2 0%, #e9efe8 100%); }
+
+.contacto-bloque {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.contacto-bloque::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--verde-base), var(--oro));
+}
+.contacto-bloque--via::before { background: linear-gradient(90deg, var(--oro), var(--oro-claro)); }
+.contacto-bloque:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(13,35,24,0.14); }
+
+/* Íconos de los datos con tinte verde (antes gris plano) */
+.ci-icono { background: #eaf1ea; transition: background 0.15s; }
+.contacto-item:hover .ci-icono { background: #dce9dd; }
+
+/* Tarjetas del equipo con el mismo realce */
+.miembro-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.miembro-card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(13,35,24,0.14); }

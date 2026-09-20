@@ -7,6 +7,7 @@
 .promocion-vacio { color: #999; grid-column: 1 / -1; text-align: center; padding: 2rem 0; }
 
 .egresado-card {
+  position: relative;
   background: #fff;
   border: none;
   border-radius: 12px;
@@ -24,6 +25,21 @@
 .egresado-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 22px rgba(13, 35, 24, 0.14);
+}
+
+/* Estrella dorada en la esquina cuando el egresado está destacado. */
+.egresado-destacado {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--oro);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+.egresado-card:has(.egresado-destacado) {
+  box-shadow: 0 2px 12px rgba(169, 130, 15, 0.22);
+  outline: 1px solid rgba(201, 162, 39, 0.35);
 }
 
 .egresado-foto {
@@ -64,33 +80,56 @@
 
 .modal-caja-egresado {
   background: #fff;
-  border-radius: 16px;
-  padding: 2rem;
+  border-radius: 10px;
+  padding: 0;
   width: 100%;
-  max-width: 380px;
-  text-align: center;
+  max-width: 640px;
+  max-height: 92vh;
+  overflow-y: auto;
   position: relative;
 }
 
 .modal-cerrar {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
+  top: 0.9rem;
+  right: 0.9rem;
+  background: rgba(255, 255, 255, 0.85);
   border: none;
-  font-size: 1.1rem;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1.05rem;
   cursor: pointer;
-  color: #888;
+  color: #566;
+  z-index: 2;
+}
+.modal-cerrar:hover { background: #fff; color: #222; }
+
+/* Cuerpo en dos columnas: identidad (verde) a la izquierda, datos a la derecha. */
+.modal-eg-cuerpo {
+  display: grid;
+  grid-template-columns: 210px 1fr;
+}
+
+.modal-eg-identidad {
+  background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-base));
+  color: #fff;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 10px 0 0 10px;
 }
 
 .modal-egresado-foto {
-  width: 140px;
-  height: 140px;
-  margin: 0 auto 1.1rem;
-  border-radius: 50%;
+  width: 132px;
+  height: 132px;
+  margin: 0 auto 1rem;
+  border-radius: 10px;
   overflow: hidden;
   background: #eef2ea;
-  border: 3px solid var(--oro);
+  border: 2px solid var(--oro);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -98,19 +137,94 @@
 }
 
 .modal-egresado-foto img { width: 100%; height: 100%; object-fit: cover; }
-.modal-egresado-foto svg { width: 60px; height: 60px; }
+.modal-egresado-foto svg { width: 56px; height: 56px; }
 
 .modal-egresado-nombre {
   font-family: var(--fuente-serif);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
+  color: #fff;
+  line-height: 1.25;
+}
+
+.modal-eg-rol {
+  display: inline-block;
+  margin-top: 0.55rem;
+  font-family: var(--fuente-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--verde-oscuro);
+  background: var(--oro);
+  padding: 0.22rem 0.7rem;
+  border-radius: 20px;
+}
+
+.modal-eg-insignia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff4d6;
+  background: rgba(201, 162, 39, 0.28);
+  border: 1px solid rgba(240, 200, 74, 0.55);
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+}
+
+.modal-eg-detalle {
+  padding: 2rem 1.75rem 1.75rem;
+  text-align: left;
+}
+
+.modal-eg-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.modal-eg-titulo {
+  font-family: var(--fuente-serif);
+  font-size: 1.05rem;
   color: var(--verde-oscuro);
 }
 
+.btn-destacar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #8a6d10;
+  background: #fdf3d8;
+  border: 1px solid #e8cf8a;
+  border-radius: 20px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.btn-destacar:hover { background: #f8e9bd; }
+.btn-destacar .btn-destacar-estrella { color: #c9a227; font-size: 0.85rem; }
+.btn-destacar.activo {
+  background: var(--verde-oscuro);
+  border-color: var(--verde-oscuro);
+  color: #fff;
+}
+.btn-destacar.activo .btn-destacar-estrella { color: var(--oro); }
+.btn-destacar:disabled { opacity: 0.6; cursor: default; }
+
 .modal-egresado-profesion {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--verde-base);
   font-weight: 600;
-  margin-top: 0.3rem;
+  margin-bottom: 0.4rem;
 }
 
 .modal-egresado-frase {
@@ -126,6 +240,12 @@
 .modal-egresado-frase:empty,
 .modal-egresado-profesion:empty { display: none; }
 
+@media (max-width: 560px) {
+  .modal-eg-cuerpo { grid-template-columns: 1fr; }
+  .modal-eg-identidad { border-radius: 10px 10px 0 0; padding: 1.75rem 1.25rem 1.5rem; }
+  .modal-eg-detalle { padding: 1.5rem 1.25rem; }
+}
+
 @media (max-width: 480px) {
   .promocion-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 0.9rem; }
   .egresado-foto { width: 62px; height: 62px; }
@@ -133,34 +253,81 @@
 
 .promociones-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.25rem;
   margin-bottom: 2.25rem;
 }
 
 .promo-mini-card {
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(13, 35, 24, 0.08);
-  padding: 1.1rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 14px rgba(13, 35, 24, 0.08);
   text-decoration: none;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  overflow: hidden;
   border: 2px solid transparent;
-  transition: transform 0.15s, border-color 0.15s;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
 }
 
-.promo-mini-card:hover { transform: translateY(-2px); }
-.promo-mini-card.active { border-color: var(--oro); background: #fdf6e8; }
+.promo-mini-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(13, 35, 24, 0.15);
+}
+.promo-mini-card.active { border-color: var(--oro); box-shadow: 0 8px 24px rgba(169, 130, 15, 0.22); }
+
+/* Banner superior: la foto de la promoción o, si no hay, un degradado con birrete. */
+.promo-mini-img {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(150deg, var(--verde-oscuro), var(--verde-base));
+}
+.promo-mini-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.promo-mini-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.75);
+}
+.promo-mini-placeholder svg { width: 46px; height: 46px; }
+/* El año, superpuesto en una esquina del banner. */
+.promo-mini-card.active .promo-mini-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 3px var(--oro);
+}
+
+.promo-mini-info {
+  padding: 0.85rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
 
 .promo-mini-anio {
   font-family: var(--fuente-display);
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   color: var(--verde-base);
+  line-height: 1;
 }
 
-.promo-mini-total { font-size: 0.76rem; color: #888; }
+.promo-mini-total {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #6a7a70;
+  font-weight: 600;
+}
+.promo-mini-total svg { width: 14px; height: 14px; color: var(--oro); }
 
 .page-header--secundario {
   display: flex;
@@ -185,3 +352,30 @@
   font-weight: 600;
 }
 .btn-enviar-mensaje-perfil:hover { background: var(--verde-oscuro); }
+
+/* Detalle del egresado en el modal: lista de datos (público, o todo si admin). */
+.modal-egresado-datos {
+  display: grid;
+  grid-template-columns: 40% 1fr;
+  gap: 0.6rem 0.9rem;
+  text-align: left;
+  margin: 0.5rem 0 0.4rem;
+  font-size: 0.86rem;
+}
+.modal-egresado-datos dt {
+  color: #8a9a90;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  align-self: center;
+}
+.modal-egresado-datos dd { color: #22402e; font-weight: 600; }
+.modal-egresado-datos dd a { color: #1a3d2b; word-break: break-word; }
+.modal-egresado-adminnota {
+  font-size: 0.7rem;
+  color: #8a6d10;
+  background: #fdf3d8;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  margin: 0.8rem 0 0;
+}

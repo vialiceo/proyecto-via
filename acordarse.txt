@@ -2,22 +2,38 @@ para enviar un focking git se usa git commit -m "mensaje" y luego git push
  si no se puede hacer push es por que hay cambios en el servidor y se debe usar 
  git pull y luego git push
  
-
-
  en index, contacto y login hay partes de integracion de flask que se tienen acomodar apenas cree la db 
 
  actualizar flask
 
- no putear mysql pq no registra la contraseña :,v
-
  rezar que mis compañeros hagan algo
-
- claude es mi salvacion y tokens no me faltaran
 
  creo que esta quedando un poquito pesado el sitio :v
  ya que al menos me gusta como quedando
 
- profes si ven esto diganle a karla que colabore POR FAVOR 
-
  git push 
  
+ comentarios:
+        python ''' o # 
+        javascript y sql /* y */
+
+cursos: 
+        git:
+            https://www.youtube.com/watch?v=VdGzPZ31ts8&list=WL&index=10&pp=iAQBsAgC
+            https://www.youtube.com/watch?v=2mxh3tgx71c&list=WL&index=12&pp=iAQBsAgC
+        python y flask: 
+            https://www.youtube.com/watch?v=FX0lMm_Qj10&list=WL&index=3&t=525s&pp=iAQB0gcJCSQMAYcqIYzvsAgC
+            https://www.youtube.com/watch?v=-1DmVCPB6H8
+            https://www.youtube.com/watch?v=nKPbfIU442g
+            https://www.youtube.com/watch?v=n2YrGsXJC6Y&pp=0gcJCSQMAYcqIYzv
+        sql :
+            https://www.youtube.com/watch?v=OuJerKzV5T0&t=4063s
+        javascript:
+            https://www.youtube.com/watch?v=6cnFl9aHD5Y
+            https://www.youtube.com/watch?v=bmGPv687toc&list=WL&index=11&pp=iAQBsAgC
+            https://www.youtube.com/watch?v=m2o-eeqwgkQ
+        ciberseguridad:
+            https://www.youtube.com/watch?v=gzES0MuWqHE&t=306s&pp=ygUSY2liZXJzZWd1cmlkYWQgd2Vi
+            https://www.youtube.com/watch?v=jVLcvLB4IJs
+            
+

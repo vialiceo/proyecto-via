@@ -1,4 +1,4 @@
-from backend import db
+from backend import db, utils
 
 
 def listar_tecnicos_activos():
@@ -11,19 +11,30 @@ _CAMPOS_USUARIO_ADMIN = {"nombre", "cedula", "correo", "usuario", "rol", "estado
 
 
 def obtener_usuario_por_id(usuario_id):
-    return db.fetch_one(
+    fila = db.fetch_one(
         """SELECT u.*, t.nombre AS tecnico_nombre
            FROM usuarios u LEFT JOIN tecnicos t ON t.id = u.tecnico_id
            WHERE u.id = %s""",
         (usuario_id,),
     )
+    if fila and fila.get("cedula"):
+        fila["cedula"] = utils.descifrar_cedula(fila["cedula"])
+    return fila
 
 
 def obtener_usuario_por_login(identificador):
-    return db.fetch_one(
+    """
+    La cedula esta cifrada: se compara con la version cifrada del
+    identificador (si no es numerico, cifrar_cedula da None y no casa).
+    """
+    cedula_cif = utils.cifrar_cedula(utils.normalizar_cedula(identificador))
+    fila = db.fetch_one(
         "SELECT * FROM usuarios WHERE correo = %s OR usuario = %s OR cedula = %s LIMIT 1",
-        (identificador, identificador, identificador),
+        (identificador, identificador, cedula_cif),
     )
+    if fila and fila.get("cedula"):
+        fila["cedula"] = utils.descifrar_cedula(fila["cedula"])
+    return fila
 
 
 def existe_login(usuario):
@@ -46,7 +57,7 @@ def crear_usuario(
              (cedula, graduado_id, nombre, correo, usuario, password_hash, rol, estado,
               anio_promocion, tecnico_id, forzar_cambio_password)
            VALUES (%s, %s, %s, %s, %s, %s, %s, 'activo', %s, %s, 1)""",
-        (cedula, graduado_id, nombre, correo, usuario, password_hash, rol, anio_promocion, tecnico_id),
+        (utils.cifrar_cedula(cedula), graduado_id, nombre, correo, usuario, password_hash, rol, anio_promocion, tecnico_id),
     )
     return lastrowid
 
@@ -55,6 +66,8 @@ def actualizar_usuario_admin(usuario_id, campos: dict):
     campos = {k: v for k, v in campos.items() if k in _CAMPOS_USUARIO_ADMIN}
     if not campos:
         return 0
+    if "cedula" in campos:
+        campos["cedula"] = utils.cifrar_cedula(campos["cedula"])
     set_clause = ", ".join(f"{campo} = %s" for campo in campos)
     _, rowcount = db.execute(
         f"UPDATE usuarios SET {set_clause} WHERE id = %s",
@@ -106,9 +119,14 @@ def listar_usuarios_admin(busqueda=None, rol=None, estado=None, tecnico_id=None,
     parametros = []
 
     if busqueda:
-        condiciones.append("(u.nombre LIKE %s OR u.correo LIKE %s OR u.usuario LIKE %s OR u.cedula LIKE %s)")
         comodin = f"%{busqueda}%"
-        parametros += [comodin, comodin, comodin, comodin]
+        cedula_cif = utils.cifrar_cedula(utils.normalizar_cedula(busqueda))
+        if cedula_cif:
+            condiciones.append("(u.nombre LIKE %s OR u.correo LIKE %s OR u.usuario LIKE %s OR u.cedula = %s)")
+            parametros += [comodin, comodin, comodin, cedula_cif]
+        else:
+            condiciones.append("(u.nombre LIKE %s OR u.correo LIKE %s OR u.usuario LIKE %s)")
+            parametros += [comodin, comodin, comodin]
     if rol:
         condiciones.append("u.rol = %s")
         parametros.append(rol)
@@ -124,13 +142,20 @@ def listar_usuarios_admin(busqueda=None, rol=None, estado=None, tecnico_id=None,
 
     items = db.fetch_all(
         f"""SELECT u.id, u.cedula, u.nombre, u.correo, u.usuario, u.rol, u.estado,
-                   u.anio_promocion, t.nombre AS tecnico_nombre, u.ultimo_login, u.creado_en
-            FROM usuarios u LEFT JOIN tecnicos t ON t.id = u.tecnico_id
+                   u.anio_promocion, u.foto, u.destacado,
+                   t.nombre AS tecnico_nombre, u.ultimo_login, u.creado_en,
+                   pe.profesion, pe.lugar_residencia, pe.lugar_estudio, pe.frase
+            FROM usuarios u
+            LEFT JOIN tecnicos t ON t.id = u.tecnico_id
+            LEFT JOIN perfil_extendido pe ON pe.usuario_id = u.id
             {where}
             ORDER BY u.creado_en DESC
             LIMIT %s OFFSET %s""",
         (*parametros, int(por_pagina), int(offset)),
     )
+    for _it in items:
+        if _it.get("cedula"):
+            _it["cedula"] = utils.descifrar_cedula(_it["cedula"])
     total = db.fetch_one(
         f"SELECT COUNT(*) AS total FROM usuarios u {where}", tuple(parametros)
     )["total"]
@@ -171,23 +196,37 @@ def listar_promociones_recientes(limite=4):
 
 
 def listar_todas_promociones():
+    """Todas las promociones del catálogo (1967 en adelante), tenga o no
+    egresados registrados. Así la página "Ver promociones" muestra la línea de
+    tiempo completa del Liceo. El conteo de egresados sale del LEFT JOIN.
+
+    Se conservan los nombres de columna (anio_promocion, total_egresados) para
+    que la plantilla promocion.html no cambie."""
     return db.fetch_all(
-        """SELECT anio_promocion, COUNT(*) AS total_egresados
-           FROM usuarios
-           WHERE rol = 'egresado' AND estado = 'activo' AND anio_promocion IS NOT NULL
-           GROUP BY anio_promocion
-           ORDER BY anio_promocion DESC"""
+        """SELECT pr.anio AS anio_promocion,
+                  COUNT(u.id) AS total_egresados
+           FROM promociones pr
+           LEFT JOIN usuarios u
+             ON u.anio_promocion = pr.anio
+            AND u.rol = 'egresado' AND u.estado = 'activo'
+           WHERE pr.activa = 1
+           GROUP BY pr.anio
+           ORDER BY pr.anio DESC"""
     )
 
 
 def listar_egresados_por_promocion(anio, pagina=1, por_pagina=60):
     offset = max(pagina - 1, 0) * por_pagina
     return db.fetch_all(
-        """SELECT u.id, u.nombre, u.foto, pe.profesion, pe.frase
+        """SELECT u.id, u.nombre, u.foto, u.destacado, u.anio_promocion, u.correo,
+                  t.nombre AS tecnico_nombre,
+                  pe.profesion, pe.lugar_residencia, pe.lugar_estudio, pe.frase,
+                  COALESCE(pe.campos_publicos, '') AS campos_publicos
            FROM usuarios u
+           LEFT JOIN tecnicos t ON t.id = u.tecnico_id
            LEFT JOIN perfil_extendido pe ON pe.usuario_id = u.id
            WHERE u.rol = 'egresado' AND u.estado = 'activo' AND u.anio_promocion = %s
-           ORDER BY u.nombre
+           ORDER BY u.destacado DESC, u.nombre
            LIMIT %s OFFSET %s""",
         (anio, int(por_pagina), int(offset)),
     )
@@ -199,17 +238,21 @@ def obtener_perfil_extendido(usuario_id):
     )
 
 
-def upsert_perfil_extendido(usuario_id, profesion, lugar_residencia, lugar_estudio, fecha_nacimiento, frase=None):
+def upsert_perfil_extendido(usuario_id, profesion, lugar_residencia, lugar_estudio,
+                            fecha_nacimiento, frase=None, campos_publicos=None):
     db.execute(
-        """INSERT INTO perfil_extendido (usuario_id, profesion, lugar_residencia, lugar_estudio, fecha_nacimiento, frase)
-           VALUES (%s, %s, %s, %s, %s, %s)
+        """INSERT INTO perfil_extendido
+             (usuario_id, profesion, lugar_residencia, lugar_estudio, fecha_nacimiento, frase, campos_publicos)
+           VALUES (%s, %s, %s, %s, %s, %s, %s)
            ON DUPLICATE KEY UPDATE
              profesion = VALUES(profesion),
              lugar_residencia = VALUES(lugar_residencia),
              lugar_estudio = VALUES(lugar_estudio),
              fecha_nacimiento = VALUES(fecha_nacimiento),
-             frase = VALUES(frase)""",
-        (usuario_id, profesion, lugar_residencia, lugar_estudio, fecha_nacimiento, frase),
+             frase = VALUES(frase),
+             campos_publicos = VALUES(campos_publicos)""",
+        (usuario_id, profesion, lugar_residencia, lugar_estudio, fecha_nacimiento,
+         frase, campos_publicos or ""),
     )
 
 
@@ -412,8 +455,10 @@ def listar_directorio(busqueda=None, tecnico_id=None, anio_promocion=None, pagin
     offset = max(pagina - 1, 0) * por_pagina
 
     items = db.fetch_all(
-        f"""SELECT u.id, u.nombre, u.foto, u.anio_promocion, t.nombre AS tecnico_nombre,
-                   pe.profesion, pe.frase
+        f"""SELECT u.id, u.nombre, u.foto, u.correo, u.anio_promocion, u.destacado,
+                   t.nombre AS tecnico_nombre,
+                   pe.profesion, pe.lugar_residencia, pe.lugar_estudio, pe.frase,
+                   COALESCE(pe.campos_publicos, '') AS campos_publicos
             FROM usuarios u
             LEFT JOIN tecnicos t ON t.id = u.tecnico_id
             LEFT JOIN perfil_extendido pe ON pe.usuario_id = u.id
@@ -422,8 +467,26 @@ def listar_directorio(busqueda=None, tecnico_id=None, anio_promocion=None, pagin
             LIMIT %s OFFSET %s""",
         (*parametros, int(por_pagina), int(offset)),
     )
-    total = db.fetch_one(f"SELECT COUNT(*) AS total FROM usuarios u {where}", tuple(parametros))["total"]
+    total = db.fetch_one(
+        f"""SELECT COUNT(*) AS total FROM usuarios u
+            LEFT JOIN perfil_extendido pe ON pe.usuario_id = u.id {where}""",
+        tuple(parametros),
+    )["total"]
     return items, total
+
+
+def alternar_destacado(usuario_id):
+    """Prende o apaga la marca de "destacado" de un egresado. Solo la usa la
+    administración desde el directorio. Devuelve el nuevo estado (True/False)."""
+    fila = db.fetch_one(
+        "SELECT destacado FROM usuarios WHERE id = %s AND rol = 'egresado'",
+        (usuario_id,),
+    )
+    if fila is None:
+        return None
+    nuevo = 0 if fila["destacado"] else 1
+    db.execute("UPDATE usuarios SET destacado = %s WHERE id = %s", (nuevo, usuario_id))
+    return bool(nuevo)
 
 
 def crear_solicitud(usuario_id, tipo, descripcion):
@@ -534,19 +597,73 @@ def marcar_mensajes_leidos(conversacion_id, usuario_id):
     )
 
 
-def listar_eventos(momento="proximos", pagina=1, por_pagina=20):
+def listar_eventos(momento="proximos", pagina=1, por_pagina=20, usuario_id=None):
     orden = "ASC" if momento == "proximos" else "DESC"
     comparador = ">=" if momento == "proximos" else "<"
     offset = max(pagina - 1, 0) * por_pagina
     return db.fetch_all(
-        f"""SELECT * FROM eventos WHERE fecha_inicio {comparador} NOW()
-            ORDER BY fecha_inicio {orden} LIMIT %s OFFSET %s""",
-        (int(por_pagina), int(offset)),
+        f"""SELECT e.*, (ef.usuario_id IS NOT NULL) AS es_favorito
+            FROM eventos e
+            LEFT JOIN eventos_favoritos ef
+              ON ef.evento_id = e.id AND ef.usuario_id = %s
+            WHERE e.fecha_inicio {comparador} NOW()
+            ORDER BY e.fecha_inicio {orden} LIMIT %s OFFSET %s""",
+        (usuario_id, int(por_pagina), int(offset)),
     )
 
 
-def obtener_evento(evento_id):
-    return db.fetch_one("SELECT * FROM eventos WHERE id = %s", (evento_id,))
+def obtener_evento(evento_id, usuario_id=None):
+    return db.fetch_one(
+        """SELECT e.*, u.nombre AS creador_nombre,
+                  (SELECT COUNT(*) FROM eventos_favoritos WHERE evento_id = e.id) AS total_favoritos,
+                  EXISTS(SELECT 1 FROM eventos_favoritos
+                         WHERE evento_id = e.id AND usuario_id = %s) AS es_favorito
+           FROM eventos e
+           LEFT JOIN usuarios u ON u.id = e.creado_por
+           WHERE e.id = %s""",
+        (usuario_id, evento_id),
+    )
+
+
+def alternar_evento_favorito(usuario_id, evento_id):
+    """Marca o desmarca un evento como favorito. Devuelve True si quedó marcado."""
+    existe = db.fetch_one(
+        "SELECT 1 FROM eventos_favoritos WHERE usuario_id = %s AND evento_id = %s",
+        (usuario_id, evento_id),
+    )
+    if existe:
+        db.execute(
+            "DELETE FROM eventos_favoritos WHERE usuario_id = %s AND evento_id = %s",
+            (usuario_id, evento_id),
+        )
+        return False
+    db.execute(
+        "INSERT INTO eventos_favoritos (usuario_id, evento_id) VALUES (%s, %s)",
+        (usuario_id, evento_id),
+    )
+    return True
+
+
+def eventos_para_recordar():
+    """Favoritos cuyo evento es HOY y a los que aún no se les envió recordatorio.
+    Lo usa la tarea diaria enviar_recordatorios.py."""
+    return db.fetch_all(
+        """SELECT ef.usuario_id, ef.evento_id, u.nombre AS usuario_nombre, u.correo,
+                  e.titulo, e.lugar, e.fecha_inicio
+           FROM eventos_favoritos ef
+           JOIN eventos e ON e.id = ef.evento_id
+           JOIN usuarios u ON u.id = ef.usuario_id
+           WHERE DATE(e.fecha_inicio) = CURDATE()
+             AND ef.recordado_en IS NULL
+             AND u.estado = 'activo'"""
+    )
+
+
+def marcar_recordatorio_enviado(usuario_id, evento_id):
+    db.execute(
+        "UPDATE eventos_favoritos SET recordado_en = NOW() WHERE usuario_id = %s AND evento_id = %s",
+        (usuario_id, evento_id),
+    )
 
 
 def crear_evento(titulo, descripcion, categoria, lugar, fecha_inicio, creado_por):
@@ -586,9 +703,14 @@ def buscar_graduados(busqueda=None, anio_promocion=None, tecnico_id=None, con_cu
     parametros = []
 
     if busqueda:
-        condiciones.append("(g.nombre LIKE %s OR g.cedula LIKE %s)")
         comodin = f"%{busqueda}%"
-        parametros += [comodin, comodin]
+        cedula_cif = utils.cifrar_cedula(utils.normalizar_cedula(busqueda))
+        if cedula_cif:
+            condiciones.append("(g.nombre LIKE %s OR g.cedula = %s)")
+            parametros += [comodin, cedula_cif]
+        else:
+            condiciones.append("g.nombre LIKE %s")
+            parametros.append(comodin)
     if anio_promocion:
         condiciones.append("g.anio_promocion = %s")
         parametros.append(anio_promocion)
@@ -614,6 +736,9 @@ def buscar_graduados(busqueda=None, anio_promocion=None, tecnico_id=None, con_cu
             LIMIT %s OFFSET %s""",
         (*parametros, int(por_pagina), int(offset)),
     )
+    for _it in items:
+        if _it.get("cedula"):
+            _it["cedula"] = utils.descifrar_cedula(_it["cedula"])
     total = db.fetch_one(
         f"""SELECT COUNT(*) AS total FROM graduados g
             LEFT JOIN usuarios u ON u.graduado_id = g.id {where}""",
@@ -623,23 +748,24 @@ def buscar_graduados(busqueda=None, anio_promocion=None, tecnico_id=None, con_cu
 
 
 def buscar_graduado_coincidente(cedula=None, nombre=None, anio_promocion=None):
+    fila = None
     if cedula:
-        fila = db.fetch_one("SELECT * FROM graduados WHERE cedula = %s", (cedula,))
-        if fila:
-            return fila
-    if nombre and anio_promocion:
-        return db.fetch_one(
+        fila = db.fetch_one("SELECT * FROM graduados WHERE cedula = %s", (utils.cifrar_cedula(cedula),))
+    if not fila and nombre and anio_promocion:
+        fila = db.fetch_one(
             "SELECT * FROM graduados WHERE nombre = %s AND anio_promocion = %s",
             (nombre, anio_promocion),
         )
-    return None
+    if fila and fila.get("cedula"):
+        fila["cedula"] = utils.descifrar_cedula(fila["cedula"])
+    return fila
 
 
 def crear_graduado(cedula, nombre, anio_promocion, tecnico_id=None, libro_acta=None, observaciones=None):
     lastrowid, _ = db.execute(
         """INSERT INTO graduados (cedula, nombre, anio_promocion, tecnico_id, libro_acta, observaciones)
            VALUES (%s, %s, %s, %s, %s, %s)""",
-        (cedula or None, nombre, anio_promocion, tecnico_id, libro_acta, observaciones),
+        (utils.cifrar_cedula(cedula), nombre, anio_promocion, tecnico_id, libro_acta, observaciones),
     )
     return lastrowid
 
@@ -657,7 +783,7 @@ def importar_graduados(filas):
                  tecnico_id = COALESCE(VALUES(tecnico_id), tecnico_id),
                  libro_acta = COALESCE(VALUES(libro_acta), libro_acta)""",
             [
-                (f.get("cedula") or None, f["nombre"], f["anio_promocion"], f.get("tecnico_id"), f.get("libro_acta"))
+                (utils.cifrar_cedula(f.get("cedula")), f["nombre"], f["anio_promocion"], f.get("tecnico_id"), f.get("libro_acta"))
                 for f in filas
             ],
         )
@@ -693,7 +819,7 @@ def crear_solicitud_cuenta(
         """INSERT INTO solicitudes_cuenta
              (cedula, nombre, correo, telefono, anio_promocion, tecnico_id, mensaje, graduado_id, origen, ip_origen)
            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-        (cedula, nombre, correo, telefono, anio_promocion, tecnico_id, mensaje, graduado_id, origen, ip_origen),
+        (utils.cifrar_cedula(cedula), nombre, correo, telefono, anio_promocion, tecnico_id, mensaje, graduado_id, origen, ip_origen),
     )
     return lastrowid
 
@@ -702,19 +828,19 @@ def existe_solicitud_cuenta_pendiente(cedula, correo):
     return db.fetch_one(
         """SELECT id FROM solicitudes_cuenta
            WHERE estado = 'pendiente' AND (cedula = %s OR correo = %s) LIMIT 1""",
-        (cedula, correo),
+        (utils.cifrar_cedula(cedula), correo),
     ) is not None
 
 
 def existe_cuenta_con(cedula, correo):
     return db.fetch_one(
         "SELECT id FROM usuarios WHERE cedula = %s OR correo = %s LIMIT 1",
-        (cedula, correo),
+        (utils.cifrar_cedula(cedula), correo),
     ) is not None
 
 
 def obtener_solicitud_cuenta(solicitud_id):
-    return db.fetch_one(
+    fila = db.fetch_one(
         """SELECT sc.*, t.nombre AS tecnico_nombre, g.nombre AS graduado_nombre,
                   g.anio_promocion AS graduado_anio, g.libro_acta
            FROM solicitudes_cuenta sc
@@ -723,6 +849,9 @@ def obtener_solicitud_cuenta(solicitud_id):
            WHERE sc.id = %s""",
         (solicitud_id,),
     )
+    if fila and fila.get("cedula"):
+        fila["cedula"] = utils.descifrar_cedula(fila["cedula"])
+    return fila
 
 
 def listar_solicitudes_cuenta(estado=None, busqueda=None, pagina=1, por_pagina=25):
@@ -733,9 +862,14 @@ def listar_solicitudes_cuenta(estado=None, busqueda=None, pagina=1, por_pagina=2
         condiciones.append("sc.estado = %s")
         parametros.append(estado)
     if busqueda:
-        condiciones.append("(sc.nombre LIKE %s OR sc.cedula LIKE %s OR sc.correo LIKE %s)")
         comodin = f"%{busqueda}%"
-        parametros += [comodin, comodin, comodin]
+        cedula_cif = utils.cifrar_cedula(utils.normalizar_cedula(busqueda))
+        if cedula_cif:
+            condiciones.append("(sc.nombre LIKE %s OR sc.cedula = %s OR sc.correo LIKE %s)")
+            parametros += [comodin, cedula_cif, comodin]
+        else:
+            condiciones.append("(sc.nombre LIKE %s OR sc.correo LIKE %s)")
+            parametros += [comodin, comodin]
 
     where = f"WHERE {' AND '.join(condiciones)}" if condiciones else ""
     offset = max(pagina - 1, 0) * por_pagina
@@ -752,6 +886,9 @@ def listar_solicitudes_cuenta(estado=None, busqueda=None, pagina=1, por_pagina=2
             LIMIT %s OFFSET %s""",
         (*parametros, int(por_pagina), int(offset)),
     )
+    for _it in items:
+        if _it.get("cedula"):
+            _it["cedula"] = utils.descifrar_cedula(_it["cedula"])
     total = db.fetch_one(
         f"SELECT COUNT(*) AS total FROM solicitudes_cuenta sc {where}", tuple(parametros)
     )["total"]

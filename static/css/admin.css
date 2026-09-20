@@ -84,3 +84,81 @@
 
 .panel-item-titulo { font-weight: 700; font-size: 0.85rem; color: #222; }
 .panel-item-meta { font-size: 0.75rem; color: #888; }
+
+/* --- Fila de usuario: avatar + nombre ------------------------------------- */
+.celda-usuario { display: flex; align-items: center; gap: 0.7rem; }
+.celda-avatar {
+  position: relative;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #eef2ea;
+  border: 2px solid var(--oro, #c9a227);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--verde-base, #1a3d2b);
+}
+.celda-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.celda-avatar svg { width: 20px; height: 20px; }
+.celda-avatar-estrella {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--oro, #c9a227);
+  background: #fff;
+  border-radius: 50%;
+  padding: 1px;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+}
+.celda-usuario-texto { min-width: 0; }
+
+/* --- Menú de 3 puntos por fila -------------------------------------------- */
+.celda-acciones { text-align: right; }
+.fila-menu { position: relative; display: inline-block; }
+.btn-tres-puntos {
+  background: none;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-tres-puntos:hover { background: #f2f4f0; border-color: var(--verde-base, #1a3d2b); }
+.fila-menu-lista {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 30;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(13, 35, 24, 0.16);
+  padding: 0.3rem;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+}
+/* `display:flex` le gana al atributo `hidden`; sin esto el menú sale
+   desplegado al cargar. Con esto queda oculto hasta pulsar los 3 puntos. */
+.fila-menu-lista[hidden] { display: none; }
+.fila-menu-item {
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  font-family: var(--fuente-cuerpo, 'Lato', sans-serif);
+  font-size: 0.82rem;
+  color: #333;
+  cursor: pointer;
+}
+.fila-menu-item:hover { background: #f2f4f0; color: var(--verde-oscuro, #0d2318); }

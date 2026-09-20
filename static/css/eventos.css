@@ -143,3 +143,114 @@
   .evento-fecha { width: 100%; }
   .modal-form .campo-fila { grid-template-columns: 1fr; }
 }
+
+/* --- Botones en la tarjeta de evento (ver detalle + favorito) ------------- */
+.evento-botones {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+  flex-wrap: wrap;
+}
+.btn-detalle-evento {
+  font-family: var(--fuente-cuerpo, 'Lato', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--verde-base, #1a3d2b);
+  border: 1px solid var(--verde-base, #1a3d2b);
+  border-radius: 20px;
+  padding: 0.35rem 0.9rem;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-detalle-evento:hover { background: var(--verde-base, #1a3d2b); color: #fff; }
+
+.form-favorito { margin: 0; }
+.btn-favorito {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--fuente-cuerpo, 'Lato', sans-serif);
+  font-size: 0.78rem;
+  color: #8a6d10;
+  background: #fdf7e3;
+  border: 1px solid #e8d59a;
+  border-radius: 20px;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.btn-favorito .favorito-estrella { font-size: 0.95rem; line-height: 1; }
+.btn-favorito:hover { background: #f8eec8; }
+.btn-favorito.activo {
+  background: #a9820f;
+  border-color: #a9820f;
+  color: #fff;
+}
+
+/* --- Página de detalle del evento ---------------------------------------- */
+.volver-eventos { color: var(--verde-base, #1a3d2b); text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+.volver-eventos:hover { color: #a9820f; }
+
+.evento-detalle {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(13, 35, 24, 0.08);
+  padding: 2rem;
+  max-width: 760px;
+}
+.evento-detalle-cabecera { display: flex; gap: 1.5rem; align-items: center; margin-bottom: 1.6rem; }
+.evento-detalle-fecha {
+  flex-shrink: 0;
+  width: 80px; height: 90px;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #1a3d2b, #0d2318);
+  color: #f0c84a;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.evento-detalle-fecha .evento-dia { font-family: var(--fuente-serif, Georgia, serif); font-size: 2rem; font-weight: 700; line-height: 1; }
+.evento-detalle-fecha .evento-mes { font-size: 0.7rem; letter-spacing: 0.1em; }
+.evento-detalle-fecha .evento-anio { font-size: 0.68rem; color: rgba(255,255,255,0.7); margin-top: 0.15rem; }
+.evento-detalle-titulo { font-family: var(--fuente-serif, Georgia, serif); font-size: 1.6rem; color: #1a3d2b; margin-top: 0.4rem; }
+
+.evento-detalle-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem 1.5rem;
+  padding: 1.2rem 0;
+  border-top: 1px solid #eef2ec;
+  border-bottom: 1px solid #eef2ec;
+}
+.evento-detalle-datos div { display: flex; flex-direction: column; gap: 0.2rem; }
+.evento-detalle-datos dt { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: #99a69e; }
+.evento-detalle-datos dd { font-size: 0.9rem; color: #22402e; font-weight: 600; }
+
+.evento-detalle-desc { margin-top: 1.4rem; }
+.evento-detalle-desc h2 { font-family: var(--fuente-serif, Georgia, serif); font-size: 1.1rem; color: #1a3d2b; margin-bottom: 0.5rem; }
+.evento-detalle-desc p { line-height: 1.7; color: #444; white-space: pre-wrap; }
+
+.evento-detalle-favorito { margin-top: 1.8rem; }
+.btn-favorito-grande {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--fuente-cuerpo, 'Lato', sans-serif);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #8a6d10;
+  background: #fdf7e3;
+  border: 1px solid #e8d59a;
+  border-radius: 10px;
+  padding: 0.8rem 1.3rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-favorito-grande .favorito-estrella { font-size: 1.3rem; line-height: 1; }
+.btn-favorito-grande:hover { background: #f8eec8; }
+.btn-favorito-grande.activo { background: #a9820f; border-color: #a9820f; color: #fff; }
+.favorito-nota { font-size: 0.8rem; color: #5a6b60; margin-top: 0.7rem; }
+
+@media (max-width: 560px) {
+  .evento-detalle-datos { grid-template-columns: 1fr; }
+  .evento-detalle-cabecera { flex-direction: column; align-items: flex-start; }
+}

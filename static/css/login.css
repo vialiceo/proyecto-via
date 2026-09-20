@@ -16,9 +16,9 @@
   --texto-suave:    rgba(255, 255, 255, 0.80);
   --texto-tenue:    rgba(255, 255, 255, 0.45);
   --radio-input:    7px;
-  --fuente-display: 'Cinzel', serif;
-  --fuente-serif:   'Playfair Display', Georgia, serif;
-  --fuente-cuerpo:  'Lato', sans-serif;
+  --fuente-display: 'Marcellus', serif;
+  --fuente-serif: 'Cormorant Garamond', Georgia, serif;
+  --fuente-cuerpo: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
 }
 
 html, body {
@@ -511,3 +511,22 @@ html, body {
 
 .btn-ver.mostrando .icon-eye     { display: block; }
 .btn-ver.mostrando .icon-eye-off { display: none; }
+/* Enlace para volver al inicio (portada) desde el login. */
+.link-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: flex-start;
+  margin-bottom: 1rem;
+  color: var(--verde-base, #1a3d2b);
+  text-decoration: none;
+  font-family: var(--fuente-cuerpo, sans-serif);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.link-volver:hover { color: var(--oro, #c9a227); }
+
+/* El enlace de volver va sobre el panel verde: debe ser claro, no verde. */
+.link-volver { color: rgba(255,255,255,0.92); }
+.link-volver:hover { color: var(--oro-claro, #f0c84a); }

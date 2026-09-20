@@ -1,4 +1,6 @@
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+import time
+
+from flask import current_app, session, Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import (
     UserMixin,
     current_user,
@@ -32,6 +34,19 @@ class Usuario(UserMixin):
         return self.estado == "activo"
 
 
+@auth_bp.before_app_request
+def _enforce_expiracion_sesion():
+    """Cierra la sesion cuando paso el tiempo fijo desde el login, aunque la
+    persona siga activa. La expiracion se fija una sola vez al iniciar sesion,
+    asi que navegar o hacer cambios no la corre."""
+    if not current_user.is_authenticated:
+        return
+    expira = session.get("expira_en")
+    if expira is not None and time.time() > expira:
+        logout_user()
+        session.clear()
+
+
 @login_manager.user_loader
 def cargar_usuario(usuario_id):
     fila = models.obtener_usuario_por_id(usuario_id)
@@ -61,6 +76,15 @@ def login():
 
         usuario = Usuario(fila)
         login_user(usuario)
+        """
+        La sesion dura un tiempo FIJO desde AHORA (el login) y no se renueva al
+        navegar. Se guarda la hora exacta de expiracion: _enforce_expiracion_sesion
+        la hace cumplir en el servidor y el contador del navegador la lee.
+        """
+        session.permanent = True
+        session["expira_en"] = (
+            time.time() + current_app.permanent_session_lifetime.total_seconds()
+        )
         models.registrar_login(usuario.id)
         utils.encolar_tarea(models.registrar_bitacora, usuario.id, "login", ip=utils.ip_cliente())
 
@@ -69,8 +93,10 @@ def login():
             return redirect(url_for("auth.cambiar_password"))
 
         siguiente = utils.redireccion_segura(request.args.get("next"), url_for("public.index"))
-        # No se salta directo al destino: primero la pantalla de bienvenida,
-        # que da un respiro visual y confirma que la sesión quedó lista.
+        """
+        No se salta directo al destino: primero la pantalla de bienvenida,
+        que da un respiro visual y confirma que la sesión quedó lista.
+        """
         return redirect(url_for("auth.preparando", next=siguiente))
 
     return render_template("login.html")
@@ -83,6 +109,16 @@ def preparando():
     sola al destino. El `next` se valida para no permitir redirección abierta."""
     destino = utils.redireccion_segura(request.args.get("next"), url_for("public.index"))
     return render_template("preparando.html", destino=destino)
+
+
+@auth_bp.route("/ping")
+@login_required
+def ping():
+    """Petición ligera que renueva la sesión mientras haya actividad. La usa el
+    contador de sesión del navegador para no cerrar la sesión de alguien que
+    está usando la página sin cambiar de página."""
+    session.permanent = True
+    return "", 204
 
 
 @auth_bp.route("/logout")

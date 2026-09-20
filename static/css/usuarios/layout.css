@@ -282,3 +282,30 @@
      se ocultan, el cajón lateral cubre esa navegación. */
   .topbar-nav-icons { display: none; }
 }
+
+/* Icono "Cerrar sesión" del topbar: se distingue en rojo al pasar el cursor. */
+.topbar-nav-icon--salir:hover {
+  background: rgba(139, 38, 30, 0.4);
+  color: #ffd9d3;
+  border-color: rgba(139, 38, 30, 0.6);
+}
+
+/* Marca junto al escudo en el topbar (escudo + nombre). */
+.topbar-shield-link { display: flex; align-items: center; gap: 0.6rem; }
+.topbar-brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.topbar-brand-name {
+  font-family: var(--fuente-serif, 'Playfair Display', Georgia, serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+.topbar-brand-sub {
+  font-family: var(--fuente-cuerpo, 'Lato', sans-serif);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  color: var(--oro-claro, #f0c84a);
+}
+/* En pantallas angostas se oculta el texto y queda solo el escudo. */
+@media (max-width: 640px) {
+  .topbar-brand-text { display: none; }
+}

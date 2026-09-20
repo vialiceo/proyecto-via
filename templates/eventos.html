@@ -39,6 +39,18 @@
           <span>🕒 {{ e.fecha_inicio.strftime('%d/%m/%Y %H:%M') }}</span>
           {% if e.lugar %}<span>📍 {{ e.lugar }}</span>{% endif %}
         </div>
+        <div class="evento-botones">
+          <a href="{{ url_for('usuarios.evento_detalle', evento_id=e.id) }}" class="btn-detalle-evento">Ver detalle</a>
+          <form action="{{ url_for('usuarios.evento_favorito', evento_id=e.id) }}" method="POST" class="form-favorito">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="volver_a" value="{{ url_for('usuarios.eventos', momento=momento) }}" />
+            <button type="submit" class="btn-favorito {% if e.es_favorito %}activo{% endif %}"
+                    title="{{ 'Quitar recordatorio' if e.es_favorito else 'Recordarme por correo el día del evento' }}">
+              <span class="favorito-estrella">{{ '★' if e.es_favorito else '☆' }}</span>
+              <span class="favorito-texto">{{ 'Recordatorio activo' if e.es_favorito else 'Recordármelo' }}</span>
+            </button>
+          </form>
+        </div>
       </div>
       {% if current_user.rol == 'administrador' %}
       <div class="evento-acciones">

@@ -1,17 +1,9 @@
-# Dónde va cada imagen
+#Donde va cada imagen
 
 Todo lo que esté dentro de `static/` se sirve solo: si el archivo existe en
 `static/img/escudo/escudo-liceo.png`, el navegador lo pide como
-`/static/img/escudo/escudo-liceo.png`. No hay que registrar nada en Python.
+`/static/img/escudo/escudo-liceo.png`. no hay que registrar nada en python
 
-La diferencia entre las dos carpetas grandes:
-
-| Carpeta | Qué guarda | ¿Va a git? |
-|---|---|---|
-| `static/img/` | Imágenes **del sitio**: escudo, favicon, fotos de promociones, equipo | Sí |
-| `static/uploads/` | Imágenes **que suben los usuarios**: fotos de perfil | No (está en `.gitignore`) |
-
----
 
 ## 1. Escudo — `static/img/escudo/`
 
@@ -28,8 +20,7 @@ al hacerle clic abre el sitio de la institución en otra pestaña.
   (`index.html`, `usuarios/_layout.html`, `contacto.html`) a `escudo-liceo.svg`
 
 Si el archivo **no existe**, no se rompe nada: el `onerror` borra la `<img>` y
-se sigue viendo el escudo dibujado con CSS que hay ahora. Puedes probar la
-página sin haber subido nada.
+se sigue viendo el escudo dibujado con CSS que hay ahora
 
 Para cambiar a dónde apunta el botón, edita el `href` en esas 3 plantillas.
 
@@ -37,18 +28,10 @@ Para cambiar a dónde apunta el botón, edita el `href` en esas 3 plantillas.
 
 ## 2. Favicon — `static/img/favicon/`
 
-Ya está creado `favicon.svg` (escudo verde con la V dorada) y enlazado en las
-7 plantillas que tienen `<head>`. Funciona en Chrome, Firefox, Edge y Safari 17+.
+`favicon.svg` (escudo verde con la V dorada) y enlazado en las
+7 plantillas que tienen `<head>`. 
 
-Si quieres cubrir navegadores viejos y el ícono de iOS, genera estos dos en
-<https://realfavicongenerator.net> a partir del SVG y ponlos aquí:
 
-| Archivo | Tamaño |
-|---|---|
-| `favicon.ico` | 16×16 + 32×32 + 48×48 en un solo .ico |
-| `apple-touch-icon.png` | 180×180 px, **sin** transparencia |
-
-Después descomenta estas dos líneas en las 7 plantillas con `<head>`:
 
 ```html
 <link rel="icon" href="/static/img/favicon/favicon.ico" sizes="any" />
@@ -66,12 +49,12 @@ año que venga de la base de datos, así que **no hay que tocar código**: basta
 con dejar el archivo con el nombre correcto.
 
 - Proporción **4:3** (así está el recuadro)
-- **1200×900 px** es el punto justo
+- **1200×900 px** 
 - JPG con calidad 80 — pesa poco y se ve bien
 - Máximo ~300 KB por foto
 
 Si falta el archivo, aparece el recuadro verde que dice "PROMOCIÓN". No es un
-error, pero se nota que está a medias.
+error
 
 ---
 

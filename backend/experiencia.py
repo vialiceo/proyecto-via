@@ -27,6 +27,8 @@ def construir_vista_perfil(usuario_id):
         "frase": extendido.get("frase"),
         "edad": utils.calcular_edad(extendido.get("fecha_nacimiento")),
         "contactos": contactos,
+        # Lista de campos que el egresado eligió mostrar en el directorio.
+        "campos_publicos": (extendido.get("campos_publicos") or "").split(","),
     }
 
 
@@ -63,6 +65,13 @@ def validar_datos_perfil(form):
     if correo and len(correo) > 190:
         errores.append("El correo es demasiado largo (máximo 190 caracteres).")
 
+    """
+    Campos que el egresado decidió mostrar en su tarjeta del directorio.
+    Cada checkbox se llama "publico_<campo>". Solo se aceptan campos válidos.
+    """
+    posibles = ("profesion", "lugar_residencia", "lugar_estudio", "frase", "correo")
+    publicos = [campo for campo in posibles if form.get(f"publico_{campo}")]
+
     datos = {
         "correo": correo,
         "profesion": profesion,
@@ -70,6 +79,7 @@ def validar_datos_perfil(form):
         "lugar_estudio": lugar_estudio,
         "fecha_nacimiento": fecha_nacimiento,
         "frase": frase,
+        "campos_publicos": ",".join(publicos),
     }
     return errores, datos
 
@@ -120,6 +130,7 @@ def guardar_perfil(usuario_id, datos, contactos):
         datos["lugar_estudio"],
         datos["fecha_nacimiento"],
         datos.get("frase"),
+        campos_publicos=datos.get("campos_publicos", ""),
     )
     models.reemplazar_contactos(usuario_id, contactos)
     utils.encolar_tarea(models.registrar_bitacora, usuario_id, "perfil_actualizado", ip=utils.ip_cliente())

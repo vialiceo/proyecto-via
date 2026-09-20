@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>V.I.A – Vinculación Integral de Alumnos</title>
   <link rel="stylesheet" href="/static/css/ayuda.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Marcellus&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
 
   <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
   <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
@@ -49,8 +49,12 @@
 
 
       <nav class="navbar-links">
-        <a href="{{ url_for('public.solicitar_cuenta') }}" class="nav-secundario">SOLICITAR CUENTA</a>
-        <a href="{{ url_for('auth.login') }}" class="nav-cta">INGRESAR</a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('public.index') }}" class="nav-cta">← VOLVER A MI CUENTA</a>
+        {% else %}
+          <a href="{{ url_for('public.solicitar_cuenta') }}" class="nav-secundario">SOLICITAR CUENTA</a>
+          <a href="{{ url_for('auth.login') }}" class="nav-cta">INGRESAR</a>
+        {% endif %}
       </nav>
 
 
@@ -266,8 +270,9 @@
       <div class="footer-col">
         <h3 class="footer-col-title">Información Legal</h3>
         <ul class="footer-links footer-links--plain">
-          <li><a href="#">Estatuto General</a></li>
-          <li><a href="#">Estatuto Profesoral</a></li>
+          <li><a href="{{ url_for('public.estatuto_general') }}">Estatuto General</a></li>
+          <li><a href="{{ url_for('public.estatuto_profesoral') }}">Estatuto Profesoral</a></li>
+          <li><a href="{{ url_for('public.reglamento_estudiantil') }}">Reglamento Estudiantil</a></li>
           <li><a href="#">Reglamento Estudiantil</a></li>
           <li><a href="{{ url_for('public.aviso_legal') }}">Política de Privacidad</a></li>
         </ul>
@@ -277,7 +282,7 @@
 
     <div class="footer-bottom">
       <p><em>Seis décadas formando con excelencia, valores y compromiso.</em></p>
-      <p>© 2026 Institución Educativa Liceo Tame — V.I.A. Todos los derechos reservados.</p>
+      <p>© 2026 Institución Educativa Liceo Tame — V.I.A · Desarrollado por Sovietech. Todos los derechos reservados.</p>
     </div>
   </footer>
 

@@ -1,0 +1,43 @@
+{# Modal de detalle de un egresado. Estructura de dos columnas: identidad a la
+   izquierda y los datos ("Acerca de") a la derecha.
+
+   `permitir_destacar` (por defecto false): solo se pasa true desde las páginas
+   de administración. Así el botón "Destacar alumno" NO aparece nunca en las
+   páginas de usuarios (directorio, promociones); es exclusivo de admins. #}
+{% set permitir_destacar = permitir_destacar|default(false) %}
+<div class="modal-fondo" id="modalEgresado"
+     data-yo="{{ current_user.id }}"
+     data-admin="{{ 1 if current_user.rol == 'administrador' else 0 }}"
+     role="dialog" aria-modal="true" aria-labelledby="modalEgresadoNombre" hidden>
+  <div class="modal-caja-egresado">
+    <button type="button" class="modal-cerrar" id="modalEgresadoCerrar" aria-label="Cerrar">✕</button>
+
+    <div class="modal-eg-cuerpo">
+      <aside class="modal-eg-identidad">
+        <div class="modal-egresado-foto" id="modalEgresadoFoto"></div>
+        <h2 class="modal-egresado-nombre" id="modalEgresadoNombre"></h2>
+        <span class="modal-eg-rol">Egresado</span>
+        <span class="modal-eg-insignia" id="modalEgresadoInsignia" hidden>★ Destacado</span>
+      </aside>
+
+      <div class="modal-eg-detalle">
+        <div class="modal-eg-cabecera">
+          <h3 class="modal-eg-titulo">Acerca de</h3>
+          {% if permitir_destacar %}
+          <button type="button" class="btn-destacar" id="btnDestacar" hidden>
+            <span class="btn-destacar-estrella">★</span>
+            <span class="btn-destacar-texto">Destacar alumno</span>
+          </button>
+          {% endif %}
+        </div>
+
+        <p class="modal-egresado-profesion" id="modalEgresadoProfesion"></p>
+        <dl class="modal-egresado-datos" id="modalEgresadoDatos"></dl>
+        <p class="modal-egresado-frase" id="modalEgresadoFrase"></p>
+        <p class="modal-egresado-adminnota" id="modalEgresadoAdminNota" hidden>Vista de administración: incluye datos que el egresado no hizo públicos.</p>
+
+        <a href="#" id="modalEgresadoMensaje" class="btn-enviar-mensaje-perfil">Enviar mensaje</a>
+      </div>
+    </div>
+  </div>
+</div>

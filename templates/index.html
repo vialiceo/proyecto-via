@@ -3,21 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>try{var t=localStorage.getItem('via-tema');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
   <meta name="csrf-token" content="{{ csrf_token() }}" />
+  {% if current_user.is_authenticated and session.get('expira_en') %}<meta name="session-expira" content="{{ session.get('expira_en') | round | int }}" />{% endif %}
   <title>V.I.A – Principal</title>
 
   <link rel="stylesheet" href="/static/css/usuarios/Base usuarios.css" />
   <link rel="stylesheet" href="/static/css/index.css" />
+  <link rel="stylesheet" href="/static/css/promocion.css" />
   {% if current_user.rol == 'administrador' %}
   <link rel="stylesheet" href="/static/css/admin.css" />
   <link rel="stylesheet" href="/static/css/perfiles.css" />
   {% endif %}
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Marcellus&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
 
   <link rel="icon" type="image/svg+xml" href="/static/img/favicon/favicon.svg" />
   <link rel="manifest" href="/static/img/favicon/site.webmanifest" />
   <link rel="stylesheet" href="/static/css/carga.css" />
   <link rel="stylesheet" href="/static/css/movil.css" />
+  <link rel="stylesheet" href="/static/css/tema.css" />
 </head>
 <body>
 
@@ -43,20 +47,24 @@
           <div class="ts-sun">☀</div>
           <span class="ts-bottom">LICEO T.</span>
         </div>
+        <span class="topbar-brand-text">
+          <span class="topbar-brand-name">Liceo Tame</span>
+          <span class="topbar-brand-sub">V.I.A — Vinculación Integral de Alumnos</span>
+        </span>
       </a>
 
       <nav class="topbar-nav-icons" aria-label="Accesos rápidos">
-        <a href="{{ url_for('public.index') }}" class="topbar-nav-icon active" aria-label="Principal" title="Principal">
+        <a href="{{ url_for('public.index') }}" class="topbar-nav-icon {% if active_page == 'principal' %}active{% endif %}" aria-label="Inicio" title="Inicio">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </a>
-        <a href="{{ url_for('usuarios.perfil') }}" class="topbar-nav-icon" aria-label="Actualizar información" title="Actualizar información">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        <a href="{{ url_for('usuarios.promociones') }}" class="topbar-nav-icon {% if active_page == 'promociones' %}active{% endif %}" aria-label="Ver promociones" title="Ver promociones">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.5 9 2.5 12 0v-5"/></svg>
         </a>
-        <a href="{{ url_for('usuarios.comentarios') }}" class="topbar-nav-icon" aria-label="Comentarios" title="Comentarios">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        </a>
-        <a href="{{ url_for('public.ayuda') }}" class="topbar-nav-icon" aria-label="Ayuda" title="Ayuda">
+        <a href="{{ url_for('public.ayuda') }}" class="topbar-nav-icon {% if active_page == 'ayuda' %}active{% endif %}" aria-label="Ayuda y tickets" title="Ayuda / Tickets">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="topbar-nav-icon topbar-nav-icon--salir" aria-label="Cerrar sesión" title="Cerrar sesión">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </a>
       </nav>
 
@@ -65,15 +73,7 @@
 
       <div class="profile-menu-wrapper">
         <button class="profile-btn" id="profileBtn" aria-label="Menú de usuario" aria-expanded="false">
-          {% if current_user.foto %}
-            <img src="{{ current_user.foto }}" alt="Foto de perfil" class="profile-photo" />
-          {% else %}
-
-            <svg class="profile-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="12" cy="8" r="4"/>
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-            </svg>
-          {% endif %}
+          <img src="{{ current_user.foto or url_for('static', filename='img/avatar.svg') }}" onerror="this.src='/static/img/avatar.svg'" alt="Foto de perfil" class="profile-photo" />
         </button>
 
 
@@ -90,6 +90,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             Cambiar contraseña
           </a>
+          <button type="button" class="dropdown-item" id="temaToggle" aria-pressed="false">
+            <svg class="tema-toggle-icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+            <span id="temaToggleTexto">Modo oscuro</span>
+          </button>
           <div class="dropdown-divider"></div>
           <a href="{{ url_for('auth.logout') }}" class="dropdown-item dropdown-item--danger">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -182,15 +186,44 @@
           </thead>
           <tbody>
             {% for u in usuarios %}
-            <tr data-id="{{ u.id }}">
-              <td>{{ u.nombre }}<br /><span class="celda-secundaria">{% if u.cedula %}C.C. {{ u.cedula }} · {% endif %}{{ u.correo }}</span></td>
+            <tr data-id="{{ u.id }}"
+                data-nombre="{{ u.nombre }}"
+                data-foto="{{ u.foto or '' }}"
+                data-anio="{{ u.anio_promocion or '' }}"
+                data-tecnico="{{ u.tecnico_nombre or '' }}"
+                data-profesion="{{ u.profesion or '' }}"
+                data-residencia="{{ u.lugar_residencia or '' }}"
+                data-estudio="{{ u.lugar_estudio or '' }}"
+                data-correo="{{ u.correo or '' }}"
+                data-frase="{{ u.frase or '' }}"
+                data-destacado="{{ 1 if u.destacado else 0 }}"
+                data-esadmin="1">
+              <td>
+                <div class="celda-usuario">
+                  <span class="celda-avatar">
+                    <img src="{{ u.foto or url_for('static', filename='img/avatar.svg') }}" onerror="this.src='/static/img/avatar.svg'" alt="Foto de {{ u.nombre }}" />
+                    {% if u.destacado %}<span class="celda-avatar-estrella" title="Destacado">★</span>{% endif %}
+                  </span>
+                  <span class="celda-usuario-texto">
+                    {{ u.nombre }}<br /><span class="celda-secundaria">{% if u.cedula %}C.C. {{ u.cedula }} · {% endif %}{{ u.correo }}</span>
+                  </span>
+                </div>
+              </td>
               <td>{{ u.usuario }}</td>
               <td><span class="pill pill--{{ u.rol }}">{{ u.rol }}</span></td>
               <td>{{ u.anio_promocion or '—' }}</td>
               <td>{{ u.tecnico_nombre or '—' }}</td>
               <td><span class="pill pill-estado--{{ u.estado }}">{{ u.estado }}</span></td>
               <td>{{ u.ultimo_login.strftime('%d/%m/%Y %H:%M') if u.ultimo_login else 'Nunca' }}</td>
-              <td><button type="button" class="btn-gestionar" data-usuario-id="{{ u.id }}">Gestionar</button></td>
+              <td class="celda-acciones">
+                <div class="fila-menu">
+                  <button type="button" class="btn-tres-puntos" aria-label="Acciones" aria-haspopup="true" aria-expanded="false">⋮</button>
+                  <div class="fila-menu-lista" hidden>
+                    <button type="button" class="fila-menu-item btn-gestionar" data-usuario-id="{{ u.id }}">Gestionar</button>
+                    <button type="button" class="fila-menu-item btn-ver-perfil">Ver perfil</button>
+                  </div>
+                </div>
+              </td>
             </tr>
             {% else %}
             <tr><td colspan="8" class="tabla-vacia">No hay cuentas que coincidan con el filtro.</td></tr>
@@ -234,7 +267,7 @@
           <div class="modal-acciones">
             <button type="button" id="btnActivar" class="btn-accion btn-accion--ok">Activar</button>
             <button type="button" id="btnDesactivar" class="btn-accion btn-accion--warn">Desactivar</button>
-            <button type="button" id="btnResetPassword" class="btn-accion">Resetear contraseña</button>
+            <button type="button" id="btnResetPassword" class="btn-accion btn-accion--reset">Restablecer contraseña</button>
           </div>
 
           <div class="modal-bitacora">
@@ -243,6 +276,10 @@
           </div>
         </div>
       </div>
+
+      {% with permitir_destacar = true %}
+        {% include 'usuarios/_modal_egresado.html' %}
+      {% endwith %}
 
       {% else %}
 
@@ -271,7 +308,8 @@
           <div class="carousel-track" id="carouselTrack">
 
             {% for promo in promociones_recientes %}
-            <a href="{{ url_for('usuarios.promociones', anio=promo.anio_promocion) }}" class="promo-card">
+            <a href="{{ url_for('usuarios.directorio', anio_promocion=promo.anio_promocion) }}"
+               class="promo-card" data-anio="{{ promo.anio_promocion }}">
               <div class="promo-img-wrapper">
                 <img src="{{ url_for('static', filename='img/promociones/' ~ promo.anio_promocion ~ '.jpg') }}"
                      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -297,6 +335,19 @@
 
       <div class="carousel-dots" id="carouselDots"></div>
 
+      {# Al hacer clic en una promoción del carrusel, sus egresados se despliegan
+         aquí mismo (sin cambiar de página). Para el detalle se abre el modal. #}
+      <section class="promo-inline" id="promoInline" hidden aria-live="polite">
+        <div class="promo-inline-cabecera">
+          <h2 class="promo-inline-titulo" id="promoInlineTitulo"></h2>
+          <a class="promo-inline-vertodos" id="promoInlineVerTodos" href="#">Ver en el directorio →</a>
+        </div>
+        <div class="promocion-grid" id="promoInlineLista"></div>
+        <p class="promo-inline-nota">¿Quieres ver más? Entra a <a href="{{ url_for('usuarios.promociones') }}">Ver promociones</a>.</p>
+      </section>
+
+      {% include 'usuarios/_modal_egresado.html' %}
+
       {% endif %}
 
     </main>
@@ -308,12 +359,16 @@
   <script src="/static/js/nav.js"></script>
   <script src="/static/js/perfil.js"></script>
   {% if current_user.rol == 'administrador' %}
+  <script src="/static/js/modal-egresado.js"></script>
   <script src="/static/js/admin.js"></script>
   {% else %}
+  <script src="/static/js/modal-egresado.js"></script>
   <script src="/static/js/carrusel.js"></script>
   {% endif %}
 
   <script src="/static/js/carga.js"></script>
+  <script src="/static/js/sesion.js"></script>
+  <script src="/static/js/tema.js"></script>
 
   <script src="/static/js/modal.js"></script>
 </body>

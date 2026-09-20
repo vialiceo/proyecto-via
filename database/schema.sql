@@ -1,6 +1,18 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
+/*
+ * Catálogo de promociones: un año por promoción (desde 1967). La página
+ * "Ver promociones" las lista todas, tengan o no egresados aún. Las
+ * modalidades/técnicos de cada año se agregan cuando haya datos reales.
+ */
+CREATE TABLE IF NOT EXISTS promociones (
+  anio        SMALLINT UNSIGNED PRIMARY KEY,
+  descripcion VARCHAR(200) NULL,
+  activa      TINYINT(1) NOT NULL DEFAULT 1,
+  creado_en   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS tecnicos (
   id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   nombre        VARCHAR(120) NOT NULL,
@@ -11,7 +23,7 @@ CREATE TABLE IF NOT EXISTS tecnicos (
 
 CREATE TABLE IF NOT EXISTS graduados (
   id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  cedula         VARCHAR(20)       NULL,
+  cedula         VARCHAR(120)      NULL, /* cifrada (AES-SIV) */
   nombre         VARCHAR(150)      NOT NULL,
   anio_promocion SMALLINT UNSIGNED NOT NULL,
   tecnico_id     INT UNSIGNED      NULL,
@@ -30,7 +42,7 @@ CREATE TABLE IF NOT EXISTS graduados (
 
 CREATE TABLE IF NOT EXISTS usuarios (
   id                     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  cedula                 VARCHAR(20)     NULL,
+  cedula                 VARCHAR(120)    NULL, /* cifrada (AES-SIV) */
   graduado_id            INT UNSIGNED    NULL,
   nombre                 VARCHAR(150)    NOT NULL,
   correo                 VARCHAR(190)    NOT NULL,
@@ -41,6 +53,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   anio_promocion         SMALLINT UNSIGNED NULL,
   tecnico_id             INT UNSIGNED    NULL,
   foto                   VARCHAR(255)    NULL,
+  destacado              TINYINT(1)      NOT NULL DEFAULT 0,
   forzar_cambio_password TINYINT(1)      NOT NULL DEFAULT 1,
   ultimo_login            DATETIME       NULL,
   creado_en              DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -64,6 +77,7 @@ CREATE TABLE IF NOT EXISTS perfil_extendido (
   lugar_estudio     VARCHAR(150) NULL,
   fecha_nacimiento  DATE         NULL,
   frase             VARCHAR(200) NULL,
+  campos_publicos   VARCHAR(255) NOT NULL DEFAULT 'profesion,frase',
   actualizado_en    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_perfil_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
@@ -195,9 +209,20 @@ CREATE TABLE IF NOT EXISTS eventos (
   KEY ix_eventos_fecha (fecha_inicio)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS eventos_favoritos (
+  usuario_id   INT UNSIGNED NOT NULL,
+  evento_id    INT UNSIGNED NOT NULL,
+  creado_en    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  recordado_en DATETIME NULL,
+  PRIMARY KEY (usuario_id, evento_id),
+  CONSTRAINT fk_favevento_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  CONSTRAINT fk_favevento_evento  FOREIGN KEY (evento_id)  REFERENCES eventos(id)  ON DELETE CASCADE,
+  KEY ix_favevento_evento (evento_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS solicitudes_cuenta (
   id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  cedula         VARCHAR(20)       NOT NULL,
+  cedula         VARCHAR(120)      NULL, /* cifrada (AES-SIV) */
   nombre         VARCHAR(150)      NOT NULL,
   correo         VARCHAR(190)      NOT NULL,
   telefono       VARCHAR(40)       NULL,

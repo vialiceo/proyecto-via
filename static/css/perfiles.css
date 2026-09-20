@@ -175,8 +175,16 @@
   cursor: pointer;
 }
 
-.btn-accion--ok { border-color: #285c1f; color: #285c1f; }
-.btn-accion--warn { border-color: #8a2c23; color: #8a2c23; }
+/* Botones de acción con fondo de color y letra blanca, para que contrasten
+   y se distingan de un vistazo. */
+.btn-accion { color: #fff; font-weight: 600; }
+.btn-accion--ok    { background: #285c1f; border-color: #285c1f; }
+.btn-accion--ok:hover    { background: #1f4a18; }
+.btn-accion--warn  { background: #8a2c23; border-color: #8a2c23; }
+.btn-accion--warn:hover  { background: #71231c; }
+.btn-accion--reset { background: #a9820f; border-color: #a9820f; }
+.btn-accion--reset:hover { background: #8a6a0c; }
+.btn-accion--reset::before { content: "🔑 "; }
 
 .modal-bitacora h3 { font-size: 0.85rem; color: var(--verde-oscuro); margin-bottom: 0.6rem; }
 .bitacora-lista { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; max-height: 180px; overflow-y: auto; }
@@ -188,3 +196,21 @@
   .modal-form .campo-fila { grid-template-columns: 1fr; }
   .modal-caja { padding: 1.5rem; }
 }
+
+/* Botón "Guardar cambios" del modal de gestión de cuenta (index.html). */
+.modal-form .btn-guardar {
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--verde-base, #1a3d2b);
+  color: #fff;
+  font-family: var(--fuente-cuerpo, 'Lato', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-form .btn-guardar:hover { background: var(--verde-oscuro, #0d2318); }

@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from backend import experiencia, models, utils
@@ -64,7 +64,12 @@ def actualizar_foto():
         return redirect(url_for("usuarios.perfil"))
 
     nombre_seguro = utils.nombre_archivo_seguro(current_user.id, archivo.filename)
-    carpeta_absoluta = os.path.join(current_app.root_path, current_app.config["UPLOAD_FOLDER"])
+    """
+    OJO: se usa static_folder (la carpeta que Flask SIRVE), no root_path.
+    root_path apunta a backend/, asi que guardaba en backend/static/uploads/...
+    mientras Flask servia /static/... desde <raiz>/static/... -> foto 404.
+    """
+    carpeta_absoluta = os.path.join(current_app.static_folder, "uploads", "perfiles")
     os.makedirs(carpeta_absoluta, exist_ok=True)
     archivo.save(os.path.join(carpeta_absoluta, nombre_seguro))
 
@@ -105,16 +110,58 @@ def _comentarios_visibles_cacheados(pagina):
 @usuarios_bp.route("/promociones")
 @login_required
 def promociones():
-    anio = request.args.get("anio", type=int)
-    lista_promociones = _todas_las_promociones_cacheadas()
-    egresados = _egresados_por_promocion_cacheados(anio) if anio else []
     return render_template(
         "promocion.html",
-        promociones=lista_promociones,
-        anio=anio,
-        egresados=egresados,
+        promociones=_todas_las_promociones_cacheadas(),
+        imagenes_promocion=_anios_con_imagen(),
         active_page="promociones",
     )
+
+
+@usuarios_bp.route("/promociones/<int:anio>/egresados")
+@login_required
+def promocion_egresados(anio):
+    """Egresados de una promoción, en JSON, para el desplegable del carrusel del
+    inicio (no recarga la página). Devuelve solo los campos que cada quien puede
+    ver según la privacidad del egresado; la administración ve todo."""
+    es_admin = current_user.rol == "administrador"
+    salida = []
+    for e in _egresados_por_promocion_cacheados(anio):
+        publicos = (e.get("campos_publicos") or "").split(",")
+        def visible(campo):
+            return es_admin or campo in publicos
+        salida.append({
+            "id": e["id"],
+            "nombre": e["nombre"],
+            "foto": e["foto"] or "",
+            "anio": e["anio_promocion"] or "",
+            "tecnico": e["tecnico_nombre"] or "",
+            "destacado": "1" if e["destacado"] else "0",
+            "profesion": (e["profesion"] or "") if visible("profesion") else "",
+            "residencia": (e["lugar_residencia"] or "") if visible("lugar_residencia") else "",
+            "estudio": (e["lugar_estudio"] or "") if visible("lugar_estudio") else "",
+            "correo": (e["correo"] or "") if visible("correo") else "",
+            "frase": (e["frase"] or "") if visible("frase") else "",
+        })
+    return jsonify(egresados=salida)
+
+
+@cache.memoize(timeout=300)
+def _anios_con_imagen():
+    """Años que tienen foto de promoción en static/img/promociones/<anio>.jpg.
+    Así la plantilla solo pide la imagen cuando existe y no llena la consola de
+    404 para las promociones sin foto."""
+    carpeta = os.path.join(current_app.root_path, "static", "img", "promociones")
+    try:
+        nombres = os.listdir(carpeta)
+    except OSError:
+        return set()
+    anios = set()
+    for nombre in nombres:
+        base, ext = os.path.splitext(nombre)
+        if ext.lower() in (".jpg", ".jpeg", ".png", ".webp") and base.isdigit():
+            anios.add(int(base))
+    return anios
 
 
 @cache.memoize(timeout=180)
@@ -151,6 +198,23 @@ def directorio():
         filtros={"q": busqueda or "", "tecnico_id": tecnico_id or "", "anio_promocion": anio_promocion or ""},
         active_page="directorio",
     )
+
+
+@usuarios_bp.route("/directorio/<int:usuario_id>/destacar", methods=["POST"])
+@utils.admin_required
+@limiter.limit("120 per hour")
+def destacar_egresado(usuario_id):
+    """Alterna la marca de "destacado" de un egresado. Solo administración.
+    Responde JSON porque lo llama el modal del directorio con fetch."""
+    nuevo_estado = models.alternar_destacado(usuario_id)
+    if nuevo_estado is None:
+        return jsonify(ok=False, error="Egresado no encontrado."), 404
+    """
+    El directorio y las promociones quedan cacheados; hay que refrescarlos
+    para que la insignia aparezca al recargar.
+    """
+    cache.delete_memoized(_egresados_por_promocion_cacheados)
+    return jsonify(ok=True, destacado=nuevo_estado)
 
 
 @usuarios_bp.route("/solicitudes", methods=["GET", "POST"])
@@ -242,10 +306,16 @@ def mensajes_enviar(conversacion_id):
 @usuarios_bp.route("/mensajes/con/<int:usuario_id>")
 @login_required
 def mensajes_con(usuario_id):
+    """
+    Mensajearte a ti mismo no tiene sentido: en vez de un 404 crudo, se
+    avisa y se vuelve al directorio.
+    """
     if usuario_id == current_user.id:
-        abort(404)
+        flash("No puedes enviarte un mensaje a ti mismo.", "info")
+        return redirect(url_for("usuarios.directorio"))
     if not models.obtener_usuario_por_id(usuario_id):
-        abort(404)
+        flash("Esa persona ya no existe.", "error")
+        return redirect(url_for("usuarios.directorio"))
     conversacion_id = models.obtener_o_crear_conversacion(current_user.id, usuario_id)
     return redirect(url_for("usuarios.mensajes", con=conversacion_id))
 
@@ -255,8 +325,35 @@ def mensajes_con(usuario_id):
 def eventos():
     momento = "pasados" if request.args.get("momento") == "pasados" else "proximos"
     pagina, por_pagina = utils.parametros_paginacion(valor_por_defecto=20, maximo=50)
-    items = models.listar_eventos(momento=momento, pagina=pagina, por_pagina=por_pagina)
+    items = models.listar_eventos(
+        momento=momento, pagina=pagina, por_pagina=por_pagina, usuario_id=current_user.id
+    )
     return render_template("eventos.html", eventos=items, momento=momento, active_page="eventos")
+
+
+@usuarios_bp.route("/eventos/<int:evento_id>")
+@login_required
+def evento_detalle(evento_id):
+    evento = models.obtener_evento(evento_id, usuario_id=current_user.id)
+    if not evento:
+        abort(404)
+    return render_template("evento_detalle.html", evento=evento, active_page="eventos")
+
+
+@usuarios_bp.route("/eventos/<int:evento_id>/favorito", methods=["POST"])
+@login_required
+@limiter.limit("60 per hour")
+def evento_favorito(evento_id):
+    if not models.obtener_evento(evento_id):
+        abort(404)
+    marcado = models.alternar_evento_favorito(current_user.id, evento_id)
+    if marcado:
+        flash("Evento guardado. Te recordaremos por correo el día del evento.", "success")
+    else:
+        flash("Quitaste el evento de tus favoritos.", "info")
+    """Volver a donde estaba (detalle o lista)."""
+    destino = utils.redireccion_segura(request.form.get("volver_a"), url_for("usuarios.eventos"))
+    return redirect(destino)
 
 
 @usuarios_bp.route("/eventos/nuevo", methods=["GET", "POST"])

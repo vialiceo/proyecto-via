@@ -33,21 +33,27 @@
 
   <div class="promocion-grid">
     {% for e in egresados %}
+    {% set publicos = (e.campos_publicos or '').split(',') %}
+    {% set es_admin = current_user.rol == 'administrador' %}
     <button
       type="button"
       class="egresado-card"
       data-id="{{ e.id }}"
       data-nombre="{{ e.nombre }}"
       data-foto="{{ e.foto or '' }}"
-      data-profesion="{{ e.profesion or '' }}"
-      data-frase="{{ e.frase or '' }}"
+      data-anio="{{ e.anio_promocion or '' }}"
+      data-tecnico="{{ e.tecnico_nombre or '' }}"
+      {% if es_admin or 'profesion' in publicos %}data-profesion="{{ e.profesion or '' }}"{% endif %}
+      {% if es_admin or 'lugar_residencia' in publicos %}data-residencia="{{ e.lugar_residencia or '' }}"{% endif %}
+      {% if es_admin or 'lugar_estudio' in publicos %}data-estudio="{{ e.lugar_estudio or '' }}"{% endif %}
+      {% if es_admin or 'correo' in publicos %}data-correo="{{ e.correo or '' }}"{% endif %}
+      {% if es_admin or 'frase' in publicos %}data-frase="{{ e.frase or '' }}"{% endif %}
+      data-destacado="{{ 1 if e.destacado else 0 }}"
+      {% if es_admin %}data-esadmin="1"{% endif %}
     >
+      {% if e.destacado %}<span class="egresado-destacado" title="Egresado destacado">★</span>{% endif %}
       <div class="egresado-foto">
-        {% if e.foto %}
-          <img src="{{ e.foto }}" alt="Foto de {{ e.nombre }}" />
-        {% else %}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        {% endif %}
+        <img src="{{ e.foto or url_for('static', filename='img/avatar.svg') }}" onerror="this.src='/static/img/avatar.svg'" alt="Foto de {{ e.nombre }}" />
       </div>
       <span class="egresado-nombre">{{ e.nombre }}</span>
       <span class="egresado-profesion">{{ e.tecnico_nombre or e.profesion or '' }}</span>
@@ -59,20 +65,11 @@
 
   {{ paginacion(pagina, por_pagina, total) }}
 
-  <div class="modal-fondo" id="modalEgresado" role="dialog" aria-modal="true" aria-labelledby="modalEgresadoNombre" hidden>
-    <div class="modal-caja-egresado">
-      <button type="button" class="modal-cerrar" id="modalEgresadoCerrar" aria-label="Cerrar">✕</button>
-      <div class="modal-egresado-foto" id="modalEgresadoFoto"></div>
-      <h2 class="modal-egresado-nombre" id="modalEgresadoNombre"></h2>
-      <p class="modal-egresado-profesion" id="modalEgresadoProfesion"></p>
-      <p class="modal-egresado-frase" id="modalEgresadoFrase"></p>
-      <a href="#" id="modalEgresadoMensaje" class="btn-enviar-mensaje-perfil">Enviar mensaje</a>
-    </div>
-  </div>
+  {% include 'usuarios/_modal_egresado.html' %}
 
 {% endblock %}
 
 {% block extra_js %}
   <script src="/static/js/modal.js"></script>
-  <script src="/static/js/promocion.js"></script>
+  <script src="/static/js/modal-egresado.js"></script>
 {% endblock %}

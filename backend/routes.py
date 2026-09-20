@@ -14,8 +14,8 @@ ANIO_PROMOCION_MIN = 1967
 @public_bp.route("/")
 def index():
     if not current_user.is_authenticated:
-        # Portada publica: quien llega sin sesion debe entender que es V.I.A
-        # y como pedir una cuenta, no aterrizar en la pagina de Ayuda.
+        ''' Portada publica: quien llega sin sesion debe entender que es V.I.A
+            y como pedir una cuenta, no aterrizar en la pagina de Ayuda.'''
         return render_template(
             "portada.html",
             promociones_recientes=_promociones_recientes_publicas(),
@@ -58,7 +58,7 @@ def _promociones_recientes_publicas():
     try:
         return models.listar_promociones_recientes(limite=4)
     except Exception:
-        # La portada nunca debe caerse por la base: sin datos se muestra igual.
+        """La portada nunca debe caerse por la base: sin datos se muestra igual."""
         return []
 
 
@@ -92,6 +92,46 @@ def ayuda():
 @public_bp.route("/aviso-legal")
 def aviso_legal():
     return render_template("aviso_legal.html")
+
+
+"""
+Documentos institucionales. El contenido llega después; por ahora son páginas
+estructuradas y con su ruta, enlazadas desde el footer.
+"""
+_DOCS_INSTITUCIONALES = {
+    "estatuto-general": (
+        "Estatuto General",
+        "Marco normativo general de la Institución Educativa Liceo Tame.",
+    ),
+    "estatuto-profesoral": (
+        "Estatuto Profesoral",
+        "Normas y lineamientos para el cuerpo docente del Liceo Tame.",
+    ),
+    "reglamento-estudiantil": (
+        "Reglamento Estudiantil",
+        "Deberes, derechos y normas de convivencia de los estudiantes.",
+    ),
+}
+
+
+def _render_doc(slug):
+    titulo, intro = _DOCS_INSTITUCIONALES[slug]
+    return render_template("documento_institucional.html", titulo=titulo, intro=intro)
+
+
+@public_bp.route("/estatuto-general")
+def estatuto_general():
+    return _render_doc("estatuto-general")
+
+
+@public_bp.route("/estatuto-profesoral")
+def estatuto_profesoral():
+    return _render_doc("estatuto-profesoral")
+
+
+@public_bp.route("/reglamento-estudiantil")
+def reglamento_estudiantil():
+    return _render_doc("reglamento-estudiantil")
 
 
 def validar_solicitud_cuenta(datos):

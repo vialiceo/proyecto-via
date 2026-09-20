@@ -4,11 +4,5 @@ __pycache__/
 *.pyc
 static/uploads/
 logs/
-node_modules/
-tests/reporte/
-test-results/
-tests/.sesiones/
-
-# Esta rama va sin las skills de Claude Code: son herramientas de desarrollo,
-# no parte de la aplicación. Flask corre igual sin ellas.
 .claude/
+.vscode/

@@ -1,0 +1,270 @@
+/* Paleta por tema (claro/oscuro). Los tokens semánticos viven aquí; el modo
+   oscuro se activa con data-theme="dark" en <html>. Mantiene el verde + dorado
+   del Liceo. Se carga de último para ganar por cascada sin !important. */
+
+:root {
+  --fondo:        #f4f6f2;
+  --superficie:   #ffffff;
+  --superficie-2: #f4f6f2;
+  --campo-bg:     #fbfbfa;
+  --texto:        #1a1a1a;
+  --texto-medio:  #444a46;
+  --texto-suave:  #7a8a80;
+  --borde:        #e6ebe4;
+  --borde-suave:  #eef2ec;
+  --avatar-bg:    #eef2ea;
+  --sombra:       rgba(13,35,24,0.08);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --fondo:        #0f1a14;
+  --superficie:   #16241c;
+  --superficie-2: #1b2d22;
+  --campo-bg:     #12201a;
+  --texto:        #e7efe9;
+  --texto-medio:  #c2d0c7;
+  --texto-suave:  #8ba394;
+  --borde:        #294034;
+  --borde-suave:  #223429;
+  --avatar-bg:    #22332a;
+  --sombra:       rgba(0,0,0,0.38);
+  color-scheme: dark;
+}
+
+/* ====================== MODO OSCURO ====================== */
+
+/* Fondos base */
+:root[data-theme="dark"] html,
+:root[data-theme="dark"] body { background: var(--fondo); color: var(--texto); }
+:root[data-theme="dark"] .main-content { background: var(--fondo); color: var(--texto); }
+
+/* Superficies (tarjetas, paneles, tablas, modales) */
+:root[data-theme="dark"] .perfil-card,
+:root[data-theme="dark"] .perfil-col-lateral > section,
+:root[data-theme="dark"] .egresado-card,
+:root[data-theme="dark"] .promo-mini-card,
+:root[data-theme="dark"] .promo-inline,
+:root[data-theme="dark"] .stat-card,
+:root[data-theme="dark"] .config-card,
+:root[data-theme="dark"] .comentario,
+:root[data-theme="dark"] .evento-card,
+:root[data-theme="dark"] .evento-detalle,
+:root[data-theme="dark"] .bloque-plegable,
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .resumen-item,
+:root[data-theme="dark"] .solicitud-card,
+:root[data-theme="dark"] .solicitud-cuenta,
+:root[data-theme="dark"] .ticket,
+:root[data-theme="dark"] .conversaciones-lista,
+:root[data-theme="dark"] .hilo-mensajes,
+:root[data-theme="dark"] .tabla-wrapper,
+:root[data-theme="dark"] .modal-caja,
+:root[data-theme="dark"] .fila-menu-lista,
+:root[data-theme="dark"] .profile-dropdown {
+  background: var(--superficie);
+  color: var(--texto);
+  box-shadow: 0 2px 14px var(--sombra);
+}
+
+/* La caja del modal de egresado: el lado izquierdo (identidad) sigue verde;
+   solo el lado derecho (blanco) pasa a superficie oscura. */
+:root[data-theme="dark"] .modal-caja-egresado { background: var(--superficie); }
+:root[data-theme="dark"] .modal-eg-detalle { background: var(--superficie); color: var(--texto); }
+
+/* Títulos y nombres (venían en verde oscuro / grises oscuros) */
+:root[data-theme="dark"] .page-title,
+:root[data-theme="dark"] .page-title--pequeno,
+:root[data-theme="dark"] .index-titulo,
+:root[data-theme="dark"] .card-titulo,
+:root[data-theme="dark"] .modal-titulo,
+:root[data-theme="dark"] .modal-eg-titulo,
+:root[data-theme="dark"] .identidad-nombre,
+:root[data-theme="dark"] .egresado-nombre,
+:root[data-theme="dark"] .modal-egresado-nombre,
+:root[data-theme="dark"] .acerca-de-mi h3,
+:root[data-theme="dark"] .main-content h1,
+:root[data-theme="dark"] .main-content h2,
+:root[data-theme="dark"] .main-content h3 { color: var(--texto); }
+
+/* Texto normal y valores */
+:root[data-theme="dark"] .page-desc,
+:root[data-theme="dark"] .datos-grid dd,
+:root[data-theme="dark"] .identidad-datos dd,
+:root[data-theme="dark"] .info-ad-valor,
+:root[data-theme="dark"] .red-valor,
+:root[data-theme="dark"] .modal-egresado-datos dd,
+:root[data-theme="dark"] .acerca-de-mi p,
+:root[data-theme="dark"] .modal-egresado-datos dd a,
+:root[data-theme="dark"] .tabla-usuarios td,
+:root[data-theme="dark"] .tabla-graduados td { color: var(--texto-medio); }
+
+/* Texto tenue (etiquetas, ayudas, vacíos) */
+:root[data-theme="dark"] dt,
+:root[data-theme="dark"] .datos-grid dt,
+:root[data-theme="dark"] .identidad-datos dt,
+:root[data-theme="dark"] .info-ad-label,
+:root[data-theme="dark"] .red-tipo,
+:root[data-theme="dark"] .foto-ayuda,
+:root[data-theme="dark"] .campo-ayuda,
+:root[data-theme="dark"] .campo label,
+:root[data-theme="dark"] .contacto-vacio,
+:root[data-theme="dark"] .promocion-vacio,
+:root[data-theme="dark"] .egresado-profesion,
+:root[data-theme="dark"] .promo-mini-total,
+:root[data-theme="dark"] .celda-secundaria,
+:root[data-theme="dark"] .modal-egresado-datos dt,
+:root[data-theme="dark"] .tabla-usuarios th,
+:root[data-theme="dark"] .tabla-graduados th { color: var(--texto-suave); }
+
+/* Bordes internos */
+:root[data-theme="dark"] .acerca-de-mi,
+:root[data-theme="dark"] .identidad-datos,
+:root[data-theme="dark"] .modal-egresado-frase,
+:root[data-theme="dark"] .tabla-usuarios td,
+:root[data-theme="dark"] .tabla-usuarios th,
+:root[data-theme="dark"] .tabla-graduados td,
+:root[data-theme="dark"] .tabla-graduados th,
+:root[data-theme="dark"] .modal-acciones,
+:root[data-theme="dark"] .fila-menu-lista { border-color: var(--borde); }
+
+/* Campos de formulario */
+:root[data-theme="dark"] .campo input,
+:root[data-theme="dark"] .campo select,
+:root[data-theme="dark"] .campo textarea,
+:root[data-theme="dark"] .filtros-form input,
+:root[data-theme="dark"] .filtros-form select,
+:root[data-theme="dark"] .filtros-archivo input,
+:root[data-theme="dark"] .filtros-archivo select,
+:root[data-theme="dark"] .form-comentario textarea,
+:root[data-theme="dark"] .form-mensaje input,
+:root[data-theme="dark"] .form-registro input,
+:root[data-theme="dark"] .form-registro select,
+:root[data-theme="dark"] .form-solicitud select,
+:root[data-theme="dark"] .form-solicitud textarea,
+:root[data-theme="dark"] .form-graduado input,
+:root[data-theme="dark"] .form-graduado select,
+:root[data-theme="dark"] .fila-contacto input,
+:root[data-theme="dark"] .fila-contacto select,
+:root[data-theme="dark"] .modal-form input,
+:root[data-theme="dark"] .modal-form select {
+  background: var(--campo-bg);
+  color: var(--texto);
+  border-color: var(--borde);
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder { color: var(--texto-suave); }
+
+/* Avatares / marcos de foto */
+:root[data-theme="dark"] .egresado-foto,
+:root[data-theme="dark"] .modal-egresado-foto,
+:root[data-theme="dark"] .celda-avatar,
+:root[data-theme="dark"] .identidad-foto img,
+:root[data-theme="dark"] .identidad-foto svg { background: var(--avatar-bg); }
+
+/* Menús desplegables (perfil, 3 puntos) */
+:root[data-theme="dark"] .dropdown-item { color: var(--texto); }
+:root[data-theme="dark"] .dropdown-item:hover,
+:root[data-theme="dark"] .fila-menu-item:hover { background: var(--superficie-2); }
+:root[data-theme="dark"] .fila-menu-item { color: var(--texto); }
+:root[data-theme="dark"] .btn-tres-puntos { background: var(--superficie); color: var(--texto); border-color: var(--borde); }
+
+/* Intro / notas suaves */
+:root[data-theme="dark"] .form-intro { background: var(--superficie-2); color: var(--texto-medio); }
+
+/* La foto de perfil form-foto ayuda y separadores */
+:root[data-theme="dark"] .dropdown-divider { background: var(--borde); }
+
+/* ====================== INTERRUPTOR DE TEMA ====================== */
+.tema-toggle-icono { width: 18px; height: 18px; flex: 0 0 auto; }
+
+/* El interruptor es un <button> con estilo de item del menú de perfil. */
+button.dropdown-item {
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+/* ---- Textos que usaban verde oscuro como COLOR DE LETRA -----------------
+   Sobre superficies oscuras hay que aclararlos (año de promoción, números de
+   estadísticas, títulos y nombres secundarios, categorías de evento, etc.). */
+:root[data-theme="dark"] {
+  --enlace: #86c39e;
+}
+:root[data-theme="dark"] .promo-mini-anio,
+:root[data-theme="dark"] .promo-label,
+:root[data-theme="dark"] .stat-num,
+:root[data-theme="dark"] .resumen-num,
+:root[data-theme="dark"] .comentario-autor,
+:root[data-theme="dark"] .conversacion-nombre,
+:root[data-theme="dark"] .ticket-asunto,
+:root[data-theme="dark"] .sc-nombre,
+:root[data-theme="dark"] .panel-cabecera h2,
+:root[data-theme="dark"] .modal-bitacora h3,
+:root[data-theme="dark"] .modal-titulo,
+:root[data-theme="dark"] .evento-titulo,
+:root[data-theme="dark"] .evento-categoria,
+:root[data-theme="dark"] .evento-detalle-titulo,
+:root[data-theme="dark"] .evento-detalle-datos dd,
+:root[data-theme="dark"] .evento-detalle-desc h2 { color: var(--texto); }
+
+:root[data-theme="dark"] .page-eyebrow,
+:root[data-theme="dark"] .filter-label { color: var(--texto-suave); }
+
+/* Enlaces y botones de contorno con verde: se aclaran para que resalten. */
+:root[data-theme="dark"] .paginacion a,
+:root[data-theme="dark"] .pag-link,
+:root[data-theme="dark"] .panel-enlace,
+:root[data-theme="dark"] .config-link-flecha,
+:root[data-theme="dark"] .config-nota a,
+:root[data-theme="dark"] .config-texto a,
+:root[data-theme="dark"] .conversaciones-vacio a,
+:root[data-theme="dark"] .identidad-nota a,
+:root[data-theme="dark"] .btn-foto,
+:root[data-theme="dark"] .btn-agregar,
+:root[data-theme="dark"] .btn-gestionar,
+:root[data-theme="dark"] .btn-buscar,
+:root[data-theme="dark"] .tab { color: var(--enlace); }
+:root[data-theme="dark"] .btn-foto,
+:root[data-theme="dark"] .btn-agregar,
+:root[data-theme="dark"] .btn-gestionar { border-color: var(--enlace); }
+:root[data-theme="dark"] .tab.active { color: #ffffff; }
+
+/* La barra de búsqueda del inicio (input grande) también oscura. */
+:root[data-theme="dark"] .search-bar {
+  background: var(--campo-bg);
+  color: var(--texto);
+  border-color: var(--borde);
+}
+
+/* Superficies del archivo de graduados / paneles de admin (no visibles sin
+   sesión de admin, se cubren por si acaso). */
+:root[data-theme="dark"] .panel-carga,
+:root[data-theme="dark"] .resumen-archivo,
+:root[data-theme="dark"] .aviso-pendientes {
+  background: var(--superficie);
+  color: var(--texto);
+}
+:root[data-theme="dark"] .ayuda-csv code {
+  background: var(--superficie-2);
+  color: var(--texto-medio);
+}
+:root[data-theme="dark"] .conteo-resultados,
+:root[data-theme="dark"] .resumen-label,
+:root[data-theme="dark"] .stat-label { color: var(--texto-suave); }
+
+/* ---- Configuración ---- */
+:root[data-theme="dark"] .config-datos dd,
+:root[data-theme="dark"] .config-link { color: var(--texto); }
+:root[data-theme="dark"] .config-datos dt,
+:root[data-theme="dark"] .config-nota,
+:root[data-theme="dark"] .config-texto,
+:root[data-theme="dark"] .config-texto--pequeno { color: var(--texto-suave); }
+:root[data-theme="dark"] .btn-config,
+:root[data-theme="dark"] .config-link-flecha,
+:root[data-theme="dark"] .config-nota a,
+:root[data-theme="dark"] .config-texto a { color: var(--enlace); }
+:root[data-theme="dark"] .btn-config { border-color: var(--enlace); }

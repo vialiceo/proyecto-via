@@ -1,27 +1,31 @@
--- ---------------------------------------------------------------------------
--- Migración: archivo de graduados + solicitudes de cuenta
--- ---------------------------------------------------------------------------
--- Solo hace falta si YA tienes una base `egresados` con datos.
---
--- `database/schema.sql` usa CREATE TABLE IF NOT EXISTS, así que al volverlo a
--- correr sí crea las tablas nuevas (graduados, solicitudes_cuenta) pero NO
--- agrega las columnas `cedula` y `graduado_id` a una tabla `usuarios` que ya
--- existía. Este archivo hace esa parte.
---
---   mysql -u root -p egresados < database/migracion_graduados.sql
---
--- Se corre UNA sola vez. Si lo repites, MySQL responderá:
---   ERROR 1060 (Duplicate column name)  -> la columna ya estaba
---   ERROR 1061 (Duplicate key name)     -> el índice ya estaba
--- Ambos significan que la migración ya se había aplicado; no hay daño.
---
--- En una base nueva no uses este archivo: corre schema.sql y ya queda todo.
--- ---------------------------------------------------------------------------
+/*
+ * ---------------------------------------------------------------------------
+ * Migración: archivo de graduados + solicitudes de cuenta
+ * ---------------------------------------------------------------------------
+ * Solo hace falta si YA tienes una base `egresados` con datos.
+ *
+ * `database/schema.sql` usa CREATE TABLE IF NOT EXISTS, así que al volverlo a
+ * correr sí crea las tablas nuevas (graduados, solicitudes_cuenta) pero NO
+ * agrega las columnas `cedula` y `graduado_id` a una tabla `usuarios` que ya
+ * existía. Este archivo hace esa parte.
+ *
+ * mysql -u root -p egresados < database/migracion_graduados.sql
+ *
+ * Se corre UNA sola vez. Si lo repites, MySQL responderá:
+ * ERROR 1060 (Duplicate column name)  -> la columna ya estaba
+ * ERROR 1061 (Duplicate key name)     -> el índice ya estaba
+ * Ambos significan que la migración ya se había aplicado; no hay daño.
+ *
+ * En una base nueva no uses este archivo: corre schema.sql y ya queda todo.
+ * ---------------------------------------------------------------------------
+ */
 
 SET NAMES utf8mb4;
 
--- 1. Tablas nuevas ----------------------------------------------------------
--- Van primero porque `usuarios.graduado_id` apunta a `graduados.id`.
+/*
+ * 1. Tablas nuevas ----------------------------------------------------------
+ * Van primero porque `usuarios.graduado_id` apunta a `graduados.id`.
+ */
 
 CREATE TABLE IF NOT EXISTS graduados (
   id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -42,24 +46,30 @@ CREATE TABLE IF NOT EXISTS graduados (
   KEY ix_graduados_tecnico_anio (tecnico_id, anio_promocion)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 2. Columnas nuevas en `usuarios` ------------------------------------------
--- Las dos son NULL: las cuentas que ya existen se quedan sin cédula y sin
--- enlace al archivo hasta que un administrador las complete a mano. Por eso
--- no se pueden declarar NOT NULL.
+/*
+ * 2. Columnas nuevas en `usuarios` ------------------------------------------
+ * Las dos son NULL: las cuentas que ya existen se quedan sin cédula y sin
+ * enlace al archivo hasta que un administrador las complete a mano. Por eso
+ * no se pueden declarar NOT NULL.
+ */
 
 ALTER TABLE usuarios
   ADD COLUMN cedula      VARCHAR(20)  NULL AFTER id,
   ADD COLUMN graduado_id INT UNSIGNED NULL AFTER cedula;
 
--- UNIQUE con valores NULL: MySQL permite muchas filas en NULL dentro de un
--- índice UNIQUE, así que esto no choca con las cuentas viejas sin cédula.
+/*
+ * UNIQUE con valores NULL: MySQL permite muchas filas en NULL dentro de un
+ * índice UNIQUE, así que esto no choca con las cuentas viejas sin cédula.
+ */
 ALTER TABLE usuarios
   ADD UNIQUE KEY uq_usuarios_cedula (cedula),
   ADD UNIQUE KEY uq_usuarios_graduado (graduado_id),
   ADD CONSTRAINT fk_usuarios_graduado FOREIGN KEY (graduado_id) REFERENCES graduados(id) ON DELETE SET NULL;
 
--- 3. Bandeja de solicitudes -------------------------------------------------
--- Va al final porque tiene llaves foráneas hacia `graduados` y `usuarios`.
+/*
+ * 3. Bandeja de solicitudes -------------------------------------------------
+ * Va al final porque tiene llaves foráneas hacia `graduados` y `usuarios`.
+ */
 
 CREATE TABLE IF NOT EXISTS solicitudes_cuenta (
   id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -91,9 +101,11 @@ CREATE TABLE IF NOT EXISTS solicitudes_cuenta (
   KEY ix_soli_cuenta_correo (correo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- 4. Comprobación -----------------------------------------------------------
--- Descomenta para confirmar que quedó aplicada:
--- SHOW COLUMNS FROM usuarios LIKE 'cedula';
--- SHOW COLUMNS FROM usuarios LIKE 'graduado_id';
--- SHOW TABLES LIKE 'graduados';
--- SHOW TABLES LIKE 'solicitudes_cuenta';
+/*
+ * 4. Comprobación -----------------------------------------------------------
+ * Descomenta para confirmar que quedó aplicada:
+ * SHOW COLUMNS FROM usuarios LIKE 'cedula';
+ * SHOW COLUMNS FROM usuarios LIKE 'graduado_id';
+ * SHOW TABLES LIKE 'graduados';
+ * SHOW TABLES LIKE 'solicitudes_cuenta';
+ */

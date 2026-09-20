@@ -11,67 +11,33 @@
   <div class="page-header">
     <p class="page-eyebrow">Egresados</p>
     <h1 class="page-title">Ver promociones</h1>
-    <p class="page-desc">Consulta las promociones de egresados y conéctate con tu comunidad.</p>
+    <p class="page-desc">Elige una promoción para ver a sus egresados en el directorio.</p>
   </div>
 
   <div class="promociones-grid">
     {% for p in promociones %}
-    <a href="{{ url_for('usuarios.promociones', anio=p.anio_promocion) }}" class="promo-mini-card {% if anio == p.anio_promocion %}active{% endif %}">
-      <span class="promo-mini-anio">{{ p.anio_promocion }}</span>
-      <span class="promo-mini-total">{{ p.total_egresados }} egresado{{ 's' if p.total_egresados != 1 else '' }}</span>
+    <a href="{{ url_for('usuarios.directorio', anio_promocion=p.anio_promocion) }}" class="promo-mini-card">
+      <div class="promo-mini-img">
+        {% if p.anio_promocion in imagenes_promocion %}
+        <img src="{{ url_for('static', filename='img/promociones/' ~ p.anio_promocion ~ '.jpg') }}"
+             alt="Promoción {{ p.anio_promocion }}" loading="lazy" />
+        {% else %}
+        <div class="promo-mini-placeholder" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.5 9 2.5 12 0v-5"/></svg>
+        </div>
+        {% endif %}
+      </div>
+      <div class="promo-mini-info">
+        <span class="promo-mini-anio">{{ p.anio_promocion }}</span>
+        <span class="promo-mini-total">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M17 11a4 4 0 000-8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><path d="M21 21v-2a4 4 0 00-3-3.87"/></svg>
+          {{ p.total_egresados }} egresado{{ 's' if p.total_egresados != 1 else '' }}
+        </span>
+      </div>
     </a>
     {% else %}
     <p class="promocion-vacio">Todavía no hay promociones con egresados registrados.</p>
     {% endfor %}
   </div>
 
-  {% if anio %}
-  <div class="page-header page-header--secundario">
-    <h2 class="page-title page-title--pequeno">Egresados promoción {{ anio }}</h2>
-    <span class="page-desc">{{ egresados|length }} egresado{{ 's' if egresados|length != 1 else '' }}</span>
-  </div>
-
-  <div class="promocion-grid">
-    {% for e in egresados %}
-    <button
-      type="button"
-      class="egresado-card"
-      data-id="{{ e.id }}"
-      data-nombre="{{ e.nombre }}"
-      data-foto="{{ e.foto or '' }}"
-      data-profesion="{{ e.profesion or '' }}"
-      data-frase="{{ e.frase or '' }}"
-    >
-      <div class="egresado-foto">
-        {% if e.foto %}
-          <img src="{{ e.foto }}" alt="Foto de {{ e.nombre }}" />
-        {% else %}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        {% endif %}
-      </div>
-      <span class="egresado-nombre">{{ e.nombre }}</span>
-      {% if e.profesion %}<span class="egresado-profesion">{{ e.profesion }}</span>{% endif %}
-    </button>
-    {% else %}
-    <p class="promocion-vacio">Todavía no hay egresados registrados en esta promoción.</p>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <div class="modal-fondo" id="modalEgresado" role="dialog" aria-modal="true" aria-labelledby="modalEgresadoNombre" hidden>
-    <div class="modal-caja-egresado">
-      <button type="button" class="modal-cerrar" id="modalEgresadoCerrar" aria-label="Cerrar">✕</button>
-      <div class="modal-egresado-foto" id="modalEgresadoFoto"></div>
-      <h2 class="modal-egresado-nombre" id="modalEgresadoNombre"></h2>
-      <p class="modal-egresado-profesion" id="modalEgresadoProfesion"></p>
-      <p class="modal-egresado-frase" id="modalEgresadoFrase"></p>
-      <a href="#" id="modalEgresadoMensaje" class="btn-enviar-mensaje-perfil">Enviar mensaje</a>
-    </div>
-  </div>
-
-{% endblock %}
-
-{% block extra_js %}
-  <script src="/static/js/modal.js"></script>
-  <script src="/static/js/promocion.js"></script>
 {% endblock %}

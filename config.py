@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,6 +13,8 @@ def _bool(valor, default=False):
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-cambiar-en-produccion")
+    """Clave para cifrar la cédula por columna (AES-SIV). Ver backend/utils.py."""
+    CEDULA_ENC_KEY = os.getenv("CEDULA_ENC_KEY")
 
     MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
     MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
@@ -41,34 +44,34 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SECURE = _bool(os.getenv("SESSION_COOKIE_SECURE"), False)
-    PERMANENT_SESSION_LIFETIME = 60 * 60 * 8
+    '''cierre de sesion automatico despues de 1 hora segun el estado de la cookie.'''
+    PERMANENT_SESSION_LIFETIME = timedelta(
+        minutes=int(os.getenv("SESSION_MINUTOS", "60"))
+    )
 
     ADMIN_PAGE_SIZE = 25
 
     SOLICITUDES_API_KEY = os.getenv("SOLICITUDES_API_KEY") or None
 
-    # --- CORS -------------------------------------------------------------
-    # Lista blanca de orígenes que pueden hacer peticiones cruzadas al API.
-    # VACÍA a propósito: la aplicación es de una sola página servida por el
-    # mismo Flask, así que no necesita CORS para funcionar. Solo se llena si
-    # una plataforma externa (otro dominio) va a consumir /api/v1.
-    #
-    #   CORS_ORIGINS=https://plataforma.example.com,https://otra.example.com
-    #
-    # NUNCA poner "*": con cookies de sesión, un comodín deja que cualquier
-    # web lea los datos del usuario. La lista se compara exacta.
-    CORS_ORIGINS = [
-        o.strip()
-        for o in (os.getenv("CORS_ORIGINS") or "").split(",")
-        if o.strip()
-    ]
+'''  --- CORS (CORS (por sus siglas en inglés, Cross-Origin Resource Sharing, o Intercambio de Recursos de Origen Cruzado) es un mecanismo de seguridad implementado por los navegadores web que permite a una página web solicitar y cargar recursos desde un dominio diferente al que sirvió la página original)
+    Lista blanca de orígenes que pueden hacer peticiones cruzadas al API.
+    VACÍA a propósito: la aplicación es de una sola página servida por el
+    mismo Flask, así que no necesita CORS para funcionar. Solo se llena si
+    una plataforma externa (otro dominio) va a consumir /api/v1.
+    
+    NUNCA poner "*": con cookies de sesión, un comodín deja que cualquier
+    web lea los datos del usuario. La lista se compara exacta.'''
+CORS_ORIGINS="https://plataforma.example.com,https://otra.example.com"
+CORS_ORIGINS = [
+    o.strip()
+    for o in (os.getenv("CORS_ORIGINS") or "").split(",")
+    if o.strip()
+]
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
-
-    # El navegador guarda los CSS y JS en caché: sin esto, al editar una hoja
-    # de estilos hay que recargar con Ctrl+F5 para ver el cambio.
+    """En desarrollo no se cachean CSS/JS, para ver los cambios sin Ctrl+F5."""
     SEND_FILE_MAX_AGE_DEFAULT = 0
     TEMPLATES_AUTO_RELOAD = True
 
@@ -76,6 +79,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     SESSION_COOKIE_SECURE = True
+    """En produccion los estaticos se cachean 1 dia: menos peticiones al servidor."""
+    SEND_FILE_MAX_AGE_DEFAULT = 86400
 
 
 def get_config():
