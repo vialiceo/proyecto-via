@@ -82,3 +82,10 @@
     gap: 1.2rem;
   }
 }
+
+/* Etiqueta "(opcional)" más discreta junto a los campos no obligatorios. */
+.label-opcional {
+  color: #8a8f88;
+  font-weight: 400;
+  font-size: 0.9em;
+}

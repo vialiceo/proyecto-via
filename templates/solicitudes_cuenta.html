@@ -70,6 +70,12 @@
             Coincide con <strong>{{ s.graduado_nombre }}</strong> en el archivo de graduados
             {% if s.libro_acta %}(acta {{ s.libro_acta }}){% endif %}.
           </p>
+        {% elif s.estado == 'pendiente' and s.candidatos %}
+          <p class="sc-verificacion sc-verificacion--aviso">
+            Hay <strong>{{ s.candidatos|length }}</strong> posible{{ 's' if s.candidatos|length != 1 else '' }}
+            coincidencia{{ 's' if s.candidatos|length != 1 else '' }} en el archivo de graduados.
+            Elige la correcta abajo antes de aprobar.
+          </p>
         {% elif s.estado == 'pendiente' %}
           <p class="sc-verificacion sc-verificacion--alerta">
             No se encontró a esta persona en el archivo de graduados. Verifica el acta de grado antes de aprobar.
@@ -81,7 +87,19 @@
             <form action="{{ url_for('admin.solicitud_cuenta_aprobar', solicitud_id=s.id) }}" method="POST" class="sc-form-aprobar">
               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
               <input type="hidden" name="volver_a" value="{{ estado or '' }}" />
-              {% if not s.graduado_id %}
+              {% if s.graduado_id %}
+                {# Coincidencia única ya enlazada: se aprueba con el graduado guardado. #}
+              {% elif s.candidatos %}
+                <label class="sc-selector-grad">
+                  <span>Elige el graduado que coincide:</span>
+                  <select name="graduado_id" required>
+                    <option value="">— Selecciona el correcto —</option>
+                    {% for c in s.candidatos %}
+                      <option value="{{ c.id }}">{{ c.nombre }}{% if c.libro_acta %} · acta {{ c.libro_acta }}{% endif %}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+              {% else %}
                 <label class="sc-checkbox">
                   <input type="checkbox" name="crear_graduado" value="1" />
                   Añadirla también al archivo de graduados

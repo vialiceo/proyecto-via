@@ -534,3 +534,30 @@
     min-width: 0;
   }
 }
+
+/* Aviso ámbar: hay varias posibles coincidencias en el archivo de graduados. */
+.sc-verificacion--aviso {
+  background: #fdf1d8;
+  color: #8a6d10;
+}
+
+/* Selector del graduado correcto cuando hay homónimos en la misma promoción. */
+.sc-selector-grad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  color: var(--texto-medio, #444a46);
+}
+
+.sc-selector-grad select {
+  font-family: var(--fuente-cuerpo);
+  font-size: 0.82rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--borde, #d8d8d8);
+  border-radius: 8px;
+  background: var(--campo-bg, #fff);
+  color: var(--texto, #1a1a1a);
+  min-width: 260px;
+  max-width: 100%;
+}

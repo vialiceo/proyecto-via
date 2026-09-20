@@ -7,9 +7,10 @@
  * Crea SOLO lo indispensable para que el sistema funcione desde cero:
  * 1. La cuenta de administrador.
  * 2. El catálogo de promociones (un año por promoción, 1967 a 2026).
+ * 3. El catálogo de modalidades/técnicos del colegio (14).
  *
- * No incluye egresados, graduados ni técnicos de prueba: esos datos son
- * reales y se cargan desde el panel de administración o por importación.
+ * No incluye egresados ni graduados: esos datos son reales y se cargan
+ * desde el panel de administración o por importación.
  * ---------------------------------------------------------------------------
  */
 
@@ -30,7 +31,7 @@ ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);
 
 /*
  * --- 2. Catálogo de promociones (1967 a 2026) -----------------------------
- * Un año por promoción. Las modalidades/técnicos se agregan después.
+ * Un año por promoción.
  */
 INSERT INTO promociones (anio) VALUES
   (1967),
@@ -94,3 +95,25 @@ INSERT INTO promociones (anio) VALUES
   (2025),
   (2026)
 ON DUPLICATE KEY UPDATE anio = VALUES(anio);
+
+/*
+ * --- 3. Catalogo de modalidades / tecnicos del colegio --------------------
+ * Son las 14 modalidades reales del Liceo Tame (1968-2016). Al importar el
+ * archivo de graduados, cada fila se enlaza a su modalidad por este nombre.
+ */
+INSERT INTO tecnicos (nombre) VALUES
+  ('ACADÉMICO'),
+  ('ACADÉMICO CON ÉNFASIS EN EMPRENDIMIENTO'),
+  ('ACADÉMICO CON ÉNFASIS EN INFORMÁTICA'),
+  ('AGROPECUARIO'),
+  ('AGROPECUARIO TÉCNICO'),
+  ('BACHILLERES DEL CLEI LECTIVOS ESPECIALES INTEGRADOS 6'),
+  ('CIENCIAS NATURALES'),
+  ('HUMANIDADES INGLES'),
+  ('INFORMÁTICA'),
+  ('MATEMÁTICAS'),
+  ('MATEMÁTICAS Y TECNOLOGÍA'),
+  ('PROYECCIÓN COMUNITARIA'),
+  ('TÉCNICO AGROPECUARIO'),
+  ('TÉCNICO INFORMÁTICA')
+ON DUPLICATE KEY UPDATE nombre = VALUES(nombre);

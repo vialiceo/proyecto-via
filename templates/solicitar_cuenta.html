@@ -31,11 +31,36 @@
       </div>
     </div>
 
-    <div class="field-group">
-      <label for="nombre">Nombre completo</label>
-      <input type="text" id="nombre" name="nombre" maxlength="150" required value="{{ form.nombre or '' }}" />
-      <span class="field-ayuda">Escríbelo tal como aparece en tu diploma o acta de grado.</span>
+    <div class="campo-fila">
+      <div class="field-group">
+        <label for="primer_nombre">Primer nombre</label>
+        <input type="text" id="primer_nombre" name="primer_nombre" maxlength="40"
+               required value="{{ form.primer_nombre or '' }}" />
+      </div>
+      <div class="field-group">
+        <label for="segundo_nombre">Segundo nombre <span class="label-opcional">(opcional)</span></label>
+        <input type="text" id="segundo_nombre" name="segundo_nombre" maxlength="40"
+               value="{{ form.segundo_nombre or '' }}" />
+      </div>
     </div>
+
+    <div class="campo-fila">
+      <div class="field-group">
+        <label for="primer_apellido">Primer apellido</label>
+        <input type="text" id="primer_apellido" name="primer_apellido" maxlength="40"
+               required value="{{ form.primer_apellido or '' }}" />
+      </div>
+      <div class="field-group">
+        <label for="segundo_apellido">Segundo apellido <span class="label-opcional">(opcional)</span></label>
+        <input type="text" id="segundo_apellido" name="segundo_apellido" maxlength="40"
+               value="{{ form.segundo_apellido or '' }}" />
+      </div>
+    </div>
+
+    <span class="field-ayuda">
+      Escríbelos tal como aparecen en tu diploma o acta de grado. Con el primer nombre y el primer
+      apellido basta; agrega los segundos solo si hace falta para distinguirte de un homónimo.
+    </span>
 
     <div class="campo-fila">
       <div class="field-group">

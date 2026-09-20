@@ -2,6 +2,7 @@ import hashlib
 import logging
 import os
 import re
+import unicodedata
 import base64
 import secrets
 from concurrent.futures import ThreadPoolExecutor
@@ -206,6 +207,17 @@ def normalizar_cedula(valor):
     if not valor:
         return ""
     return re.sub(r"[^\d]", "", str(valor))
+
+
+def normalizar_nombre_tokens(texto):
+    """Devuelve el conjunto de palabras de un nombre, sin acentos ni mayusculas.
+    Sirve para comparar nombres sin importar el orden ni la puntuacion: el archivo
+    de graduados a veces guarda los apellidos y nombres en columnas cambiadas."""
+    if not texto:
+        return set()
+    base = unicodedata.normalize("NFKD", str(texto))
+    base = "".join(c for c in base if not unicodedata.combining(c)).lower()
+    return {palabra for palabra in re.findall(r"[a-z0-9]+", base) if len(palabra) >= 2}
 
 
 def validar_cedula(valor):

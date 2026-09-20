@@ -224,6 +224,10 @@ CREATE TABLE IF NOT EXISTS solicitudes_cuenta (
   id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   cedula         VARCHAR(120)      NULL, /* cifrada (AES-SIV) */
   nombre         VARCHAR(150)      NOT NULL,
+  primer_nombre    VARCHAR(60)     NULL,
+  segundo_nombre   VARCHAR(60)     NULL,
+  primer_apellido  VARCHAR(60)     NULL,
+  segundo_apellido VARCHAR(60)     NULL,
   correo         VARCHAR(190)      NOT NULL,
   telefono       VARCHAR(40)       NULL,
   anio_promocion SMALLINT UNSIGNED NOT NULL,

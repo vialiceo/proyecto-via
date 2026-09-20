@@ -747,18 +747,73 @@ def buscar_graduados(busqueda=None, anio_promocion=None, tecnico_id=None, con_cu
     return items, total
 
 
-def buscar_graduado_coincidente(cedula=None, nombre=None, anio_promocion=None):
-    fila = None
+def _graduados_de_anio(anio_promocion):
+    return db.fetch_all(
+        """SELECT g.id, g.nombre, g.anio_promocion, g.tecnico_id, g.libro_acta,
+                  u.id AS usuario_id
+           FROM graduados g
+           LEFT JOIN usuarios u ON u.graduado_id = g.id
+           WHERE g.anio_promocion = %s
+           ORDER BY g.nombre""",
+        (anio_promocion,),
+    )
+
+
+def buscar_graduados_candidatos(cedula=None, nombre=None, anio_promocion=None,
+                                obligatorios=None, incluir_reclamados=False):
+    """Lista los graduados del archivo que podrian ser esta persona.
+
+    Prioridad: si hay cedula y coincide, devuelve ese unico graduado. Si no, empareja
+    por las PALABRAS del nombre dentro del mismo anio, sin importar el orden (el Excel
+    a veces guarda un apellido en la columna de nombres). `obligatorios` son las palabras
+    que deben estar si o si (primer nombre + primer apellido); el resto del nombre solo
+    afina cuando con ellas quedan varios. Excluye a quien ya tiene cuenta."""
     if cedula:
         fila = db.fetch_one("SELECT * FROM graduados WHERE cedula = %s", (utils.cifrar_cedula(cedula),))
-    if not fila and nombre and anio_promocion:
-        fila = db.fetch_one(
-            "SELECT * FROM graduados WHERE nombre = %s AND anio_promocion = %s",
-            (nombre, anio_promocion),
-        )
-    if fila and fila.get("cedula"):
-        fila["cedula"] = utils.descifrar_cedula(fila["cedula"])
-    return fila
+        if fila:
+            if fila.get("cedula"):
+                fila["cedula"] = utils.descifrar_cedula(fila["cedula"])
+            return [fila]
+
+    if not anio_promocion:
+        return []
+
+    tokens_todos = utils.normalizar_nombre_tokens(nombre)
+    if not tokens_todos:
+        return []
+
+    if obligatorios:
+        oblig = set()
+        for parte in obligatorios:
+            oblig |= utils.normalizar_nombre_tokens(parte)
+    else:
+        oblig = set(tokens_todos)
+    if not oblig:
+        return []
+    opcionales = tokens_todos - oblig
+
+    candidatos = []
+    for g in _graduados_de_anio(anio_promocion):
+        if g.get("usuario_id") and not incluir_reclamados:
+            continue
+        if oblig <= utils.normalizar_nombre_tokens(g["nombre"]):
+            candidatos.append(g)
+
+    if opcionales:
+        afinados = [g for g in candidatos
+                    if opcionales <= utils.normalizar_nombre_tokens(g["nombre"])]
+        if afinados:
+            candidatos = afinados
+    return candidatos
+
+
+def buscar_graduado_coincidente(cedula=None, nombre=None, anio_promocion=None):
+    """Compatibilidad: devuelve un unico graduado solo cuando la coincidencia es
+    inequivoca (uno solo). Si hay varios o ninguno, devuelve None."""
+    candidatos = buscar_graduados_candidatos(
+        cedula=cedula, nombre=nombre, anio_promocion=anio_promocion
+    )
+    return candidatos[0] if len(candidatos) == 1 else None
 
 
 def crear_graduado(cedula, nombre, anio_promocion, tecnico_id=None, libro_acta=None, observaciones=None):
@@ -814,12 +869,15 @@ def listar_promociones_graduados():
 def crear_solicitud_cuenta(
     cedula, nombre, correo, anio_promocion, telefono=None, tecnico_id=None,
     mensaje=None, graduado_id=None, origen="formulario", ip_origen=None,
+    primer_nombre=None, segundo_nombre=None, primer_apellido=None, segundo_apellido=None,
 ):
     lastrowid, _ = db.execute(
         """INSERT INTO solicitudes_cuenta
-             (cedula, nombre, correo, telefono, anio_promocion, tecnico_id, mensaje, graduado_id, origen, ip_origen)
-           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-        (utils.cifrar_cedula(cedula), nombre, correo, telefono, anio_promocion, tecnico_id, mensaje, graduado_id, origen, ip_origen),
+             (cedula, nombre, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+              correo, telefono, anio_promocion, tecnico_id, mensaje, graduado_id, origen, ip_origen)
+           VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+        (utils.cifrar_cedula(cedula), nombre, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+         correo, telefono, anio_promocion, tecnico_id, mensaje, graduado_id, origen, ip_origen),
     )
     return lastrowid
 

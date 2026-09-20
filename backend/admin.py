@@ -116,6 +116,18 @@ def solicitudes_cuenta():
         estado=estado, busqueda=busqueda, pagina=pagina, por_pagina=por_pagina
     )
 
+    # Para las pendientes sin coincidencia unica, buscamos los posibles graduados
+    # del archivo (mismo primer nombre + primer apellido + anio) para que el admin elija.
+    for s in solicitudes:
+        if s["estado"] == "pendiente" and not s.get("graduado_id"):
+            obligatorios = [p for p in (s.get("primer_nombre"), s.get("primer_apellido")) if p]
+            s["candidatos"] = models.buscar_graduados_candidatos(
+                nombre=s["nombre"], anio_promocion=s["anio_promocion"],
+                obligatorios=obligatorios or None,
+            )
+        else:
+            s["candidatos"] = []
+
     return render_template(
         "solicitudes_cuenta.html",
         solicitudes=solicitudes,

@@ -136,7 +136,18 @@ def reglamento_estudiantil():
 
 def validar_solicitud_cuenta(datos):
     cedula = utils.normalizar_cedula(datos.get("cedula"))
-    nombre = (datos.get("nombre") or "").strip()
+    primer_nombre = (datos.get("primer_nombre") or "").strip()
+    segundo_nombre = (datos.get("segundo_nombre") or "").strip()
+    primer_apellido = (datos.get("primer_apellido") or "").strip()
+    segundo_apellido = (datos.get("segundo_apellido") or "").strip()
+    # El formulario del portal manda el nombre en partes; la API externa manda
+    # "nombre" completo. Con las partes armamos el nombre; si no, usamos el directo.
+    nombre_directo = (datos.get("nombre") or "").strip()
+    if primer_nombre or primer_apellido:
+        nombre = " ".join(p for p in (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido) if p)
+    else:
+        nombre = nombre_directo
+
     correo = (datos.get("correo") or "").strip().lower()
     telefono = (datos.get("telefono") or "").strip() or None
     mensaje = (datos.get("mensaje") or "").strip() or None
@@ -153,6 +164,13 @@ def validar_solicitud_cuenta(datos):
     errores = []
     if not utils.validar_cedula(cedula):
         errores.append("La cédula debe tener entre 6 y 15 dígitos.")
+    # Del formulario (partes): primer nombre y primer apellido son obligatorios.
+    # La API con "nombre" completo se valida solo por longitud.
+    if not nombre_directo or primer_nombre or primer_apellido:
+        if not utils.texto_no_vacio(primer_nombre, 2, 40):
+            errores.append("Escribe tu primer nombre.")
+        if not utils.texto_no_vacio(primer_apellido, 2, 40):
+            errores.append("Escribe tu primer apellido.")
     if not utils.texto_no_vacio(nombre, 5, 150):
         errores.append("Escribe tu nombre completo tal como aparece en el acta de grado.")
     if not utils.validar_correo(correo):
@@ -178,6 +196,10 @@ def validar_solicitud_cuenta(datos):
     return {
         "cedula": cedula,
         "nombre": nombre,
+        "primer_nombre": primer_nombre or None,
+        "segundo_nombre": segundo_nombre or None,
+        "primer_apellido": primer_apellido or None,
+        "segundo_apellido": segundo_apellido or None,
         "correo": correo,
         "telefono": telefono,
         "anio_promocion": anio_promocion,
@@ -187,11 +209,15 @@ def validar_solicitud_cuenta(datos):
 
 
 def registrar_solicitud_cuenta(limpios, origen="formulario", ip_origen=None):
-    graduado = models.buscar_graduado_coincidente(
+    obligatorios = [p for p in (limpios.get("primer_nombre"), limpios.get("primer_apellido")) if p]
+    candidatos = models.buscar_graduados_candidatos(
         cedula=limpios["cedula"],
         nombre=limpios["nombre"],
         anio_promocion=limpios["anio_promocion"],
+        obligatorios=obligatorios or None,
     )
+    # Solo se enlaza automaticamente si la coincidencia es inequivoca (una sola).
+    graduado = candidatos[0] if len(candidatos) == 1 else None
     solicitud_id = models.crear_solicitud_cuenta(
         cedula=limpios["cedula"],
         nombre=limpios["nombre"],
@@ -203,6 +229,10 @@ def registrar_solicitud_cuenta(limpios, origen="formulario", ip_origen=None):
         graduado_id=graduado["id"] if graduado else None,
         origen=origen,
         ip_origen=ip_origen,
+        primer_nombre=limpios.get("primer_nombre"),
+        segundo_nombre=limpios.get("segundo_nombre"),
+        primer_apellido=limpios.get("primer_apellido"),
+        segundo_apellido=limpios.get("segundo_apellido"),
     )
     utils.enviar_correo_async(
         limpios["correo"],
