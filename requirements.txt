@@ -1,12 +1,10 @@
-'''V.I.A — dependencias del backend Flask
+#V.I.A — dependencias del backend Flask
+#pip install -r requirements.txt
+#Las versiones van fijadas con == a propósito: son exactamente las que se
+#probaron en este proyecto. Con >= una instalación futura podría traer una
+#versión distinta y romperse el día de la sustentación. Para actualizar a
+#conciencia: pip install -U <paquete> y volver a correr la app.
 
-pip install -r requirements.txt
-
-Las versiones van fijadas con == a propósito: son exactamente las que se
-probaron en este proyecto. Con >= una instalación futura podría traer una
-versión distinta y romperse el día de la sustentación. Para actualizar a
-conciencia: pip install -U <paquete> y volver a correr la app.
-'''
 
 Flask==3.1.3
 Werkzeug==3.1.8              # hashing de contraseñas (scrypt) y utilidades WSGI
