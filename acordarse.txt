@@ -22,23 +22,33 @@ para enviar un focking git se usa git commit -m "mensaje" y luego git push
         python ''' o # 
         javascript y sql /* y */
 
-cursos: 
+cursos y documentacion : 
         git:
             https://www.youtube.com/watch?v=VdGzPZ31ts8&list=WL&index=10&pp=iAQBsAgC
             https://www.youtube.com/watch?v=2mxh3tgx71c&list=WL&index=12&pp=iAQBsAgC
+            https://www.w3schools.com/git/default.asp
         python y flask: 
             https://www.youtube.com/watch?v=FX0lMm_Qj10&list=WL&index=3&t=525s&pp=iAQB0gcJCSQMAYcqIYzvsAgC
             https://www.youtube.com/watch?v=-1DmVCPB6H8
             https://www.youtube.com/watch?v=nKPbfIU442g
             https://www.youtube.com/watch?v=n2YrGsXJC6Y&pp=0gcJCSQMAYcqIYzv
+            https://www.w3schools.com/python/python_ref_keywords.asp
+            https://flask-es.readthedocs.io/tutorial/database/
+            https://flask-es.readthedocs.io/tutorial/views/
+            https://flask-es.readthedocs.io
         sql :
             https://www.youtube.com/watch?v=OuJerKzV5T0&t=4063s
+            https://www.w3schools.com/sql/sql_primarykey.asp
+            https://www.w3schools.com/mysql/default.asp
         javascript:
             https://www.youtube.com/watch?v=6cnFl9aHD5Y
             https://www.youtube.com/watch?v=bmGPv687toc&list=WL&index=11&pp=iAQBsAgC
             https://www.youtube.com/watch?v=m2o-eeqwgkQ
+            https://www.w3schools.com/js/js_objects.aspS
+            https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Classes/constructor
         ciberseguridad:
             https://www.youtube.com/watch?v=gzES0MuWqHE&t=306s&pp=ygUSY2liZXJzZWd1cmlkYWQgd2Vi
             https://www.youtube.com/watch?v=jVLcvLB4IJs
-
+            https://www.w3schools.com/xml/default.asp
+            https://www.w3schools.com/cybersecurity/index.php
 
