@@ -36,7 +36,10 @@ html, body {
 .panel-left {
   position: relative;
   flex: 0 0 46%;
-  background: linear-gradient(155deg, #091a10 0%, var(--verde-base) 45%, #1e4a30 100%);
+  background-color: var(--verde-base); 
+  background-image: url('/static/img/portada/login.jpg');
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -511,7 +514,7 @@ html, body {
 
 .btn-ver.mostrando .icon-eye     { display: block; }
 .btn-ver.mostrando .icon-eye-off { display: none; }
-/* Enlace para volver al inicio (portada) desde el login. */
+
 .link-volver {
   display: inline-flex;
   align-items: center;
@@ -527,6 +530,6 @@ html, body {
 }
 .link-volver:hover { color: var(--oro, #c9a227); }
 
-/* El enlace de volver va sobre el panel verde: debe ser claro, no verde. */
+
 .link-volver { color: rgba(255,255,255,0.92); }
 .link-volver:hover { color: var(--oro-claro, #f0c84a); }

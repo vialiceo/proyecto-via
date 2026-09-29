@@ -712,5 +712,5 @@ así que funciona en una copia recién clonada aunque git no guarde carpetas vac
 
 ## Créditos
 
-Desarrollado por el equipo de trabajo del proyecto — **Sovietech**, para la Institución
+Desarrollado por el equipo de trabajo del proyecto — **sovietic_tech**, para la Institución
 Educativa Liceo Tame (60 años, 1967–2027).
