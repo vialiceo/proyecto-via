@@ -36,10 +36,11 @@ html, body {
 .panel-left {
   position: relative;
   flex: 0 0 46%;
-  background-color: var(--verde-base); 
+  background-color: #1a3d2b; /* relleno de las bandas */
   background-image: url('/static/img/portada/login.jpg');
-  background-size: cover;
+  background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -533,3 +534,6 @@ html, body {
 
 .link-volver { color: rgba(255,255,255,0.92); }
 .link-volver:hover { color: var(--oro-claro, #f0c84a); }
+
+/* El afiche (login.jpg) ya trae escudo, 60 años y eslogan: se oculta el texto CSS para que no se duplique. */
+.panel-left .left-content { display: none; }
