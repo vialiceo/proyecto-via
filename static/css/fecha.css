@@ -1,0 +1,39 @@
+/*
+ * Estilo del selector de fecha (flatpickr) con la identidad del Liceo:
+ * cabecera y dia seleccionado en verde institucional, "hoy" en dorado.
+ */
+.flatpickr-months,
+.flatpickr-weekdays,
+span.flatpickr-weekday {
+  background: #1a3d2b;
+  color: #ffffff;
+}
+
+.flatpickr-months .flatpickr-month,
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year {
+  color: #ffffff;
+}
+
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg {
+  fill: #ffffff;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: #1a3d2b;
+  border-color: #1a3d2b;
+}
+
+.flatpickr-day.today {
+  border-color: #c9a227;
+}
+
+.flatpickr-day.today:hover {
+  background: #c9a227;
+  border-color: #c9a227;
+  color: #1a1a1a;
+}

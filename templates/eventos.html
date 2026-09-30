@@ -4,6 +4,8 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="/static/css/eventos.css" />
+  <link rel="stylesheet" href="/static/css/flatpickr.min.css" />
+  <link rel="stylesheet" href="/static/css/fecha.css" />
 {% endblock %}
 
 {% block content %}
@@ -36,8 +38,8 @@
         <h2 class="evento-titulo">{{ e.titulo }}</h2>
         {% if e.descripcion %}<p class="evento-desc">{{ e.descripcion }}</p>{% endif %}
         <div class="evento-meta">
-          <span>🕒 {{ e.fecha_inicio.strftime('%d/%m/%Y %H:%M') }}</span>
-          {% if e.lugar %}<span>📍 {{ e.lugar }}</span>{% endif %}
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 2"/></svg> {{ e.fecha_inicio.strftime('%d/%m/%Y %H:%M') }}</span>
+          {% if e.lugar %}<span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> {{ e.lugar }}</span>{% endif %}
         </div>
         <div class="evento-botones">
           <a href="{{ url_for('usuarios.evento_detalle', evento_id=e.id) }}" class="btn-detalle-evento">Ver detalle</a>
@@ -60,7 +62,7 @@
           data-fecha="{{ e.fecha_inicio.strftime('%Y-%m-%dT%H:%M') }}" aria-label="Editar">✎</button>
         <form action="{{ url_for('usuarios.eventos_eliminar', evento_id=e.id) }}" method="POST" onsubmit="return confirm('¿Eliminar este evento?');">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <button type="submit" class="btn-icono btn-icono--danger" aria-label="Eliminar">🗑</button>
+          <button type="submit" class="btn-icono btn-icono--danger" aria-label="Eliminar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg></button>
         </form>
       </div>
       {% endif %}
@@ -96,7 +98,7 @@
           </div>
           <div class="campo">
             <label>Fecha y hora</label>
-            <input type="datetime-local" name="fecha_inicio" required />
+            <input type="text" name="fecha_inicio" required autocomplete="off" placeholder="dd/mm/aaaa hh:mm" />
           </div>
         </div>
         <div class="campo">
@@ -112,8 +114,16 @@
 {% endblock %}
 
 {% block extra_js %}
+  <script src="/static/js/flatpickr.min.js"></script>
+  <script src="/static/js/flatpickr.es.min.js"></script>
   <script src="/static/js/modal.js"></script>
   {% if current_user.rol == 'administrador' %}
+  <script>
+    if (window.flatpickr) window.fpEvento = flatpickr('[name="fecha_inicio"]', {
+      locale: "es", enableTime: true, time_24hr: true,
+      altInput: true, altFormat: "d/m/Y H:i", dateFormat: "Y-m-d\\TH:i"
+    });
+  </script>
   <script src="/static/js/eventos.js"></script>
   {% endif %}
 {% endblock %}

@@ -174,6 +174,10 @@
   border-radius: 20px;
 }
 
+/* Respeta el atributo hidden: sin esto la insignia se mostraba en TODOS los
+   egresados (el display de arriba tapaba el hidden). */
+.modal-eg-insignia[hidden] { display: none; }
+
 .modal-eg-detalle {
   padding: 2rem 1.75rem 1.75rem;
   text-align: left;

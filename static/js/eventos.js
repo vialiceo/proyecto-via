@@ -18,6 +18,7 @@ if (btnNuevoEvento) {
   btnNuevoEvento.addEventListener('click', () => {
     formEvento.action = URL_NUEVO;
     formEvento.reset();
+    if (window.fpEvento) window.fpEvento.clear();
     modalEventoTitulo.textContent = 'Crear evento';
     abrirModalEvento();
   });
@@ -31,7 +32,8 @@ document.querySelectorAll('.btn-editar-evento').forEach((boton) => {
     formEvento.descripcion.value = descripcion;
     formEvento.categoria.value = categoria;
     formEvento.lugar.value = lugar;
-    formEvento.fecha_inicio.value = fecha;
+    if (window.fpEvento) window.fpEvento.setDate(fecha, true);
+    else formEvento.fecha_inicio.value = fecha;
     modalEventoTitulo.textContent = 'Editar evento';
     abrirModalEvento();
   });

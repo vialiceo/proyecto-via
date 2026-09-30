@@ -4,6 +4,8 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="/static/css/perfil.css" />
+  <link rel="stylesheet" href="/static/css/flatpickr.min.css" />
+  <link rel="stylesheet" href="/static/css/fecha.css" />
 {% endblock %}
 
 {% block content %}
@@ -60,19 +62,19 @@
         <h2 class="card-titulo">Información adicional</h2>
         <ul class="info-adicional-lista">
           <li>
-            <span class="info-ad-icono">🎓</span>
+            <span class="info-ad-icono"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></span>
             <span class="info-ad-texto"><span class="info-ad-label">Dónde estudió</span><span class="info-ad-valor">{{ perfil.lugar_estudio or '—' }}</span></span>
           </li>
           <li>
-            <span class="info-ad-icono">💼</span>
+            <span class="info-ad-icono"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
             <span class="info-ad-texto"><span class="info-ad-label">Profesión</span><span class="info-ad-valor">{{ perfil.profesion or '—' }}</span></span>
           </li>
           <li>
-            <span class="info-ad-icono">📍</span>
+            <span class="info-ad-icono"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
             <span class="info-ad-texto"><span class="info-ad-label">Ciudad de residencia</span><span class="info-ad-valor">{{ perfil.lugar_residencia or '—' }}</span></span>
           </li>
           <li>
-            <span class="info-ad-icono">📅</span>
+            <span class="info-ad-icono"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
             <span class="info-ad-texto"><span class="info-ad-label">{{ 'Edad' if perfil.edad else 'Año de promoción' }}</span><span class="info-ad-valor">{{ (perfil.edad ~ ' años') if perfil.edad else (perfil.anio_promocion or '—') }}</span></span>
           </li>
         </ul>
@@ -84,7 +86,16 @@
         <ul class="redes-lista">
           {% for c in perfil.contactos %}
           <li class="red-item red-item--{{ c.tipo }}">
-            <span class="red-icono">{{ {'instagram':'📷','facebook':'📘','linkedin':'in','whatsapp':'🟢','telefono':'📞','correo_alterno':'✉','otro':'🔗'}.get(c.tipo, '🔗') }}</span>
+            <span class="red-icono">
+              {%- if c.tipo == 'instagram' -%}<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85C2.38 3.92 3.9 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zm0 3.68A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zm0 10.16A4 4 0 1 1 16 12a4 4 0 0 1-4 4zm6.41-10.4a1.44 1.44 0 1 0 1.44 1.44 1.44 1.44 0 0 0-1.44-1.44z"/></svg>
+              {%- elif c.tipo == 'facebook' -%}<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.44 18.63.07 12 .07S0 5.44 0 12.07c0 5.99 4.39 10.95 10.13 11.85v-8.38H7.08v-3.47h3.05V9.43c0-3.01 1.79-4.67 4.53-4.67 1.31 0 2.69.24 2.69.24v2.95h-1.51c-1.49 0-1.96.93-1.96 1.87v2.25h3.33l-.53 3.47h-2.8v8.38C19.61 23.02 24 18.06 24 12.07z"/></svg>
+              {%- elif c.tipo == 'whatsapp' -%}<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.21 3.07.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.05 21.8a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88z"/></svg>
+              {%- elif c.tipo == 'linkedin' -%}<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.2 8h4.6v16H.2V8zm7.2 0h4.4v2.2h.06c.61-1.16 2.11-2.38 4.34-2.38 4.64 0 5.5 3.05 5.5 7.02V24h-4.6v-6.2c0-1.48-.03-3.38-2.06-3.38-2.06 0-2.38 1.61-2.38 3.27V24H7.4V8z"/></svg>
+              {%- elif c.tipo == 'telefono' -%}<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 3.07 9.81 19.79 19.79 0 0 1 .22 1.18 2 2 0 0 1 2.18 0h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L6.91 7.91a16 16 0 0 0 6.72 6.72l1.06-1.52a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              {%- elif c.tipo == 'correo_alterno' -%}<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+              {%- else -%}<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              {%- endif -%}
+            </span>
             <span class="red-texto"><span class="red-tipo">{{ c.tipo.replace('_',' ')|capitalize }}</span><span class="red-valor">{{ c.valor }}</span></span>
           </li>
           {% endfor %}
@@ -138,7 +149,7 @@
         <div class="campo-fila">
           <div class="campo">
             <label for="fecha_nacimiento">Fecha de nacimiento</label>
-            <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ perfil.fecha_nacimiento or '' }}" />
+            <input type="text" id="fecha_nacimiento" name="fecha_nacimiento" value="{{ perfil.fecha_nacimiento or '' }}" autocomplete="off" placeholder="dd/mm/aaaa" />
           </div>
           <div class="campo">
             <label for="lugar_residencia">Dónde vives</label>
@@ -204,5 +215,12 @@
 {% endblock %}
 
 {% block extra_js %}
+  <script src="/static/js/flatpickr.min.js"></script>
+  <script src="/static/js/flatpickr.es.min.js"></script>
   <script src="/static/js/perfil-form.js"></script>
+  <script>
+    if (window.flatpickr) flatpickr("#fecha_nacimiento", {
+      locale: "es", altInput: true, altFormat: "d/m/Y", dateFormat: "Y-m-d", maxDate: "today"
+    });
+  </script>
 {% endblock %}
