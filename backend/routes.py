@@ -116,7 +116,9 @@ _DOCS_INSTITUCIONALES = {
 
 def _render_doc(slug):
     titulo, intro = _DOCS_INSTITUCIONALES[slug]
-    return render_template("documento_institucional.html", titulo=titulo, intro=intro)
+    return render_template(
+        "documento_institucional.html", titulo=titulo, intro=intro, slug=slug
+    )
 
 
 @public_bp.route("/estatuto-general")
